@@ -1,4 +1,4 @@
-\chapter{Resposta a colisão}
+\chapter{Resposta a colisões}
 
 A resposta a colisões é uma etapa fundamental em qualquer sistema de simulação física interativa. Após detectar que dois corpos estão em interpenetração, torna-se necessário aplicar um conjunto de correções que restaurem a plausibilidade física do movimento, evitando instabilidades numéricas. 
 
@@ -15,19 +15,19 @@ A literatura apresenta diversas abordagens para modelar o movimento de corpos r�
 
 \subsection*{Método do Impulso}
 
-O Método do Impulso tratam colisões aplicando impulsos instantâneos que alteram diretamente as velocidades dos corpos para preservar o momento linear e angular. Essa abordagem é utilizada em motores como Havok~\cite{havok} e Bullet~\cite{bullet}. O impulso é calculado em função da velocidade relativa no ponto de contato, resultando em um método eficiente para simulações em tempo real.
+O Método do Impulso trata colisões aplicando impulsos instantâneos que alteram diretamente as velocidades dos corpos para preservar o momento linear e angular. Essa abordagem é utilizada em motores como Havok~\cite{havok} e Bullet~\cite{bullet}. O impulso é calculado em função da velocidade relativa no ponto de contato, resultando em um método eficiente para simulações em tempo real.
 
 \subsection*{Método de Penalidades}
 
-Nos Métodos de Penalidades, colisões são tratadas como interpenetrações que geram forças de repulsão proporcionais à profundidade de penetração alterando diretamente a aceleração. Essas forças geralmente seguem modelos de mola e amortecimento, trata-se de um método simples, porém sensível à escolha dos parâmetros de rigidez, podendo causar instabilidade numérica.
+Nos Métodos de Penalidades, colisões são tratadas como interpenetrações que geram forças de repulsão proporcionais à profundidade de penetração alterando diretamente a aceleração. Essas forças geralmente seguem modelos de mola e amortecimento. Trata-se de um método simples, porém sensível à escolha dos parâmetros de rigidez, podendo causar instabilidade numérica.
 
-\subsection*{Método Constraint-Based com Multiplicadores de Lagrange}
+\subsection*{Método Baseado em Restrições com Multiplicadores de Lagrange}
 
 Os métodos baseados em restrições formulam os contatos como equações que devem ser satisfeitas exatamente. São resolvidos usando multiplicadores de Lagrange, essa abordagem é robusta e adequada para sistemas complexos, mas exige a solução de sistemas lineares, tornando sua aplicação onerosa em plataformas Web.
 
 \section{Processo de Separação}
 
-A metodologia de \citeonline{jakobsen2001advanced} pode ser compreendida como uma precursora da moderna \textit{Position Based Dynamics} (PBD)~\cite{muller2007position}. Diferentemente das abordagens que atuam sobre a velocidade ou aceleração, \citeonline{jakobsen2001advanced} trata colisões como restrições geométricas adicionais que devem ser satisfeitas durante o processo iterativo de relaxação da simulação. Assim, objetos penetrando um ao outro são corrigidos exclusivamente por modificações de posição, de forma estável e sem oscilações numéricas.
+A metodologia de \citeonline{jakobsen2001advanced} pode ser compreendida como uma precursora da moderna \textit{Position Based Dynamics} (PBD)~\cite{muller2007position}. Diferentemente das abordagens que atuam sobre a velocidade ou aceleração, \citeonline{jakobsen2001advanced} trata colisões como restrições geométricas adicionais que devem ser satisfeitas durante o processo iterativo de relaxamento da simulação. Assim, objetos penetrando um ao outro são corrigidos exclusivamente por modificações de posição, de forma estável e sem oscilações numéricas.
 
 A resposta à colisão envolve dois passos principais. O primeiro consiste em separar os elementos geométricos (vértices, arestas ou faces) que se encontram em interpenetração, o que caracteriza um processo estritamente geométrico. O segundo passo corresponde a um processo iterativo de relaxamento, no qual os elementos afetados ajustam suas posições de acordo com as restrições impostas pelo sistema físico.
 
@@ -46,7 +46,7 @@ Se o contato ocorre pontualmente entre duas partículas $p$ e $q$, a correção 
 \begin{figure}[htb]
 	\centering
 	\includesvg[width=0.6\linewidth]{processo-separacao}
-	\caption{Processo de separação caso colisão vértice-vértice. Correção das posição para configuração válida. Perceba que como $p$ está mais próximo de $x_1$, esse vértice é movido mais}
+	\caption{Processo de separação caso colisão vértice-aresta. Correção das posição para configuração válida. Perceba que como $p$ está mais próximo de $x_1$, esse vértice é movido mais}
 	\label{fig:processo-separacao}
 \end{figure}
 
@@ -57,7 +57,7 @@ Esta é a configuração mais comum. Um vértice $p$ de um corpo colide contra u
 \end{equation}
 ou seja, quando $\alpha=0, p=x_2$, quando $\alpha=1, p=x_1$.
 
-Durante a separação, a correção $\Delta \vec{p}$ deve alterar indiretamente $\vec{x}_1$ e $\vec{x}_2$ de forma proporcional a essa parametrização. A partir da Eq.~\ref{eq:parametric_edge}, derivamos o valor de $\alpha$ calculando quanto o ponto de contato $p$ está "ao longo" da aresta que vai do ponto $\vec{x}_2 \rightarrow \vec{x}_1$. Dessa forma, \citeonline{jakobsen2001advanced} computa as novas posições movendo as partículas proporcionalmente a $\alpha$:
+Durante a separação, a correção $\Delta \vec{p}$ deve alterar indiretamente $\vec{x}_1$ e $\vec{x}_2$ de forma proporcional a essa parametrização. A partir da Eq.~\ref{eq:parametric_edge}, derivamos o valor de $\alpha$ calculando quanto o ponto de contato $p$ está ao ``longo'' da aresta que vai do ponto $\vec{x}_2 \rightarrow \vec{x}_1$. Dessa forma, \citeonline{jakobsen2001advanced} computa as novas posições movendo as partículas proporcionalmente a $\alpha$:
 \begin{align*}
 	\vec{x}_1 +&= \alpha \Delta_p \\
 	\vec{x}_2 +&= (1-\alpha) \Delta_p \\
@@ -76,7 +76,7 @@ Isso garante que a geometria original é preservada e que o ponto $\vec{p}$, def
 
 Enquanto o SAT fornece naturalmente o MTV, o algoritmo GJK apenas informa se há interseção (retornando um \textit{simplex} interno à diferença de Minkowski). Para obter a profundidade e a normal da colisão necessárias para a resposta física, utiliza-se o Algoritmo de Expansão de Politopos (EPA).
 
-O algoritmo~\ref{alg:epa} expande o \textit{simplex} final do GJK iterativamente até encontrar a fronteira da diferença de Minkowski mais próxima da origem. A distância entre o ponto mais próximo com a origem é a profundidade de penetração. Além disso, o vetor normal para o ponto mais próximo é a direção de separação (ponto de contato). A solução ingênua é usar a normal da face mais próxima da origem, porém um \textit{simplex} não precisa conter nenhuma das faces do polígono original, o quê pode acabar com uma normal incorreta.
+O Algoritmo~\ref{alg:epa} expande o \textit{simplex} final do GJK iterativamente até encontrar a fronteira da diferença de Minkowski mais próxima da origem. A distância entre o ponto mais próximo com a origem é a profundidade de penetração. Além disso, o vetor normal para o ponto mais próximo é a direção de separação (ponto de contato). A solução ingênua é usar a normal da face mais próxima da origem, porém um \textit{simplex} não precisa conter nenhuma das faces do polígono original, o que pode levar ao cálculo de uma normal incorreta.
 \begin{algorithm}[htb]
 	\caption{EPA}
 	\KwIn{Simplex}
@@ -114,7 +114,8 @@ Em sistemas baseados em posições a estabilidade depende fortemente do processo
 
 \subsection*{Empilhamento}
 
-Métodos simplificados têm dificuldade em manter pilhas estáveis de objetos, principalmente quando as correções não são distribuídas de forma global e consistente. O empilhamento tende a "escorregar" ou colapsar devido à falta de precisão numérica adequado.
+Métodos simplificados têm dificuldade em manter pilhas estáveis de objetos, principalmente quando as correções não são distribuídas de forma global e consistente. O empilhamento tende a %"escorregar" 
+``escorregar'' ou colapsar devido à falta de precisão numérica adequado.
 
 \subsection*{Tunneling}
 

@@ -31,14 +31,22 @@ Segundo \citeonline{moller2018}, nem todos os objetos geométricos servem como v
 	\item Fácil de girar e transformar
 	\item Consome pouca memória
 \end{itemize}
-como ilustrado na figura~\ref{fig:formas-fecho-convexo}.
+como ilustrado na Figura~\ref{fig:formas-fecho-convexo}.
 
 \begin{figure}[htb]
 	\caption{Comparação entre formas de fecho convexo}
 	\centering
-	\includegraphics[width=\textwidth]{bounding-volumes.png}
+	\includegraphics[width=\textwidth]{bounding-volumes.jpg}
 	\label{fig:formas-fecho-convexo}
 \end{figure}
+
+\subsection*{Esfera Delimitadora}
+
+As esferas constituem o volume delimitador mais simples, definidas apenas por um centro $c$ e um raio $r$:
+$$
+\text{Sphere} = \{ x \in \mathbb{R}^3 \; | \; \|x - c\| \le r \}.
+$$
+Testes de colisão entre esferas são extremamente rápidos, porém inadequados para objetos de proporções irregulares. Elipsoides oferecem melhor ajuste, mas aumentam o custo de teste. Por isso, essas formas são frequentemente utilizadas em fases preliminares da detecção, ou como nós intermediários em hierarquias de volumes delimitadores (BVH).
 
 \subsection*{Caixa Delimitadora Alinhada ao Eixo Coordenado (AABB)}
 
@@ -62,7 +70,7 @@ A caixa delimitadora alinhada aos eixos (AABB) é um dos volumes delimitadores m
 \end{algorithm}
 AABBs são eficientes, porém perdem precisão quando o objeto sofre rotações, pois a caixa permanece alinhada aos eixos globais.
 
-\subsection*{Caixa Orientada (OBB)}
+\subsection*{Caixa Delimitadora Orientada (OBB)}
 
 Uma Caixa Orientada (OBB) é uma caixa retangular que pode estar arbitrariamente rotacionada em relação aos eixos do sistema de coordenadas. É definida por um ponto central $c$, por três vetores ortogonais $\hat{u}_i$ que compõem sua orientação e por semi-extensões $e_i$:
 
@@ -71,14 +79,6 @@ $$
 $$
 
 OBBs geralmente oferecem melhor ajuste, especialmente para objetos alongados ou rotacionados, reduzindo falsos positivos. Porém, o teste de interseção é mais caro que o das AABBs, o que torna seu uso preferível em cenas com número reduzido de objetos ou em simulações nas quais a precisão de ajuste é particularmente importante.
-
-\subsection*{Esferas e Elipsoides}
-
-As esferas constituem o volume delimitador mais simples, definidas apenas por um centro $c$ e um raio $r$:
-$$
-	\text{Sphere} = \{ x \in \mathbb{R}^3 \; | \; \|x - c\| \le r \}.
-$$
-Testes de colisão entre esferas são extremamente rápidos, porém inadequados para objetos de proporções irregulares. Elipsoides oferecem melhor ajuste, mas aumentam o custo de teste. Por isso, essas formas são frequentemente utilizadas em fases preliminares da detecção, ou como nós intermediários em hierarquias de volumes delimitadores (BVH).
 
 \subsection*{Quickhull}
 
@@ -103,7 +103,7 @@ Apresenta complexidade média $O(n \log n)$ em 2D, podendo chegar a $O(n^2)$ em 
 
 \section{Broad Phase}
 
-A fase de \textit{Broad Phase} tem como objetivo descartar rapidamente pares de objetos que seguramente não estão colidindo. Segundo \citeonline{ericson2004real}, "nada é mais rápido do que não ter que realizar uma tarefa". Portanto, a melhor otimização é reduzir a quantidade de trabalho o mais cedo possível.
+A fase de \textit{Broad Phase} tem como objetivo descartar rapidamente pares de objetos que seguramente não estão colidindo. Segundo \citeonline{ericson2004real}, ``nada é mais rápido do que não ter que realizar uma tarefa''. Portanto, a melhor otimização é reduzir a quantidade de trabalho o mais cedo possível.
 
 Como objetos só podem colidir com outros que estejam fisicamente próximos, a \textit{Broad Phase} utiliza consultas espaciais para identificar apenas aqueles que compartilham regiões semelhantes do espaço. O teste mais simples usado nesta etapa é o teste de interseção booleana entre volumes delimitadores primitivos como no algoritmo~\ref{alg:broad-phase}, devido ao seu baixo custo computacional.
 

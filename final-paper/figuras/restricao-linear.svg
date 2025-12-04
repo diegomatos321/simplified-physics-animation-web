@@ -1,229 +1,284 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
-   width="124.87828mm"
-   height="46.235558mm"
-   viewBox="0 0 124.87828 46.235558"
+   width="700"
+   height="229.00977"
+   viewBox="0 0 700 229.00977"
    version="1.1"
-   id="svg1"
+   id="svg20"
+   sodipodi:docname="gemini-restricao-linear.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <sodipodi:namedview
-     id="namedview1"
+     id="namedview20"
      pagecolor="#ffffff"
      bordercolor="#000000"
      borderopacity="0.25"
      inkscape:showpageshadow="2"
      inkscape:pageopacity="0.0"
      inkscape:pagecheckerboard="0"
-     inkscape:deskcolor="#d1d1d1"
-     inkscape:document-units="mm">
+     inkscape:deskcolor="#d1d1d1">
     <inkscape:page
        x="0"
        y="0"
-       width="124.87828"
-       height="46.235558"
+       width="700"
+       height="229.00977"
        id="page2"
        margin="0"
        bleed="0" />
   </sodipodi:namedview>
   <defs
-     id="defs1">
+     id="defs4">
     <marker
-       style="overflow:visible"
-       id="Triangle"
-       refX="0"
-       refY="0"
-       orient="auto-start-reverse"
-       inkscape:stockid="Triangle arrow"
-       markerWidth="1"
-       markerHeight="1"
-       viewBox="0 0 1 1"
-       inkscape:isstock="true"
-       inkscape:collect="always"
-       preserveAspectRatio="xMidYMid">
-      <path
-         transform="scale(0.5)"
-         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
-         d="M 5.77,0 -2.88,5 V -5 Z"
-         id="path135" />
+       id="arrowhead-blue"
+       markerWidth="10"
+       markerHeight="7"
+       refX="9"
+       refY="3.5"
+       orient="auto">
+      <polygon
+         points="0,7 0,0 10,3.5 "
+         fill="#3498db"
+         id="polygon1" />
     </marker>
     <marker
-       style="overflow:visible"
-       id="marker5"
-       refX="0"
-       refY="0"
-       orient="auto"
-       inkscape:stockid="Stop"
-       markerWidth="1"
-       markerHeight="1"
-       viewBox="0 0 1 1"
-       inkscape:isstock="true"
-       inkscape:collect="always"
-       preserveAspectRatio="xMidYMid">
-      <path
-         style="fill:none;stroke:context-stroke;stroke-width:1"
-         d="M 0,4 V -4"
-         id="path5" />
+       id="arrowhead-red"
+       markerWidth="10"
+       markerHeight="7"
+       refX="9"
+       refY="3.5"
+       orient="auto">
+      <polygon
+         points="0,7 0,0 10,3.5 "
+         fill="#e74c3c"
+         id="polygon2" />
     </marker>
     <marker
-       style="overflow:visible"
-       id="Stop"
+       id="arrowhead-dim"
+       markerWidth="10"
+       markerHeight="7"
        refX="0"
-       refY="0"
-       orient="auto"
-       inkscape:stockid="Stop"
-       markerWidth="1"
-       markerHeight="1"
-       viewBox="0 0 1 1"
-       inkscape:isstock="true"
-       inkscape:collect="always"
-       preserveAspectRatio="xMidYMid">
-      <path
-         style="fill:none;stroke:context-stroke;stroke-width:1"
-         d="M 0,4 V -4"
-         id="path23" />
+       refY="3.5"
+       orient="auto">
+      <polygon
+         points="10,7 10,0 0,3.5 "
+         fill="#555555"
+         id="polygon3" />
     </marker>
     <marker
-       style="overflow:visible"
-       id="Triangle-8"
-       refX="0"
-       refY="0"
-       orient="auto-start-reverse"
-       inkscape:stockid="Triangle arrow"
-       markerWidth="1"
-       markerHeight="1"
-       viewBox="0 0 1 1"
-       inkscape:isstock="true"
-       inkscape:collect="always"
-       preserveAspectRatio="xMidYMid">
-      <path
-         transform="scale(0.5)"
-         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
-         d="M 5.77,0 -2.88,5 V -5 Z"
-         id="path135-7" />
-    </marker>
-    <marker
-       style="overflow:visible"
-       id="Triangle-7"
-       refX="0"
-       refY="0"
-       orient="auto-start-reverse"
-       inkscape:stockid="Triangle arrow"
-       markerWidth="1"
-       markerHeight="1"
-       viewBox="0 0 1 1"
-       inkscape:isstock="true"
-       inkscape:collect="always"
-       preserveAspectRatio="xMidYMid">
-      <path
-         transform="scale(0.5)"
-         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
-         d="M 5.77,0 -2.88,5 V -5 Z"
-         id="path135-3" />
-    </marker>
-    <marker
-       style="overflow:visible"
-       id="Triangle-7-1"
-       refX="0"
-       refY="0"
-       orient="auto-start-reverse"
-       inkscape:stockid="Triangle arrow"
-       markerWidth="1"
-       markerHeight="1"
-       viewBox="0 0 1 1"
-       inkscape:isstock="true"
-       inkscape:collect="always"
-       preserveAspectRatio="xMidYMid">
-      <path
-         transform="scale(0.5)"
-         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
-         d="M 5.77,0 -2.88,5 V -5 Z"
-         id="path135-3-9" />
+       id="arrowhead-dim-end"
+       markerWidth="10"
+       markerHeight="7"
+       refX="10"
+       refY="3.5"
+       orient="auto">
+      <polygon
+         points="0,7 0,0 10,3.5 "
+         fill="#555555"
+         id="polygon4" />
     </marker>
   </defs>
-  <g
-     inkscape:label="Camada 1"
-     inkscape:groupmode="layer"
-     id="layer1"
-     transform="translate(-37.541096,-62.851002)">
+  <pattern
+     id="grid"
+     width="50"
+     height="50"
+     patternUnits="userSpaceOnUse">
     <path
-       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.5;stroke-dasharray:2, 0.5;stroke-dashoffset:0;stroke-opacity:1"
-       d="M 41.979453,74.527396 60.842466,102.82192"
-       id="path2" />
-    <circle
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.499999"
-       id="path1"
-       r="3.5136986"
-       cy="73.602737"
-       cx="41.054794" />
-    <circle
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.499999"
-       id="path1-3"
-       cx="60.792549"
-       cy="102.88139"
-       r="3.5136986" />
-    <g
-       id="g6">
-      <path
-         style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.3;stroke-linecap:butt;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-start:url(#Stop);marker-end:url(#marker5)"
-         d="M 49.561643,68.97945 68.239724,97.273971"
-         id="path3"
-         sodipodi:nodetypes="cc" />
-      <text
-         xml:space="preserve"
-         style="font-size:4.23333px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.3;stroke-linecap:butt;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-         x="58.993149"
-         y="81.739723"
-         id="text5"><tspan
-           sodipodi:role="line"
-           id="tspan5"
-           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Italic';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.3"
-           x="58.993149"
-           y="81.739723">d</tspan></text>
-    </g>
-    <path
-       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#Triangle)"
-       d="m 88.582192,69.349315 5.917806,8.321918"
-       id="path6" />
-    <path
-       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#Triangle-8)"
-       d="m 114.84829,106.23726 -5.9178,-8.321925"
-       id="path6-0" />
-    <circle
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.499999"
-       id="path1-6"
-       r="3.5136986"
-       cy="69.415039"
-       cx="88.799538" />
-    <circle
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.499999"
-       id="path1-3-2"
-       cx="114.88729"
-       cy="105.57286"
-       r="3.5136986" />
-    <circle
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.499999"
-       id="path1-3-22"
-       cx="155.94347"
-       cy="97.054939"
-       r="3.5136986" />
-    <path
-       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#Triangle-7)"
-       d="m 140.89729,72.619902 -5.9178,-8.321918"
-       id="path6-2" />
-    <circle
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.499999"
-       id="path1-9"
-       r="3.5136986"
-       cy="72.538788"
-       cx="140.43898" />
-    <path
-       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#Triangle-7-1)"
-       d="m 155.47262,96.485805 5.9178,8.321935"
-       id="path6-2-8" />
-  </g>
+       d="M 50 0 L 0 0 0 50"
+       fill="none"
+       stroke="#f0f0f0"
+       stroke-width="1"
+       id="path4" />
+  </pattern>
+  <line
+     x1="0"
+     y1="111.04297"
+     x2="700"
+     y2="111.04297"
+     stroke="#dddddd"
+     stroke-width="2"
+     stroke-dasharray="5, 5"
+     id="line5"
+     inkscape:export-filename="../Repositorios/simplified-physics-simulation-web/final-paper/Repositorios/simplified-physics-simulation-web/final-paper/figuras/restricao-linear.svg"
+     inkscape:export-xdpi="96"
+     inkscape:export-ydpi="96" />
+  <line
+     x1="50"
+     y1="111.04297"
+     x2="650"
+     y2="111.04297"
+     stroke="#555555"
+     stroke-width="4"
+     opacity="0.3"
+     id="line6" />
+  <circle
+     cx="50"
+     cy="111.04297"
+     r="25"
+     fill="#3498db"
+     opacity="0.6"
+     stroke="#2980b9"
+     stroke-width="2"
+     id="circle6" />
+  <text
+     x="50"
+     y="116.04297"
+     text-anchor="middle"
+     alignment-baseline="middle"
+     font-family="Arial"
+     font-weight="bold"
+     fill="#ffffff"
+     id="text6">P1</text>
+  <circle
+     cx="650"
+     cy="111.04297"
+     r="25"
+     fill="#e74c3c"
+     opacity="0.6"
+     stroke="#c0392b"
+     stroke-width="2"
+     id="circle7" />
+  <text
+     x="650"
+     y="116.04297"
+     text-anchor="middle"
+     alignment-baseline="middle"
+     font-family="Arial"
+     font-weight="bold"
+     fill="#ffffff"
+     id="text8">P2</text>
+  <circle
+     cx="150"
+     cy="111.04297"
+     r="25"
+     fill="none"
+     stroke="#3498db"
+     stroke-width="3"
+     stroke-dasharray="6, 4"
+     id="circle9" />
+  <circle
+     cx="550"
+     cy="111.04297"
+     r="25"
+     fill="none"
+     stroke="#e74c3c"
+     stroke-width="3"
+     stroke-dasharray="6, 4"
+     id="circle10" />
+  <line
+     x1="175"
+     y1="111.04297"
+     x2="525"
+     y2="111.04297"
+     stroke="#27ae60"
+     stroke-width="6"
+     stroke-linecap="round"
+     id="line10" />
+  <line
+     x1="75"
+     y1="111.04297"
+     x2="135"
+     y2="111.04297"
+     stroke="#3498db"
+     stroke-width="5"
+     marker-end="url(#arrowhead-blue)"
+     id="line11" />
+  <line
+     x1="625"
+     y1="111.04297"
+     x2="565"
+     y2="111.04297"
+     stroke="#e74c3c"
+     stroke-width="5"
+     marker-end="url(#arrowhead-red)"
+     id="line12" />
+  <line
+     x1="50"
+     y1="181.04297"
+     x2="50"
+     y2="221.04297"
+     stroke="#555555"
+     stroke-width="1"
+     id="line13" />
+  <line
+     x1="650"
+     y1="181.04297"
+     x2="650"
+     y2="221.04297"
+     stroke="#555555"
+     stroke-width="1"
+     id="line14" />
+  <line
+     x1="60"
+     y1="201.04297"
+     x2="640"
+     y2="201.04297"
+     stroke="#555555"
+     stroke-width="2"
+     marker-start="url(#arrowhead-dim)"
+     marker-end="url(#arrowhead-dim-end)"
+     id="line15" />
+  <text
+     x="350"
+     y="191.04297"
+     text-anchor="middle"
+     font-family="Arial"
+     font-size="16px"
+     fill="#555555"
+     font-weight="bold"
+     id="text15">Distância Atual</text>
+  <text
+     x="350"
+     y="226.04297"
+     text-anchor="middle"
+     font-family="Arial"
+     font-size="14px"
+     fill="#777777"
+     id="text16">(Violação: $d_{atual}$ &gt; d)</text>
+  <line
+     x1="150"
+     y1="41.042973"
+     x2="150"
+     y2="1.0429714"
+     stroke="#27ae60"
+     stroke-width="1"
+     id="line16" />
+  <line
+     x1="550"
+     y1="41.042973"
+     x2="550"
+     y2="1.0429714"
+     stroke="#27ae60"
+     stroke-width="1"
+     id="line17" />
+  <line
+     x1="160"
+     y1="21.042971"
+     x2="540"
+     y2="21.042971"
+     stroke="#27ae60"
+     stroke-width="3"
+     marker-start="url(#arrowhead-dim)"
+     marker-end="url(#arrowhead-dim-end)"
+     id="line18" />
+  <rect
+     x="240"
+     y="6.0429716"
+     width="220"
+     height="30"
+     fill="#ffffff"
+     opacity="0.8"
+     id="rect18"
+     inkscape:label="rect18" />
+  <text
+     x="350"
+     y="13.042972"
+     text-anchor="middle"
+     font-family="Arial"
+     font-size="18px"
+     fill="#27ae60"
+     font-weight="bold"
+     id="text18"
+     inkscape:label="text18">d</text>
 </svg>

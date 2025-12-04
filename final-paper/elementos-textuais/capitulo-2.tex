@@ -109,7 +109,7 @@ onde $k_d$ é o coeficiente de amortecimento e $\vec{v}$ são as velocidades.
 Para simular superfícies deformáveis, como tecidos, as partículas são organizadas em uma grade. A estabilidade e o comportamento visual do tecido dependem de como essas molas (ou restrições) são conectadas. Uma topologia robusta geralmente emprega três tipos de conexões:
 \begin{enumerate}
 	\item Molas Estruturais: Conectam partículas vizinhas diretas (horizontal e verticalmente). Elas resistem à tração e compressão básicas, mantendo a integridade da malha.
-	\item Molas de Cisalhamento: Conectam partículas diagonalmente vizinhas. Sua função é impedir que o tecido se distorça ou "deslize" sobre si mesmo, mantendo a estabilidade dos quadriláteros da malha.
+	\item Molas de Cisalhamento: Conectam partículas diagonalmente vizinhas. Sua função é impedir que o tecido se distorça ou ``deslize'' sobre si mesmo, mantendo a estabilidade dos quadriláteros da malha.
 	\item Molas de Flexão: Conectam partículas alternadas (pulando um vizinho). Elas resistem à dobra do tecido, impedindo que ele se comporte como uma malha infinitamente flexível e conferindo-lhe uma certa rigidez à curvatura.
 \end{enumerate}
 
@@ -151,68 +151,45 @@ O método de Verlet é estável e eficiente, especialmente em sistemas sujeitos 
 
 \section{Restrições Geométricas}
 
-\citeonline{jakobsen2001advanced} utiliza restrições geométricas simples para compor estruturas complexas. Objetos físicos são representados como conjuntos de partículas conectadas por restrições, que impõem relações a serem satisfeitas a cada passo de simulação.
-
-\subsection*{Restrição Linear}
-
-O caso mais comum é a restrição linear (ou restrição de distância), que mantém uma distância fixa $d$ entre duas partículas $i$ e $j$. Dessa forma o conjunto de partículas devem satisfazer a todo instante uma coleção de equações forma:
+\citeonline{jakobsen2001advanced} descreve uma restrição geométrica simples para compor estruturas complexas, a restrição linear (ou restrição de distância) mantém uma distância fixa $d$ entre duas partículas $i$ e $j$. Dessa forma o conjunto de partículas deve satisfazer a todo instante uma coleção de equações na forma:
 \begin{equation}
-   |\vec{x_i} - \vec{x_j}| = d.
+    |\vec{x_i} - \vec{x_j}| = d.
    \label{eq:linear_constraint}
 \end{equation}
 
-Mesmo que as posições das partículas estejam inicialmente corretas, depois de um passo de simulação a distância entre elas pode se tornar inválida (devido a forças externas, por exemplo). Para corrigir sua distância devemos movê-las (projeção) de forma a satisfazer \ref{eq:linear_constraint}, como ilustrado na figura~\ref{fig:correcao}.
+Mesmo que as posições das partículas estejam inicialmente corretas, depois de um passo de simulação a distância entre elas pode se tornar inválida (devido a forças externas, por exemplo). Para corrigir sua distância devemos movê-las (projetar) de forma a satisfazer \ref{eq:linear_constraint}, como ilustrado na Figura~\ref{fig:correcao}.
 \begin{figure}[htb]
 	\centering
-	\includesvg[width=0.7\linewidth]{restricao-linear}
-	\caption{Correção de posição inválida por projeção. Partículas na posição correta (à esquerda), muito distantes (centro) e muito próximas (à direita)}
+	\includesvg[width=\linewidth]{restricao-linear}
+	\caption{A distância atual entre as partículas P1 e P2 estão inválidas e devem ser corrigidas por projeção.}
     \label{fig:correcao}
 \end{figure}
 
-\subsection*{Restrição de Revolução}
+\citeonline{jakobsen2001advanced} também descreve um esquema de articulação (dobradiça) fazendo que objetos compartilhem a mesma partícula como ilustrado na Figura~\ref{fig:restricao-articulacao}. Dessa forma, seria possível modelar um corpo humanoide, \citeonline{jakobsen2001advanced} também mostra que para realismo adicional pode-se limitar o ângulo de rotação de articulações através de restrições angulares satisfazendo o produto interno abaixo:
+$$(x_2 - x_0) \cdot (x_1 - x_0) < \alpha.$$
 
-Para permitir que uma partícula gire em torno de um ponto fixo podemos construir um objeto que compartilhe a mesma partícula como ilustrado na figura~\ref{fig:restricao-revolucao}.
+Um método alternativo e simples que \citeonline{jakobsen2001advanced} também mostra é usar restrições de distância auxiliares, que não foi usada neste trabalho, onde a distância entre as extremidades $i$ e $j$ não seja maior que um valor $d_{min}$:
+
+$$|\vec{x}_i - \vec{x}_j| > d_{min}$$ 
+
 \begin{figure}[htb]
 	\centering
-	\includesvg[width=0.2\linewidth]{restricao-revolucao}
-	\caption{A restrição de revolução é uma conexão entre dois corpos em um único ponto de ancoragem.}
-	\label{fig:restricao-revolucao}
-\end{figure}
-Uma forma equivalente é impor uma restrição de distância entre a partícula e um ponto-âncora com distância $d = 0$ entre elas, fazendo com que permaneçam coladas.
-
-\subsection*{Restrição Angular}
-
-Para limitar o ângulo de rotação de articulações, pode-se utilizar restrições de distância auxiliares. Para garantir que o ângulo não exceda um limite, impõe-se que a distância entre as extremidades seja maior que um valor $d_{min}$:
-$$|\vec{x}_2 - \vec{x}_1| > d_{min}$$
-O algoritmo é análogo ao da restrição linear, porém a correção é aplicada apenas se a condição de desigualdade for violada, como ilustrado na figura~\ref{fig:restricao-angular}.
-\begin{figure}[htb]
-	\centering
-	\includesvg[width=0.2\linewidth]{restricao-angular}
-	\caption{Duas restrições lineares e uma restrição angular}
-	\label{fig:restricao-angular}
+	\includesvg[width=\linewidth]{restricao-articulacao}
+	\caption{A articulação é formada simplesmente fazendo os dois corpos compartilharem a mesma partícula}
+	\label{fig:restricao-articulacao}
 \end{figure}
 
 \section{Resolvendo restrições concorrentes por relaxamento}
 
 Na prática, uma simulação pode conter muitas restrições de todos os tipos vistos anteriormente. Para satisfazer todas elas devemos resolver todas elas sequencialmente, como as restrições entre partículas são interdependentes, não é possível satisfazê-las todas simultaneamente de maneira exata em um único passo.
 
-\citeonline{jakobsen2001advanced} propõe um método iterativo de relaxamento, também conhecido como \textit{Gauss-Seidel relaxation}, para resolver as restrições de forma aproximada. É uma abordagem de solução indireta por iteração local que consiste em aplicar pequenas correções de posição para cada par de partículas conectado, repetindo o procedimento diversas vezes até que todas as restrições estejam aproximadamente satisfeitas como no algoritmo~\ref{al:satisfazer_restricoes}. Cada iteração contribui para reduzir o erro acumulado, e a convergência ocorre rapidamente mesmo com poucas iterações (geralmente entre 3 e 5).
-\begin{algorithm}
-	\caption{Satisfazer Restrições}
-	\KwIn{n: número de repetições}
-	\For{$i \leftarrow 0$ \KwTo n}{
-		\ForEach{restrição em restrições}{
-			SatisfazerRestricao(restrição)
-		}
-	}
-	\label{al:satisfazer_restricoes}
-\end{algorithm}
+\citeonline{jakobsen2001advanced} propõe um método iterativo de relaxamento, também conhecido como relaxamento de \textit{Gauss-Seidel}, para resolver as restrições de forma aproximada. É uma abordagem de solução indireta por iteração local que consiste em aplicar pequenas correções de posição para cada par de partículas conectado, repetindo o procedimento diversas vezes até que todas as restrições estejam aproximadamente satisfeitas. Cada iteração contribui para reduzir o erro acumulado, e a convergência ocorre rapidamente mesmo com poucas iterações (geralmente entre 3 e 5).
 
-Apesar dessa abordagem parecer ingênua, ao resolver todas restrições localmente e repetir, o sistema global do sistema converge para uma configuração que satisfaça todas restrições. Quanto maior o número de iterações mais rápido o sistema irá convergir para solução ideal e também a animação irá parecer mais rígida para o usuário.
+Apesar dessa abordagem parecer ingênua, ao resolver todas restrições localmente e repetir, o sistema global do sistema converge para uma configuração que satisfaz todas restrições. Quanto maior o número de iterações, mais rápido o sistema irá convergir para solução ideal e também a animação irá parecer mais rígida para o usuário.
 
-Deve-se encontrar o movimento mínimo que satisfaça cada restrição, para restrição linear podemos fazer como no algoritmo~\ref{al:linear_constraint} que irá separar ou aproximar as partículas de tal forma que satisfaçam a distância $d$.
+Deve-se encontrar o movimento mínimo que satisfaça cada restrição, para restrição linear podemos fazer como no Algoritmo~\ref{al:linear_constraint} que irá separar ou aproximar as partículas de tal forma que satisfaçam a distância $d$.
 \begin{algorithm}[htb]
-	\caption{Restrição Linear}
+	\caption{Relaxamento para restrição linear}
 	$\vec{\delta} \leftarrow \vec{x}_2 - \vec{x}_1$ \\
 	$c \leftarrow \frac{\|\vec{\delta}\| - d}{\|\vec{\delta}\|}$ \\
 	$\vec{x}_1 \leftarrow \vec{x}_1 - \epsilon \, \vec{\delta} \, c$ \\

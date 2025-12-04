@@ -1,174 +1,173 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
-   width="142.19882mm"
-   height="91.55938mm"
-   viewBox="0 0 142.19882 91.55938"
+   width="404.95502"
+   height="329.02786"
+   viewBox="0 0 404.95502 329.02786"
    version="1.1"
-   id="svg1"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   id="svg13"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
-  <sodipodi:namedview
-     id="namedview1"
-     pagecolor="#ffffff"
-     bordercolor="#000000"
-     borderopacity="0.25"
-     inkscape:showpageshadow="2"
-     inkscape:pageopacity="0.0"
-     inkscape:pagecheckerboard="0"
-     inkscape:deskcolor="#d1d1d1"
-     inkscape:document-units="mm"
-     inkscape:zoom="0.71535494"
-     inkscape:cx="440.34085"
-     inkscape:cy="565.45356"
-     inkscape:window-width="1280"
-     inkscape:window-height="1011"
-     inkscape:window-x="20"
-     inkscape:window-y="20"
-     inkscape:window-maximized="0"
-     inkscape:current-layer="layer1">
-    <inkscape:page
-       x="-3.6354578e-13"
-       y="0"
-       width="142.19884"
-       height="91.55938"
-       id="page2"
-       margin="0"
-       bleed="0" />
-  </sodipodi:namedview>
   <defs
-     id="defs1">
+     id="defs2">
     <marker
-       style="overflow:visible"
-       id="marker10"
-       refX="0"
-       refY="0"
-       orient="auto"
-       inkscape:stockid="Stop"
-       markerWidth="1"
-       markerHeight="1"
-       viewBox="0 0 1 1"
-       inkscape:isstock="true"
-       inkscape:collect="always"
-       preserveAspectRatio="xMidYMid">
-      <path
-         style="fill:none;stroke:context-stroke;stroke-width:1"
-         d="M 0,4 V -4"
-         id="path10" />
+       id="gap-marker-start"
+       markerWidth="10"
+       markerHeight="15"
+       refX="10"
+       refY="7.5"
+       orient="auto">
+      <line
+         x1="10"
+         y1="0"
+         x2="10"
+         y2="15"
+         stroke="#27ae60"
+         stroke-width="3"
+         id="line1" />
     </marker>
     <marker
-       style="overflow:visible"
-       id="Stop"
+       id="gap-marker-end"
+       markerWidth="10"
+       markerHeight="15"
        refX="0"
-       refY="0"
-       orient="auto"
-       inkscape:stockid="Stop"
-       markerWidth="1"
-       markerHeight="1"
-       viewBox="0 0 1 1"
-       inkscape:isstock="true"
-       inkscape:collect="always"
-       preserveAspectRatio="xMidYMid">
-      <path
-         style="fill:none;stroke:context-stroke;stroke-width:1"
-         d="M 0,4 V -4"
-         id="path23" />
+       refY="7.5"
+       orient="auto">
+      <line
+         x1="0"
+         y1="0"
+         x2="0"
+         y2="15"
+         stroke="#27ae60"
+         stroke-width="3"
+         id="line2" />
     </marker>
   </defs>
+  <pattern
+     id="grid"
+     width="50"
+     height="50"
+     patternUnits="userSpaceOnUse">
+    <path
+       d="M 50 0 L 0 0 0 50"
+       fill="none"
+       stroke="#f9f9f9"
+       stroke-width="1"
+       id="path2" />
+  </pattern>
   <g
-     inkscape:label="Camada 1"
-     inkscape:groupmode="layer"
-     id="layer1"
-     transform="translate(-27.761829,-67.689715)">
-    <path
-       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-dasharray:none;stroke-opacity:1"
-       d="m 28.054541,120.9794 12.166205,-26.53234 7.010607,49.67981 z"
-       id="path1"
-       inkscape:export-filename="projecao-eixos.svg"
-       inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96" />
-    <path
-       style="fill:none;stroke:#0300ff;stroke-width:0.5;stroke-dasharray:none;stroke-opacity:1"
-       d="m 52.520548,95.794519 1.109588,-27.369863 21.93319,13.568028 8.765441,15.651145 -15.534246,23.671241 z"
-       id="path2"
-       sodipodi:nodetypes="cccccc" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-dasharray:1.2, 0.3;stroke-dashoffset:0;stroke-opacity:1"
-       d="M 40.14526,93.759453 77.675195,141.75069"
-       id="path3"
-       sodipodi:nodetypes="cc" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-dasharray:1.2, 0.3;stroke-dashoffset:0;stroke-opacity:1"
-       d="m 47.075875,143.97372 13.338164,15.16889"
-       id="path4" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-       d="M 60.152507,159.14261 77.544428,141.88146"
-       id="path5"
-       sodipodi:nodetypes="cc" />
-    <path
-       style="fill:none;stroke:#0300ff;stroke-width:0.3;stroke-dasharray:1.2, 0.3;stroke-dashoffset:0;stroke-opacity:1"
-       d="m 68.609587,121.13014 12.322422,18.03003"
-       id="path6"
-       sodipodi:nodetypes="cc" />
-    <path
-       style="fill:none;stroke:#0300ff;stroke-width:0.3;stroke-dasharray:1.2, 0.3;stroke-dashoffset:0;stroke-opacity:1"
-       d="m 84.285819,97.447686 14.39837,21.758454"
-       id="path7"
-       sodipodi:nodetypes="cc" />
-    <path
-       style="fill:none;stroke:#0300ff;stroke-width:0.3;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-       d="M 80.885096,139.2124 98.544129,119.25102"
-       id="path8"
-       sodipodi:nodetypes="cc" />
-    <path
-       style="fill:none;stroke:#0300ff;stroke-width:0.3;stroke-dasharray:1.2, 0.3;stroke-dashoffset:0;stroke-opacity:1"
-       d="m 136.09023,120.61556 17.2502,23.04978"
-       id="path6-0"
-       sodipodi:nodetypes="cc" />
-    <path
-       style="fill:none;stroke:#0300ff;stroke-width:0.3;stroke-dasharray:1.2, 0.3;stroke-dashoffset:0;stroke-opacity:1"
-       d="m 151.85758,97.308863 17.92135,28.227767"
-       id="path7-6"
-       sodipodi:nodetypes="cc" />
-    <path
-       style="fill:none;stroke:#0300ff;stroke-width:0.3;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-       d="m 153.23606,143.76873 16.6129,-18.53929"
-       id="path8-2"
-       sodipodi:nodetypes="cc" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-dasharray:none;stroke-opacity:1"
-       d="m 116.8206,124.34368 12.16621,-26.532342 7.01061,49.679812 z"
-       id="path1-3"
-       inkscape:export-filename="eixo-separador.svg"
-       inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96" />
-    <path
-       style="fill:none;stroke:#0300ff;stroke-width:0.5;stroke-dasharray:none;stroke-opacity:1"
-       d="m 120.10247,95.497341 1.10959,-27.369866 21.93319,13.568026 8.76544,15.651155 -15.53424,23.671244 z"
-       id="path2-5"
-       sodipodi:nodetypes="cccccc" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-dasharray:1.2, 0.3;stroke-dashoffset:0;stroke-opacity:1"
-       d="m 128.91132,97.123728 30.59501,39.669322"
-       id="path3-6"
-       sodipodi:nodetypes="cc" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-dasharray:1.2, 0.3;stroke-dashoffset:0;stroke-opacity:1"
-       d="m 135.84194,147.338 7.25753,7.78059"
-       id="path4-2"
-       sodipodi:nodetypes="cc" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-       d="m 143.00076,155.2021 16.48361,-18.45296"
-       id="path5-9"
-       sodipodi:nodetypes="cc" />
-    <path
-       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.2;stroke-dasharray:0.8, 0.2;stroke-dashoffset:0;stroke-opacity:1;marker-start:url(#Stop);marker-end:url(#marker10)"
-       d="m 154.00171,144.7089 6.42637,-7.11986"
-       id="path9" />
+     transform="rotate(-20,55.635657,703.68433)"
+     id="g3">
+    <polygon
+       points="200,150 350,150 350,250 200,250 "
+       fill="#3498db"
+       opacity="0.6"
+       stroke="#2980b9"
+       stroke-width="3"
+       id="polygon2" />
+    <text
+       x="275"
+       y="200"
+       text-anchor="middle"
+       font-family="Arial"
+       font-weight="bold"
+       fill="#ffffff"
+       font-size="18px"
+       id="text3">Forma A</text>
   </g>
+  <g
+     transform="matrix(0.69766147,0.18693783,-0.18693783,0.69766147,-38.073245,-186.77599)"
+     id="g5">
+    <polygon
+       points="650,300 450,250 550,100 "
+       fill="#e74c3c"
+       opacity="0.6"
+       stroke="#c0392b"
+       stroke-width="3"
+       id="polygon4"
+       transform="translate(-7.4651802,30.531226)" />
+    <text
+       x="581.89935"
+       y="150.51553"
+       text-anchor="middle"
+       font-family="Arial"
+       font-weight="bold"
+       fill="#ffffff"
+       font-size="18px"
+       id="text5"
+       transform="rotate(10.838752)">Forma B</text>
+  </g>
+  <line
+     x1="72.336716"
+     y1="317.54794"
+     x2="196.87523"
+     y2="269.6243"
+     stroke="#3498db"
+     stroke-width="8.75023"
+     stroke-linecap="round"
+     opacity="0.8"
+     id="line11" />
+  <text
+     x="111.31267"
+     y="277.9538"
+     text-anchor="middle"
+     font-family="Arial"
+     fill="#2980b9"
+     font-size="14px"
+     font-weight="bold"
+     id="text11">Sombra A</text>
+  <line
+     x1="277.40491"
+     y1="241.55991"
+     x2="395.28552"
+     y2="199.97137"
+     stroke="#e74c3c"
+     stroke-width="9.81834"
+     stroke-linecap="round"
+     opacity="0.8"
+     id="line12" />
+  <text
+     x="311.73462"
+     y="205.8157"
+     text-anchor="middle"
+     font-family="Arial"
+     fill="#c0392b"
+     font-size="14px"
+     font-weight="bold"
+     id="text12">Sombra B</text>
+  <g
+     id="g13"
+     transform="rotate(6.3458577,1609.5935,-1598.668)">
+    <line
+       x1="421.31607"
+       y1="411.83426"
+       x2="488.68393"
+       y2="378.16574"
+       stroke="#27ae60"
+       stroke-width="4"
+       marker-start="url(#gap-marker-start)"
+       marker-end="url(#gap-marker-end)"
+       id="line13" />
+    <text
+       x="401.73654"
+       y="418.71002"
+       text-anchor="middle"
+       font-family="Arial"
+       font-weight="bold"
+       fill="#27ae60"
+       font-size="16px"
+       id="text13"
+       transform="rotate(-6.3227807)">GAP</text>
+  </g>
+  <path
+     style="opacity:0.990792;fill:none;stroke:#555555;stroke-width:2;stroke-dasharray:8, 2;stroke-dashoffset:0;stroke-opacity:1"
+     d="M 153.11103,0.34202068 272.74287,329.02785"
+     id="path13" />
+  <path
+     style="opacity:0.990792;fill:none;stroke:#555555;stroke-width:2;stroke-dasharray:8, 2;stroke-dashoffset:0;stroke-opacity:1"
+     d="M 404.61301,195.89231 75.927195,315.52415"
+     id="path13-5" />
+  <path
+     style="opacity:0.990792;fill:none;stroke:#555555;stroke-width:1;stroke-dasharray:1, 1;stroke-dashoffset:0;stroke-opacity:1"
+     d="m 242.54882,246.64046 7.58413,-3.19533 2.18752,5.58802"
+     id="path14" />
 </svg>
