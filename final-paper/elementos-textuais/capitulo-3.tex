@@ -14,14 +14,14 @@ Um objeto geométrico é definido como um conjunto não vazio, limitado e fechad
 	\caption{Comparação entre polígono convexo (à esquerda) e polígono côncavo (à direita).}
 	\label{fig:poligonos}
 \end{figure}
-Uma forma é considerada convexa se, para quaisquer dois pontos contidos nessa forma, todo o segmento que os une também estiver contido nela, como ilustrado na figura~\ref{fig:poligonos}. Uma consequência prática é que, para qualquer linha que atravesse o objeto, esta o intersecta em no máximo dois pontos. Formas não convexas podem ser tratadas como composições de múltiplas partes convexas, o que permite a aplicação direta de algoritmos especializados.
+Uma forma é considerada convexa se, para quaisquer dois pontos contidos nessa forma, todo o segmento que os une também estiver contido nela, como ilustrado na Figura~\ref{fig:poligonos}. Uma consequência prática é que, para qualquer linha que atravesse o objeto, esta o intersecta em no máximo dois pontos. Formas não convexas podem ser tratadas como composições de múltiplas partes convexas, o que permite a aplicação direta de algoritmos especializados.
 
 \section{Teorema do Eixo Separador (SAT)}
 \label{sec:sat}
 
 O Teorema do Eixo Separador é um dos métodos mais difundidos para detecção de colisão entre polígonos convexos. Além de identificar a presença ou ausência de interseção, o SAT também pode ser utilizado para calcular o vetor de translação mínima (MTV), útil para correções geométricas e resposta física.
 
-O SAT é um algoritmo genérico rápido que pode remover a necessidade de ter código de detecção de colisão para cada par tipo de forma, reduzindo assim o código e a manutenção. Ele se baseia no teorema geométrico que afirma:
+O SAT é um algoritmo genérico rápido que pode remover a necessidade de ter código de detecção de colisão para cada par tipo de forma, reduzindo assim o código e a manutenção. O SAT busca pelas sombras formadas ao traçar raios paralelos sob os dois objetos, de diversas posições diferentes, se as sombras estiverem separadas o algoritmo responde que as formas não estão sobrepondo. Ele se baseia no teorema geométrico que afirma:
 
 \begin{teorema}
 	Dois polígonos convexos $A$ e $B$ não se intersectam se, e somente se, existir um eixo (reta) sobre o qual as projeções de $A$ e $B$ não se sobrepõem.

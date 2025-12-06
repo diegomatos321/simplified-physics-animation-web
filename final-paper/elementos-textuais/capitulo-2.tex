@@ -137,7 +137,7 @@ Essa pequena modificação melhora a conservação de energia e reduz a instabil
 
 \subsection*{Integração de Verlet}
 
-A Integração de Verlet é a base do método de Jakobsen. É um método de segunda ordem que não armazena explicitamente a velocidade. A nova posição é calculada com base na posição atual, na posição anterior e na aceleração:
+Verlet é um método de segunda ordem que não armazena explicitamente a velocidade. A nova posição é calculada com base na posição atual, na posição anterior e na aceleração:
 $$
 	\vec{x}_{t+\Delta t} = 2\vec{x}_t - \vec{x}_{t-\Delta t} + \vec{a}_t \Delta t^2.
 $$
@@ -147,7 +147,7 @@ $$
 	\vec{v}_t \approx \frac{\vec{x}_{t+\Delta t} - \vec{x}_{t-\Delta t}}{2\Delta t}.
 $$
 
-O método de Verlet é estável e eficiente, especialmente em sistemas sujeitos a restrições geométricas além de eliminar a necessidade de armazenar explicitamente a velocidade, utilizando as posições atual e anterior para estimar a nova posição.
+Esse é o método usado por \citeonline{jakobsen2001advanced}, por ser um método estável e eficiente, especialmente em sistemas sujeitos a restrições geométricas além de eliminar a necessidade de armazenar explicitamente a velocidade, utilizando as posições atual e anterior para estimar a nova posição.
 
 \section{Restrições Geométricas}
 
