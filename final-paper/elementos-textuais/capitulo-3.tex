@@ -21,7 +21,7 @@ Uma forma é considerada convexa se, para quaisquer dois pontos contidos nessa f
 
 O Teorema do Eixo Separador é um dos métodos mais difundidos para detecção de colisão entre polígonos convexos. Além de identificar a presença ou ausência de interseção, o SAT também pode ser utilizado para calcular o vetor de translação mínima (MTV), útil para correções geométricas e resposta física.
 
-O SAT é um algoritmo genérico rápido que pode remover a necessidade de ter código de detecção de colisão para cada par tipo de forma, reduzindo assim o código e a manutenção. O SAT busca pelas sombras formadas ao traçar raios paralelos sob os dois objetos, de diversas posições diferentes, se as sombras estiverem separadas o algoritmo responde que as formas não estão sobrepondo. Ele se baseia no teorema geométrico que afirma:
+O SAT é um algoritmo genérico rápido que pode remover a necessidade de ter código de detecção de colisão para cada par tipo de forma, reduzindo assim o código e a manutenção. Ao traçar raios paralelos sob dois objetos (a partir de uma fonte luminosa, por exemplo) se as sombras formadas estiverem separadas então não há colisão, repita esse processo ao redor das formas, caso não encontre uma sombra que esteja separada uma da outra os objetos estão em colisão. O SAT se baseia no teorema geométrico que afirma:
 
 \begin{teorema}
 	Dois polígonos convexos $A$ e $B$ não se intersectam se, e somente se, existir um eixo (reta) sobre o qual as projeções de $A$ e $B$ não se sobrepõem.
@@ -32,7 +32,7 @@ Tal eixo é denominado eixo separador, como ilustrado na Figura~\ref{fig:projeca
 \begin{figure}[htb]
 	\centering
 	\includesvg[width=0.7\linewidth]{projecao-eixos}
-	\caption{Eixo separador perpendicular a linha vertical tracejada.}
+	\caption{Face escolhida em amarelo, eixo separador perpendicular a face.}
 	\label{fig:projecao-eixos}
 \end{figure}
 
@@ -78,11 +78,13 @@ onde $\epsilon$ é um valor numérico para tratar erros de operação flutuante 
 
 \section{Algoritmo Gilbert–Johnson–Keerthi (GJK)}
 
-O algoritmo de \citeonline{gjk} calcula a distância mínima entre dois conjuntos convexos utilizando apenas uma função de suporte capaz de retornar o ponto mais distante de um conjunto em uma direção arbitrária. Esse algoritmo é particularmente eficiente em 3D e é amplamente adotado em motores físicos por sua robustez e excelente desempenho.
+O algoritmo original de \citeonline{gjk} calcula a distância mínima entre dois conjuntos convexos, neste trabalho faremos uma versão simplificada que realiza um teste Booleano para o caso de dois objetos estarem em intersecção com otimização usando regiões de Voronoi. Esse algoritmo é particularmente eficiente em 3D e é amplamente adotado em motores físicos por sua robustez e excelente desempenho.
+
+% utilizando apenas uma função de suporte capaz de retornar o ponto mais distante de um conjunto em uma direção arbitrária. 
 
 % \subsection*{Soma de Minkowski}
 
-O algoritmo GJK depende muito de um conceito chamado soma de Minkowski de dois objetos convexos A e B que é definida por:
+O GJK trabalha em cima da soma de Minkowski de dois objetos convexos A e B que é definida como
 $$
 	A + B = \{\vec{x} + \vec{y} \mid \vec{x} \in A, \vec{y} \in B \},
 $$
@@ -93,21 +95,30 @@ onde o objeto $A + B$ é o conjunto de pontos obtido por um processo de varredur
 	\caption{Em vermelho a soma de Minkowski, em verde a diferença de Minkowski}
 	\label{fig:soma-minkowski}
 \end{figure}
+Uma propriedade muito útil da soma de Minkowski é o fato de que a soma de dois objetos convexos é um objeto convexo.
 
-Uma propriedade muito útil da soma de Minkowski é o fato de que a soma de dois objetos convexos é um objeto convexo. O algoritmo GJK se beneficia dessas propriedades usando uma operação informalmente chamada de diferença de Minkowski:
+Para um objeto A, usamos a notação $-A$ para denotar o reflexo de A sobre a origem O. A diferença de Minkowski $A-B$ pode ser obtida calculando a soma de Minkowski de A e -B
 $$
 	A - B = \{\vec{x} - \vec{y} \mid \vec{x} \in A, \vec{y} \in B \},
 $$
-que pode ser pensado como um processo de varredura que calcula o vetor distância para cada ponto de $B$ em $A$. Essa operação continua sendo a soma de Minkowski (a soma da diferença) mas, neste trabalho, usaremos esse termo para referir a essa operação quando necessário. 
+que pode ser pensado como um processo de varredura que calcula o vetor distância para cada ponto de $B$ em $A$. Neste trabalho, usaremos esse termo para referir a essa operação quando necessário.
 
-Dessa forma, caso a distância entre dois pontos seja zero, podemos confirmar há colisão entre os dois objetos. Esse vetor também coincide com a origem, logo elaboramos nosso próximo teorema:
-\begin{teorema}
-	Os conjuntos $A$ e $B$ colidem se, e somente se, o ponto de origem $(0, 0)$ estiver contido em $A - B$.
-\end{teorema}
+A diferença de Minkowski também é chamada de configuração do espaço de
+obstáculos (CSO). Esse espaço possui uma propriedade muito útil de que A e B se intersectam se, e somente se, sua CSO contém a origem. Isso se deve ao fato de que se existe um ponto em comum entre A e B onde a diferença de Minkowski é igual a zero, logo, esse ponto coincide com a origem O.
 
-Executar essa operação exige $2|A||B| $ subtrações. Isso é significativo, porque uma forma é composta de um número infinito de pontos.  A grande coisa sobre GJK é que você realmente não precisa calcular a diferença de Minkowski para todos os vértices. Uma vez que ambas as formas são convexas e definidas por vértices, só precisamos realizar esta operação nos vértices mais externos.
+Assim o objetivo do GJK reduz para determinar se a CSO contém ou não a origem. A grande coisa do GJK é que você não precisa calcular a CSO, apenas uma amostra do CSO modificando iterativamente um Simplex dentro da OSC até que o Simplex contenha a origem ou pare por ser não ser possível a origem estar contida no Simplex.
 
-Dessa forma, queremos apenas saber se a diferença de Minkowski contém ou não a origem. Se isso acontecer, então sabemos que as formas estão se cruzando, caso contrário, as formas são disjuntas. Isso é feito construindo iterativamente um polígono dentro da diferença de Minkowski que tenta incluir a origem. Se o polígono que construímos contém a origem, então podemos dizer que a diferença de Minkowski contém a origem, logo há interseção entre os dois objetos. Este polígono que queremos construir deve ser da forma mais elementar possível, ou seja, um \textit{simplex}, que equivale em 2D a um triângulo, e em 3D a um tetraedro.
+Um Simplex é definido como a forma mais simples possível em um espaço de k-dimensão. Dessa forma um ponto é 0-simplex, um segmento de reta é 1-simplex, um triângulo é 2-simplex, um tetraedro é 3-simplex, como na Figura.
+
+\textbf{INSERIR FIGURA MOSTRANDO EXEMPLOS DE SIMPLEX}
+
+A construção de um Simplex dentro da região CSO faz uso de uma função de suporte, seja A um conjunto qualquer o suporte de A na direção $\vec{d}$ retorna um ponto de A mais distante na direção $\vec{d}$. Esse ponto é chamado de ponto de suporte.
+
+% Executar essa operação exige $2|A||B| $ subtrações. Isso é significativo, porque uma forma é composta de um número infinito de pontos.  A grande coisa sobre GJK é que você realmente não precisa calcular a diferença de Minkowski para todos os vértices. Uma vez que ambas as formas são convexas e definidas por vértices, só precisamos realizar esta operação nos vértices mais externos.
+
+%$ Dessa forma, queremos apenas saber se a diferença de Minkowski contém ou não a origem. Se isso acontecer, então sabemos que as formas estão se cruzando, caso contrário, as formas são disjuntas. Isso é feito construindo iterativamente um polígono dentro da diferença de Minkowski que tenta incluir a origem. Se o polígono que construímos contém a origem, então podemos dizer que a diferença de Minkowski contém a origem, logo há interseção entre os dois objetos. Este polígono que queremos construir deve ser da forma mais elementar possível, ou seja, um \textit{simplex}, que equivale em 2D a um triângulo, e em 3D a um tetraedro.
+
+\textbf{DEFINIR REGIÃO VORONOI}
 
 % \subsection*{Função de Suporte}
 
