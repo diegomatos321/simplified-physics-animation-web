@@ -28,12 +28,12 @@ O SAT é um algoritmo genérico rápido que pode remover a necessidade de ter c�
 	\label{theo:sat}
 \end{teorema}
 
-Tal eixo é denominado eixo separador, como ilustrado na Figura~\ref{fig:projecao-eixos}. Em termos computacionais, o algoritmo testa um conjunto finito de eixos candidatos. Para polígonos, os candidatos suficientes são as normais das faces (ou arestas, em 2D) de ambos os objetos.
+Tal eixo é denominado eixo separador, como ilustrado na Figura~\ref{fig:eixo-separador}. Em termos computacionais, o algoritmo testa um conjunto finito de eixos candidatos. Para polígonos, os candidatos suficientes são as normais das faces (ou arestas, em 2D) de ambos os objetos.
 \begin{figure}[htb]
 	\centering
-	\includesvg[width=0.7\linewidth]{projecao-eixos}
+	\includesvg[width=0.7\linewidth]{eixo-separador}
 	\caption{Face escolhida em amarelo, eixo separador perpendicular a face.}
-	\label{fig:projecao-eixos}
+	\label{fig:eixo-separador}
 \end{figure}
 
 % \subsection*{Projeção sobre um eixo}
@@ -47,7 +47,7 @@ A verificação de sobreposição entre dois intervalos $[min_A, max_A]$ e $[min
 $$
 	\text{Sobreposição} \iff max_A \geq min_B \quad \land \quad max_B \geq min_A,
 $$
-como ilustrado na Figura~\ref{fig:projecao-eixos}. Se essa condição falhar em qualquer eixo candidato, os objetos estão separados e o algoritmo pode encerrar imediatamente.
+como ilustrado na Figura~\ref{fig:eixo-separador}. Se essa condição falhar em qualquer eixo candidato, os objetos estão separados e o algoritmo pode encerrar imediatamente.
 
 % \subsection*{Algoritmo de Interseção e MTV}
 
@@ -78,7 +78,7 @@ onde $\epsilon$ é um valor numérico para tratar erros de operação flutuante 
 
 \section{Algoritmo Gilbert–Johnson–Keerthi (GJK)}
 
-O algoritmo original de \citeonline{gjk} calcula a distância mínima entre dois conjuntos convexos, neste trabalho faremos uma versão simplificada que realiza um teste Booleano para o caso de dois objetos estarem em intersecção com otimização usando regiões de Voronoi. Esse algoritmo é particularmente eficiente em 3D e é amplamente adotado em motores físicos por sua robustez e excelente desempenho.
+O algoritmo original de \citeonline{gjk} calcula a distância mínima entre dois conjuntos convexos, neste trabalho faremos uma versão simplificada que realiza um teste Booleano para o caso de dois objetos estarem em intersecção com otimização usando regiões de Voronoi, chamaremos de Boolean GJK (BGJK). Esse algoritmo é particularmente eficiente em 3D e é amplamente adotado em motores físicos por sua robustez e excelente desempenho.
 
 % utilizando apenas uma função de suporte capaz de retornar o ponto mais distante de um conjunto em uma direção arbitrária. 
 
@@ -106,13 +106,48 @@ que pode ser pensado como um processo de varredura que calcula o vetor distânci
 A diferença de Minkowski também é chamada de configuração do espaço de
 obstáculos (CSO). Esse espaço possui uma propriedade muito útil de que A e B se intersectam se, e somente se, sua CSO contém a origem. Isso se deve ao fato de que se existe um ponto em comum entre A e B onde a diferença de Minkowski é igual a zero, logo, esse ponto coincide com a origem O.
 
-Assim o objetivo do GJK reduz para determinar se a CSO contém ou não a origem. A grande coisa do GJK é que você não precisa calcular a CSO, apenas uma amostra do CSO modificando iterativamente um Simplex dentro da OSC até que o Simplex contenha a origem ou pare por ser não ser possível a origem estar contida no Simplex.
+Assim o objetivo do BBGJK reduz para determinar se a CSO contém ou não a origem. A grande coisa do BGJK é que você não precisa calcular a CSO, apenas uma amostra do CSO modificando iterativamente um Simplex dentro da OSC até que o Simplex contenha a origem ou pare por não ser possível a origem estar contida no Simplex.
 
 Um Simplex é definido como a forma mais simples possível em um espaço de k-dimensão. Dessa forma um ponto é 0-simplex, um segmento de reta é 1-simplex, um triângulo é 2-simplex, um tetraedro é 3-simplex, como na Figura.
 
 \textbf{INSERIR FIGURA MOSTRANDO EXEMPLOS DE SIMPLEX}
 
-A construção de um Simplex dentro da região CSO faz uso de uma função de suporte, seja A um conjunto qualquer o suporte de A na direção $\vec{d}$ retorna um ponto de A mais distante na direção $\vec{d}$. Esse ponto é chamado de ponto de suporte.
+A construção de um Simplex dentro da região CSO usa uma função de suporte que é definida tal que: seja A um conjunto qualquer, o suporte de A na direção $\vec{d}$ retorna o ponto que pertence a superfície de A mais distante da origem na direção $\vec{d}$, esse ponto é chamado de ponto de suporte. Matematicamente fazemos $S_A (\vec{d}) = max\{v \cdot a : a \in A\}$ ilustrado pela Figura.
+
+\textbf{INSERIR FIGURA ILUSTRANDO FUNÇÃO SUPORTE}
+
+Também é possível realizar aritmética com função suporte
+\begin{align*}
+	S_{A+B} (\vec{d}) &= S_A (\vec{d}) + S_B (\vec{d}) \\
+	S_{-A} (\vec{d}) &= -S_A (-\vec{d}),
+\end{align*}
+dessa forma, seja D a diferença de Minkowski de dois objetos convexos A e B, o suporte de D na direção $\vec{d}$ é a diferença dos suportes de A e B: $S_{A-B} (\vec{d}) = S_A (\vec{d}) - S_B (\vec{-d})$. Como veremos no a seguir, mesmo o CSO possuindo um infinito número de pontos o GJK consegue trabalhar em seu espaço calculando pontos sobre demanda.
+
+O Algoritmo~\ref{alg:bgjk} começa inicializando um simplex Q com um ponto de suporte S numa direção aleatória do CSO (é comum ser escolhido a diferença entre os centros de A e B). Então S é usado para gerar um nova direção $\vec{d}$ oposta a S. O loop principal consiste
+
+\begin{algorithm}[htb]
+	\caption{Boolean GJK}
+	\KwIn{Polígonos convexos A e B}
+	\KwOut{True se colidindo, False caso contrário}
+
+	S $\leftarrow S_{CSO} (\text{Direção aleatória})$ \\
+	Q $\leftarrow$ \{S\} \\
+	$\vec{d} \leftarrow -S$ \\
+	
+	\While{iterações $<$ MAX\_ITER}{
+		S $\leftarrow S_{CSO} (\vec{d})$ \\ 
+		\If{S $\cdot$ D < 0}{
+			\Return False
+		}
+		$Q \leftarrow Q \cup \{S\}$ \\
+		\If{DoSimplex(Q, $\vec{d}$)}{
+			\Return True
+		}
+	}
+
+	\Return False
+	\label{alg:bgjk}
+\end{algorithm}
 
 % Executar essa operação exige $2|A||B| $ subtrações. Isso é significativo, porque uma forma é composta de um número infinito de pontos.  A grande coisa sobre GJK é que você realmente não precisa calcular a diferença de Minkowski para todos os vértices. Uma vez que ambas as formas são convexas e definidas por vértices, só precisamos realizar esta operação nos vértices mais externos.
 
@@ -122,26 +157,26 @@ A construção de um Simplex dentro da região CSO faz uso de uma função de su
 
 % \subsection*{Função de Suporte}
 
-O algoritmo GJK começa com um simplex inicial e o refina iterativamente adicionando pontos encontrados usando a função de suporte em uma direção que aponta para a origem. Esse processo continua até que a origem seja encontrada dentro do simplex, indicando uma colisão, ou até que se determine que a origem não está contida, o que significa que não há colisão.
+% O algoritmo GJK começa com um simplex inicial e o refina iterativamente adicionando pontos encontrados usando a função de suporte em uma direção que aponta para a origem. Esse processo continua até que a origem seja encontrada dentro do simplex, indicando uma colisão, ou até que se determine que a origem não está contida, o que significa que não há colisão.
 
-A função de suporte deve retornar o ponto mais distante em uma direção dentro da diferença de Minkowski. Isso cria um simplex que contém uma área máxima, aumentando, portanto, a chance de que o algoritmo termine rapidamente. Além disso, podemos usar o fato de que todos os pontos retornados desta forma estão na borda da diferença de Minkowski e, portanto, se não pudermos adicionar um ponto além da origem ao longo de alguma direção, sabemos que a diferença de Minkowski não contém a origem. Isso aumenta as chances de o algoritmo sair rapidamente em casos de não interseção.
+% A função de suporte deve retornar o ponto mais distante em uma direção dentro da diferença de Minkowski. Isso cria um simplex que contém uma área máxima, aumentando, portanto, a chance de que o algoritmo termine rapidamente. Além disso, podemos usar o fato de que todos os pontos retornados desta forma estão na borda da diferença de Minkowski e, portanto, se não pudermos adicionar um ponto além da origem ao longo de alguma direção, sabemos que a diferença de Minkowski não contém a origem. Isso aumenta as chances de o algoritmo sair rapidamente em casos de não interseção.
 
-% \subsection*{Construção iterativa do simplex}
+% % \subsection*{Construção iterativa do simplex}
 
-O Algoritmo~\ref{alg:gjk} busca determinar se a origem está contida em $A - B$ construindo iterativamente um simplex dentro da diferença de Minkowski.
-\begin{algorithm}[htb]
-	\caption{GJK}
-	\LinesNumbered
-	\KwIn{Polígonos convexos $A$ e $B$}
-	\KwOut{Verdadeiro se ocorreu colisão}
+% O Algoritmo~\ref{alg:gjk} busca determinar se a origem está contida em $A - B$ construindo iterativamente um simplex dentro da diferença de Minkowski.
+% \begin{algorithm}[htb]
+% 	\caption{GJK}
+% 	\LinesNumbered
+% 	\KwIn{Polígonos convexos $A$ e $B$}
+% 	\KwOut{Verdadeiro se ocorreu colisão}
 	
-	Escolhe-se uma direção inicial $\vec{d}$; \\
-	$p \leftarrow \text{support}(A - B,\ \vec{d})$ \\
-	\If{$p \cdot \vec{d} < 0$}{
-		\Return{False}
-	}
-	Atualiza-se o simplex com $p$ e calcula-se nova direção $\vec{d}$; \\
-	Itera-se até que o simplex contenha a origem ou seja possível concluir ausência de interseção.
-	\label{alg:gjk}
-\end{algorithm}
-O GJK é eficiente e converge rapidamente na prática, sendo mais apropriado que o SAT em cenários tridimensionais e em motores físicos de uso geral.
+% 	Escolhe-se uma direção inicial $\vec{d}$; \\
+% 	$p \leftarrow \text{support}(A - B,\ \vec{d})$ \\
+% 	\If{$p \cdot \vec{d} < 0$}{
+% 		\Return{False}
+% 	}
+% 	Atualiza-se o simplex com $p$ e calcula-se nova direção $\vec{d}$; \\
+% 	Itera-se até que o simplex contenha a origem ou seja possível concluir ausência de interseção.
+% 	\label{alg:gjk}
+% \end{algorithm}
+% O GJK é eficiente e converge rapidamente na prática, sendo mais apropriado que o SAT em cenários tridimensionais e em motores físicos de uso geral.

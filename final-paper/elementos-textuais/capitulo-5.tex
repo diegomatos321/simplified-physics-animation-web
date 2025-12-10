@@ -50,7 +50,7 @@ Testes de colisão entre esferas são extremamente rápidos, porém inadequados 
 
 \subsection*{Caixa Delimitadora Alinhada ao Eixo Coordenado (AABB)}
 
-A caixa delimitadora alinhada aos eixos (AABB) é um dos volumes delimitadores mais utilizados. Trata-se de um paralelepípedo (ou retângulo, em 2D) cujas faces são paralelas aos eixos do sistema de coordenadas. Seu teste de interseção é extremamente como no algoritmo~\ref{alg:interseccao-aabb}.
+A caixa delimitadora alinhada aos eixos (AABB) é um dos volumes delimitadores mais utilizados. Trata-se de um paralelepípedo (ou retângulo, em 2D) cujas faces são paralelas aos eixos do sistema de coordenadas. Seu teste de interseção é extremamente como no Algoritmo~\ref{alg:interseccao-aabb}.
 \begin{algorithm}[htb]
 	\caption{Teste de Intersecção AABB}
 	\KwIn{A e B: volumes AABB}
@@ -105,7 +105,7 @@ Apresenta complexidade média $O(n \log n)$ em 2D, podendo chegar a $O(n^2)$ em 
 
 A fase de \textit{Broad Phase} tem como objetivo descartar rapidamente pares de objetos que seguramente não estão colidindo. Segundo \citeonline{ericson2004real}, ``nada é mais rápido do que não ter que realizar uma tarefa''. Portanto, a melhor otimização é reduzir a quantidade de trabalho o mais cedo possível.
 
-Como objetos só podem colidir com outros que estejam fisicamente próximos, a \textit{Broad Phase} utiliza consultas espaciais para identificar apenas aqueles que compartilham regiões semelhantes do espaço. O teste mais simples usado nesta etapa é o teste de interseção booleana entre volumes delimitadores primitivos como no algoritmo~\ref{alg:broad-phase}, devido ao seu baixo custo computacional.
+Como objetos só podem colidir com outros que estejam fisicamente próximos, a \textit{Broad Phase} utiliza consultas espaciais para identificar apenas aqueles que compartilham regiões próximas do espaço. O teste mais simples usado nesta etapa é o teste de interseção booleana entre volumes delimitadores primitivos como no algoritmo~\ref{alg:broad-phase}, devido ao seu baixo custo computacional.
 
 \begin{algorithm}[htb]
 	\caption{Broad Phase generalizada}
@@ -130,7 +130,7 @@ Como objetos só podem colidir com outros que estejam fisicamente próximos, a \
 
 \subsection*{Grade uniforme}
 
-As técnicas de partição do espaço é o processo pelo qual o espaço é subdividido em regiões convexas, chamadas células. Cada célula na partição mantém uma lista de referências a objetos que nela estão (parcialmente) contidos. Como os objetos só podem se interceptar se sobrepuserem à mesma região do espaço, o número de testes de pares de objetos é drasticamente reduzido.
+As técnicas de partição do espaço é o processo pelo qual o espaço é subdividido em regiões convexas, chamadas células. Cada célula na partição mantém uma lista de referências a objetos que nela estão (parcialmente) contidos. Como os objetos só podem se interceptar se se sobrepuserem à mesma região do espaço, o número de testes de pares de objetos é drasticamente reduzido.
 
 Um esquema muito eficaz de subdivisão espacial consiste em sobrepor um espaço com uma grade regular. Essa grade divide o espaço em várias células de tamanho igual. Cada objeto é então associado às células com as quais se sobrepõem, como ilustrado na figura~\ref{fig:grade-uniforme}.
 
