@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="-400 -350 800 710.38892"
+   width="800"
+   height="710.38892"
+   version="1.1"
+   id="svg1791"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1738">
+    <marker
+       id="arrowhead-d"
+       markerWidth="10"
+       markerHeight="7"
+       refX="9"
+       refY="3.5"
+       orient="auto">
+      <polygon
+         points="0,7 0,0 10,3.5 "
+         fill="#2ecc71"
+         id="polygon1730" />
+    </marker>
+    <marker
+       id="arrowhead-res"
+       markerWidth="12"
+       markerHeight="9"
+       refX="11"
+       refY="4.5"
+       orient="auto">
+      <polygon
+         points="0,0 12,4.5 0,9 "
+         fill="#9b59b6"
+         id="polygon1733" />
+    </marker>
+    <style
+       id="style1736">
+      .label { font-family: sans-serif; font-size: 16px; fill: #333; }
+      .title { font-family: sans-serif; font-size: 22px; font-weight: bold; fill: #2c3e50; text-anchor: middle;}
+      .sub-label { font-family: sans-serif; font-size: 14px; fill: #7f8c8d; font-style: italic;}
+      .vector-label { font-weight: bold; font-size: 16px;}
+      .formula { font-family: 'Courier New', monospace; font-weight: bold; font-size: 18px;}
+    </style>
+  </defs>
+  <line
+     x1="-400"
+     y1="10.388908"
+     x2="400"
+     y2="10.388908"
+     stroke="#eee"
+     stroke-width="2"
+     id="line1742"
+     style="stroke:#000000;stroke-opacity:1" />
+  <line
+     x1="0"
+     y1="-339.61108"
+     x2="0"
+     y2="360.38892"
+     stroke="#eee"
+     stroke-width="2"
+     id="line1744"
+     style="stroke:#000000;stroke-opacity:1" />
+  <circle
+     cx="0"
+     cy="10.388908"
+     r="5"
+     fill="#333333"
+     id="circle1746" />
+  <text
+     x="10"
+     y="30.388908"
+     class="label"
+     font-weight="bold"
+     id="text1748">Origem (0,0)</text>
+  <g
+     id="input-direction"
+     transform="translate(0,10.388908)">
+    <line
+       x1="0"
+       y1="0"
+       x2="80"
+       y2="-80"
+       stroke="#2ecc71"
+       stroke-width="4"
+       marker-end="url(#arrowhead-d)"
+       id="line1752" />
+    <text
+       x="90"
+       y="-70"
+       class="label vector-label"
+       fill="#2ecc71"
+       id="text1754">Vetor Direção de Busca (d)</text>
+  </g>
+  <g
+     id="minkowski-space"
+     transform="translate(0,10.388908)">
+    <path
+       d="M 160,-280 260,-150 180,50 -50,100 -150,0 -80,-200 Z"
+       fill="#bdc3c7"
+       opacity="0.15"
+       stroke="#7f8c8d"
+       stroke-width="2"
+       stroke-dasharray="8, 5"
+       stroke-linejoin="round"
+       id="path1759"
+       style="opacity:1;fill:#bdc3c7;fill-opacity:0.2;stroke:#000000;stroke-opacity:1" />
+    <g
+       id="result-point-highlight">
+      <line
+         x1="80"
+         y1="-360"
+         x2="240"
+         y2="-200"
+         stroke="#2ecc71"
+         stroke-width="1"
+         stroke-dasharray="4"
+         opacity="0.6"
+         id="line1763"
+         style="opacity:1;fill:none;fill-opacity:1;stroke:#00980b;stroke-width:1.1;stroke-dasharray:4.4;stroke-dashoffset:0;stroke-opacity:1" />
+      <circle
+         cx="160"
+         cy="-280"
+         r="10"
+         fill="#9b59b6"
+         stroke="#ffffff"
+         stroke-width="3"
+         id="circle1765" />
+      <text
+         x="180"
+         y="-280"
+         class="label vector-label"
+         fill="#9b59b6"
+         anchor="start"
+         id="text1767">Ponto Extremo</text>
+      <text
+         x="180"
+         y="-255"
+         class="formula"
+         fill="#9b59b6"
+         anchor="start"
+         id="text1769">P = $S_{A-B}(d)$</text>
+    </g>
+    <line
+       x1="0"
+       y1="0"
+       x2="154"
+       y2="-270"
+       stroke="#9b59b6"
+       stroke-width="5"
+       marker-end="url(#arrowhead-res)"
+       id="line1772" />
+  </g>
+</svg>
