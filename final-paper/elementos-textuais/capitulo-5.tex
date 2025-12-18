@@ -4,15 +4,13 @@ A eficiência computacional é um dos fatores determinantes para o desempenho de
 
 Como qualquer objeto pode potencialmente colidir com qualquer outro, uma simulação contendo $n$ objetos requer $(n-1)+(n-2)+\dots+1 = n(n-1)/2 = O(n^2)$ testes de pares no pior caso. Devido à complexidade quadrática, testar ingenuamente cada par torna-se impraticável mesmo para valores moderados de $n$.
 
-Reduzir o custo associado ao teste de pares afetará o tempo de execução apenas linearmente. Para realmente acelerar o processo, o número de pares testados deve ser reduzido. Essa redução é realizada separando o tratamento de colisões de múltiplos objetos em duas fases: \textit{Narrow Phase} e \textit{Broad Phase}.
+Reduzir o custo associado ao teste de pares afetará o tempo de execução apenas linearmente. Para realmente acelerar o processo, o número de pares testados deve ser reduzido. Essa redução é realizada separando o tratamento de colisões de múltiplos objetos em duas fases: \textit{Broad Phase} e \textit{Narrow Phase}.
 
 Neste capítulo, descrevemos as estratégias clássicas de otimização aplicadas à detecção e resolução de colisões, com foco na divisão entre \textit{Broad Phase} e \textit{Narrow Phase}, no uso de estruturas espaciais, na adoção de passos temporais fixos e na execução multi-thread de simulações físicas.
 
-\section{O Fecho Convexo}
+\section{Objetos envolventes}
 
-O Fecho Convexo (FC) de um conjunto é definido como a menor região convexa que contém todos os seus pontos, sendo frequentemente utilizado como um volume delimitador. Determinar o fecho convexo é um problema recorrente em computação geométrica, especialmente quando se deseja organizar pontos em estruturas mais simples ou acelerar operações posteriores, como testes de colisão.
-
-Em sistemas de simulação física e detecção de colisões, a representação geométrica dos objetos influencia diretamente a eficiência dos cálculos. Formas complexas, com muitos vértices ou superfícies não convexas, tornam tais testes significativamente mais custosos. Uma solução comum é empregar aproximações convexas ou volumes delimitadores que possibilitam testes rápidos sem sacrificar excessivamente a precisão da simulação.
+Em sistemas de simulação física e detecção de colisões, a representação geométrica dos objetos influencia diretamente a eficiência dos cálculos. Formas complexas, com muitos vértices ou superfícies não convexas, tornam tais testes significativamente mais custosos. Uma solução comum é empregar aproximações convexas que possibilitam testes rápidos sem sacrificar excessivamente a precisão da simulação.
 
 \begin{figure}[htb]
 	\centering
@@ -21,9 +19,9 @@ Em sistemas de simulação física e detecção de colisões, a representação 
 	\label{fig:fecho-convexo-interseccao}
 \end{figure}
 
-A principal motivação para o uso de volumes delimitadores é que formas mais simples (como caixas ou esferas) permitem testes de sobreposição muito mais baratos do que a geometria original que envolvem, como ilustrado na figura~\ref{fig:fecho-convexo-interseccao}. Dessa forma, o FC atua como um primeiro filtro: apenas quando o teste de interseção entre volumes delimitadores retorna positivo é que se procede para verificações mais detalhadas na geometria original. Em muitos casos, o próprio volume delimitador já é suficiente para caracterizar uma colisão.
+A principal motivação para o uso de objetos envolventes é que formas mais simples (como caixas ou esferas) permitem testes de sobreposição muito mais baratos do que a geometria original que envolvem, como ilustrado na Figura~\ref{fig:fecho-convexo-interseccao}. Dessa forma, objetos envolventes atuam como um primeiro filtro: apenas quando o teste de interseção entre objetos envolventes retorna positivo é que se procede para verificações mais detalhadas na geometria original. Em muitos casos, o próprio volume delimitador já é suficiente para caracterizar uma colisão.
 
-Segundo \citeonline{moller2018}, nem todos os objetos geométricos servem como volumes delimitadores eficazes. As propriedades desejáveis para volumes delimitadores incluem:
+Segundo \citeonline{moller2018}, nem todos os objetos geométricos servem como objetos envolventes eficazes. As propriedades desejáveis para objetos envolventes incluem:
 \begin{itemize}
 	\item Testes de interseção de baixo custo
 	\item Ajuste preciso
@@ -46,11 +44,11 @@ As esferas constituem o volume delimitador mais simples, definidas apenas por um
 $$
 \text{Sphere} = \{ x \in \mathbb{R}^3 \; | \; \|x - c\| \le r \}.
 $$
-Testes de colisão entre esferas são extremamente rápidos, porém inadequados para objetos de proporções irregulares. Elipsoides oferecem melhor ajuste, mas aumentam o custo de teste. Por isso, essas formas são frequentemente utilizadas em fases preliminares da detecção, ou como nós intermediários em hierarquias de volumes delimitadores (BVH).
+Testes de colisão entre esferas são rápidos, porém inadequados para objetos de proporções irregulares. Elipsoides oferecem melhor ajuste, mas aumentam o custo de teste. Por isso, essas formas são frequentemente utilizadas em fases preliminares da detecção, ou como nós intermediários em hierarquias de volumes delimitadores (BVH).
 
 \subsection*{Caixa Delimitadora Alinhada ao Eixo Coordenado (AABB)}
 
-A caixa delimitadora alinhada aos eixos (AABB) é um dos volumes delimitadores mais utilizados. Trata-se de um paralelepípedo (ou retângulo, em 2D) cujas faces são paralelas aos eixos do sistema de coordenadas. Seu teste de interseção é extremamente como no Algoritmo~\ref{alg:interseccao-aabb}.
+A caixa delimitadora alinhada aos eixos (AABB) foi usado por ser um dos volumes delimitadores mais comuns. Trata-se de um paralelepípedo (ou retângulo, em 2D) cujas faces são paralelas aos eixos do sistema de coordenadas. Seu teste de interseção é simples como no Algoritmo~\ref{alg:interseccao-aabb}.
 \begin{algorithm}[htb]
 	\caption{Teste de Intersecção AABB}
 	\KwIn{A e B: volumes AABB}
@@ -68,23 +66,21 @@ A caixa delimitadora alinhada aos eixos (AABB) é um dos volumes delimitadores m
 	\Return{True}
 	\label{alg:interseccao-aabb}
 \end{algorithm}
-AABBs são eficientes, porém perdem precisão quando o objeto sofre rotações, pois a caixa permanece alinhada aos eixos globais.
+Neste trabalho foram usadasa AABBs por serem simples de implementar e eficientes, porém perdem precisão quando o objeto sofre rotações, pois a caixa permanece alinhada aos eixos globais.
 
 \subsection*{Caixa Delimitadora Orientada (OBB)}
 
-Uma Caixa Orientada (OBB) é uma caixa retangular que pode estar arbitrariamente rotacionada em relação aos eixos do sistema de coordenadas. É definida por um ponto central $c$, por três vetores ortogonais $\hat{u}_i$ que compõem sua orientação e por semi-extensões $e_i$:
+Uma Caixa Delimitadora Orientada (OBB) é uma caixa retangular que pode estar arbitrariamente rotacionada em relação aos eixos do sistema de coordenadas. A representação mais comum é feita por um ponto central $c$, por três vetores ortogonais $\hat{u}_i$ que compõem sua orientação e por extensões $e_i$, que são assumidas serem positivas.
 
-$$
-	OBB = \left\{ c + \sum_{i=1}^{3} \alpha_i \hat{u}_i \; \middle| \; -e_i \le \alpha_i \le e_i \right\}.
-$$
+OBBs geralmente oferecem melhor ajuste, especialmente para objetos alongados ou rotacionados, reduzindo falsos positivos. Porém, o teste de interseção é mais caro que o das AABBs e geralmente é feito usando o SAT.
 
-OBBs geralmente oferecem melhor ajuste, especialmente para objetos alongados ou rotacionados, reduzindo falsos positivos. Porém, o teste de interseção é mais caro que o das AABBs, o que torna seu uso preferível em cenas com número reduzido de objetos ou em simulações nas quais a precisão de ajuste é particularmente importante.
+\subsection*{Fecho Convexo}
 
-\subsection*{Quickhull}
+O Fecho Convexo (FC) de um conjunto é definido como a menor região convexa que contém todos os seus pontos, sendo frequentemente utilizado como um volume delimitador. Determinar o fecho convexo é um problema recorrente em computação geométrica, especialmente quando se deseja organizar pontos em estruturas mais simples ou acelerar operações posteriores, como testes de colisão.
 
 O \textit{Quickhull} é um algoritmo para o cálculo do fecho convexo de um conjunto finito de pontos em qualquer dimensão, adotando uma estratégia de divisão e conquista semelhante ao \textit{quicksort} \cite{barber1996quickhull}.
 
-O Quickhull parte de um conjunto de pontos $S$ e constrói o polígono (ou poliedro) convexo que os contém.  O processo para 2 dimensões pode ser descrito em linhas gerais como no algoritmo~\ref{alg:quickhull_2d}.
+O Quickhull parte de um conjunto de pontos $S$ e constrói o polígono (ou poliedro) convexo que os contém.  O processo para 2 dimensões pode ser descrito em linhas gerais como no Algoritmo~\ref{alg:quickhull_2d}.
 \begin{algorithm}[htb]
 	\caption{Quickhull 2D}
 	\LinesNumbered
@@ -105,7 +101,7 @@ Apresenta complexidade média $O(n \log n)$ em 2D, podendo chegar a $O(n^2)$ em 
 
 A fase de \textit{Broad Phase} tem como objetivo descartar rapidamente pares de objetos que seguramente não estão colidindo. Segundo \citeonline{ericson2004real}, ``nada é mais rápido do que não ter que realizar uma tarefa''. Portanto, a melhor otimização é reduzir a quantidade de trabalho o mais cedo possível.
 
-Como objetos só podem colidir com outros que estejam fisicamente próximos, a \textit{Broad Phase} utiliza consultas espaciais para identificar apenas aqueles que compartilham regiões próximas do espaço. O teste mais simples usado nesta etapa é o teste de interseção booleana entre volumes delimitadores primitivos como no algoritmo~\ref{alg:broad-phase}, devido ao seu baixo custo computacional.
+Como objetos só podem colidir com outros que estejam fisicamente próximos, a \textit{Broad Phase} utiliza consultas espaciais para identificar apenas aqueles que compartilham regiões próximas do espaço. O teste mais simples usado nesta etapa é o teste de interseção booleana entre volumes delimitadores primitivos como no Algoritmo~\ref{alg:broad-phase}, devido ao seu baixo custo computacional.
 
 \begin{algorithm}[htb]
 	\caption{Broad Phase generalizada}
@@ -132,7 +128,7 @@ Como objetos só podem colidir com outros que estejam fisicamente próximos, a \
 
 As técnicas de partição do espaço é o processo pelo qual o espaço é subdividido em regiões convexas, chamadas células. Cada célula na partição mantém uma lista de referências a objetos que nela estão (parcialmente) contidos. Como os objetos só podem se interceptar se se sobrepuserem à mesma região do espaço, o número de testes de pares de objetos é drasticamente reduzido.
 
-Um esquema muito eficaz de subdivisão espacial consiste em sobrepor um espaço com uma grade regular. Essa grade divide o espaço em várias células de tamanho igual. Cada objeto é então associado às células com as quais se sobrepõem, como ilustrado na figura~\ref{fig:grade-uniforme}.
+Um esquema muito eficaz de subdivisão espacial consiste em sobrepor um espaço com uma grade regular. Essa grade divide o espaço em várias células de tamanho igual. Cada objeto é então associado às células com as quais se sobrepõem, como ilustrado na Figura~\ref{fig:grade-uniforme}.
 
 \begin{figure}[htb]
 	\caption{Divisão espacial em grade uniforme}
@@ -164,7 +160,7 @@ A complexidade é reduzida aos pares realmente necessários, tipicamente em núm
 
 \section{Física com passo de tempo fixo}
 
-A forma mais ingênua de simular física é utilizar o tempo decorrido entre quadros como passo de simulação, como ilustrado no algoritmo~\ref{alg:fisica-passo-variavel}. Embora simples, isso introduz instabilidade numérica: simulações podem divergir em altas taxas de quadros, apresentar \textit{tunneling} e se comportar de maneira não determinística. Essa abordagem trás um passo variável que será executada mais rápido ou mais lento dependendo do computador do usuário.
+A forma mais ingênua de simular física é utilizar o tempo decorrido entre quadros como passo de simulação, como ilustrado no Algoritmo~\ref{alg:fisica-passo-variavel}. Embora simples, isso introduz instabilidade numérica: simulações podem divergir em altas taxas de quadros, apresentar \textit{tunneling} e se comportar de maneira não determinística. Essa abordagem trás um passo variável que será executada mais rápido ou mais lento dependendo do computador do usuário.
 \begin{algorithm}[htb]
 	\caption{Simulação física com passo variável}
 	tempo\_anterior $\leftarrow$ agora() \\
@@ -178,7 +174,7 @@ A forma mais ingênua de simular física é utilizar o tempo decorrido entre qua
 	\label{alg:fisica-passo-variavel}
 \end{algorithm}
 
-Para garantir estabilidade, utiliza-se um passo fixo de simulação e um acumulador de tempo como no algoritmo~\ref{alg:fisica-passo-fixo}.
+Para garantir estabilidade, utiliza-se um passo fixo de simulação e um acumulador de tempo como no Algoritmo~\ref{alg:fisica-passo-fixo}.
 \begin{algorithm}[htb]
 	\caption{Simulação física com passo fixo}
 	tempo passado $\leftarrow$ agora() \\
@@ -205,9 +201,9 @@ Para garantir estabilidade, utiliza-se um passo fixo de simulação e um acumula
 
 Em programas interativos tradicionais a lógica, a física e a renderização são executadas em uma única \textit{thread}. Nesse modelo, a renderização só ocorre após a conclusão da etapa de física, e qualquer uma das etapas pode se tornar gargalo.
 
-Para um sistema single-thread, a renderização só pode começar depois que a física tiver sido simulada, ou seja, é impossível renderizar antes que a simulação física seja feita, como ilustrado na figura~\ref{fig:diagrama-threaded}. Nos casos em que uma alta quantidade de cálculo é necessária para a simulação de física, a renderização seria atrasada e a simulação o gargalo, resultando em baixas taxas de quadros e falhas gráficas. O contrário também pode ocorrer: a renderização demorar resulta em um atraso na leitura da entrada do usuário e no processo de simulação física.
+Para um sistema single-thread, a renderização só pode começar depois que a física tiver sido simulada, ou seja, é impossível renderizar antes que a simulação física seja feita, como ilustrado na Figura~\ref{fig:diagrama-threaded}. Nos casos em que uma alta quantidade de cálculo é necessária para a simulação de física, a renderização seria atrasada e a simulação o gargalo, resultando em baixas taxas de quadros e falhas gráficas. O contrário também pode ocorrer: a renderização demorar resulta em um atraso na leitura da entrada do usuário e no processo de simulação física.
 
-Para solucionar esse problema, a simulação física pode ser movida para um \textit{thread} dedicada. A \textit{thread} principal renderiza continuamente utilizando o estado físico mais recente, enquanto o \textit{thread} secundário calcula atualizações físicas em paralelo, como ilustrado na figura~\ref{fig:diagrama-threaded}.
+Para solucionar esse problema, a simulação física pode ser movida para um \textit{thread} dedicada. A \textit{thread} principal renderiza continuamente utilizando o estado físico mais recente, enquanto o \textit{thread} secundário calcula atualizações físicas em paralelo, como ilustrado na Figura~\ref{fig:diagrama-threaded}.
 
 \begin{figure}[htb]
 	\centering
