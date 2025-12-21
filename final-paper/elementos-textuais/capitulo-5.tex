@@ -8,20 +8,20 @@ Reduzir o custo associado ao teste de pares afetará o tempo de execução apena
 
 Neste capítulo, descrevemos as estratégias clássicas de otimização aplicadas à detecção e resolução de colisões, com foco na divisão entre \textit{Broad Phase} e \textit{Narrow Phase}, no uso de estruturas espaciais, na adoção de passos temporais fixos e na execução multi-thread de simulações físicas.
 
-\section{Objetos envolventes}
+\section{Volumes Delimitadores}
 
 Em sistemas de simulação física e detecção de colisões, a representação geométrica dos objetos influencia diretamente a eficiência dos cálculos. Formas complexas, com muitos vértices ou superfícies não convexas, tornam tais testes significativamente mais custosos. Uma solução comum é empregar aproximações convexas que possibilitam testes rápidos sem sacrificar excessivamente a precisão da simulação.
 
 \begin{figure}[htb]
 	\centering
 	\includesvg[width=0.7\linewidth]{fecho-convexo-interseccao}
-	\caption{As figuras à esquerda não tem intersecção de seus volumes delimitadores, logo não podem estar em colisão. Já as figuras da direita estão se sobrepondo, logo podem estar em colisão.}
+	\caption{À esquerda os volumes delimitadors se intersectam porém os objetos não colidem. À direita os volumes delimitadores se intersectam e os objetos colidem.}
 	\label{fig:fecho-convexo-interseccao}
 \end{figure}
 
-A principal motivação para o uso de objetos envolventes é que formas mais simples (como caixas ou esferas) permitem testes de sobreposição muito mais baratos do que a geometria original que envolvem, como ilustrado na Figura~\ref{fig:fecho-convexo-interseccao}. Dessa forma, objetos envolventes atuam como um primeiro filtro: apenas quando o teste de interseção entre objetos envolventes retorna positivo é que se procede para verificações mais detalhadas na geometria original. Em muitos casos, o próprio volume delimitador já é suficiente para caracterizar uma colisão.
+A principal motivação para o uso de volumes delimitadores é que formas mais simples (como caixas ou esferas) permitem testes de sobreposição muito mais baratos do que a geometria original que envolvem. Além disso, se os objetos se intersectam então os seus volumes delimitadors se intersectam, como ilustrado na Figura~\ref{fig:fecho-convexo-interseccao}. Esse fato pode ser usado para acelerar os testes de colisão, como veremos posteriormente. 
 
-Segundo \citeonline{moller2018}, nem todos os objetos geométricos servem como objetos envolventes eficazes. As propriedades desejáveis para objetos envolventes incluem:
+Segundo \citeonline{moller2018}, nem todos os objetos geométricos servem como volumes delimitadores eficazes. As propriedades desejáveis para volumes delimitadores incluem:
 \begin{itemize}
 	\item Testes de interseção de baixo custo
 	\item Ajuste preciso
@@ -34,7 +34,7 @@ como ilustrado na Figura~\ref{fig:formas-fecho-convexo}.
 \begin{figure}[htb]
 	\caption{Comparação entre formas de fecho convexo}
 	\centering
-	\includegraphics[width=\textwidth]{bounding-volumes.jpg}
+	\includesvg[width=\linewidth]{bounding_volumes}
 	\label{fig:formas-fecho-convexo}
 \end{figure}
 
@@ -48,7 +48,7 @@ Testes de colisão entre esferas são rápidos, porém inadequados para objetos 
 
 \subsection*{Caixa Delimitadora Alinhada ao Eixo Coordenado (AABB)}
 
-A caixa delimitadora alinhada aos eixos (AABB) foi usado por ser um dos volumes delimitadores mais comuns. Trata-se de um paralelepípedo (ou retângulo, em 2D) cujas faces são paralelas aos eixos do sistema de coordenadas. Seu teste de interseção é simples como no Algoritmo~\ref{alg:interseccao-aabb}.
+A caixa delimitadora alinhada aos eixos (AABB) é um dos volumes delimitadores mais comuns. Trata-se de um paralelepípedo (ou retângulo, em 2D) cujas faces são paralelas aos eixos do sistema de coordenadas. Seu teste de interseção é simples como no Algoritmo~\ref{alg:interseccao-aabb}.
 \begin{algorithm}[htb]
 	\caption{Teste de Intersecção AABB}
 	\KwIn{A e B: volumes AABB}
@@ -66,7 +66,7 @@ A caixa delimitadora alinhada aos eixos (AABB) foi usado por ser um dos volumes 
 	\Return{True}
 	\label{alg:interseccao-aabb}
 \end{algorithm}
-Neste trabalho foram usadasa AABBs por serem simples de implementar e eficientes, porém perdem precisão quando o objeto sofre rotações, pois a caixa permanece alinhada aos eixos globais.
+Neste trabalho foram usadas AABBs por serem simples de implementar e eficientes, porém perdem precisão quando o objeto sofre rotações, pois a caixa permanece alinhada aos eixos globais.
 
 \subsection*{Caixa Delimitadora Orientada (OBB)}
 
@@ -76,7 +76,7 @@ OBBs geralmente oferecem melhor ajuste, especialmente para objetos alongados ou 
 
 \subsection*{Fecho Convexo}
 
-O Fecho Convexo (FC) de um conjunto é definido como a menor região convexa que contém todos os seus pontos, sendo frequentemente utilizado como um volume delimitador. Determinar o fecho convexo é um problema recorrente em computação geométrica, especialmente quando se deseja organizar pontos em estruturas mais simples ou acelerar operações posteriores, como testes de colisão.
+O Fecho Convexo (FC) de um conjunto p é definido como a menor região convexa que contém todos os seus pontos, sendo frequentemente utilizado como um volume delimitador. Determinar o fecho convexo é um problema recorrente em computação geométrica, especialmente quando se deseja organizar pontos em estruturas mais simples ou acelerar operações posteriores, como testes de colisão.
 
 O \textit{Quickhull} é um algoritmo para o cálculo do fecho convexo de um conjunto finito de pontos em qualquer dimensão, adotando uma estratégia de divisão e conquista semelhante ao \textit{quicksort} \cite{barber1996quickhull}.
 
@@ -97,39 +97,19 @@ O Quickhull parte de um conjunto de pontos $S$ e constrói o polígono (ou polie
 \end{algorithm}
 Apresenta complexidade média $O(n \log n)$ em 2D, podendo chegar a $O(n^2)$ em casos degenerados. Em 3D, adapta-se a construções poliedrais mais complexas, mantendo o mesmo princípio recursivo.
 
-\section{Broad Phase}
+\section{Filtragem e}
 
-A fase de \textit{Broad Phase} tem como objetivo descartar rapidamente pares de objetos que seguramente não estão colidindo. Segundo \citeonline{ericson2004real}, ``nada é mais rápido do que não ter que realizar uma tarefa''. Portanto, a melhor otimização é reduzir a quantidade de trabalho o mais cedo possível.
+A fase de filtragem é chamada de \textit{Broad Phase} e tem como objetivo descartar rapidamente pares de objetos que seguramente não estão colidindo. Segundo \citeonline{ericson2004real}, ``nada é mais rápido do que não ter que realizar uma tarefa''. Portanto, a melhor otimização é reduzir a quantidade de trabalho o mais cedo possível.
 
-Como objetos só podem colidir com outros que estejam fisicamente próximos, a \textit{Broad Phase} utiliza consultas espaciais para identificar apenas aqueles que compartilham regiões próximas do espaço. O teste mais simples usado nesta etapa é o teste de interseção booleana entre volumes delimitadores primitivos como no Algoritmo~\ref{alg:broad-phase}, devido ao seu baixo custo computacional.
-
-\begin{algorithm}[htb]
-	\caption{Broad Phase generalizada}
-	\KwOut{Pares de objetos potenciais para colisão}
-	vistos $\leftarrow \{\}$ \\
-	pares\_contato $\leftarrow \{\}$ \\
-	\ForEach{bodyA em bodies}{
-		candidates $\leftarrow$ consultar objetos próximos de bodyA \\
-		\ForEach{bodyB em candidates}{
-			\If{par \{bodyA, bodyB\} já foi visto}{
-				continue
-			}
-			marcar par como visto \\
-			\If{teste de interseção barata}{
-				pares\_contato $\leftarrow$ \{bodyA, bodyB\}
-			}
-		}
-	}
-	\KwRet{pares\_contato}
-	\label{alg:broad-phase}
-\end{algorithm}
-
-\subsection*{Grade uniforme}
+Como objetos só podem colidir com outros que estejam próximos, a \textit{Broad Phase} utiliza consultas espaciais para identificar apenas aqueles que compartilham regiões próximas do espaço. O teste mais simples usado nesta etapa é o teste de interseção entre volumes delimitadores primitivos como no Algoritmo~\ref{alg:broad-phase}, devido ao seu baixo custo computacional.
 
 As técnicas de partição do espaço é o processo pelo qual o espaço é subdividido em regiões convexas, chamadas células. Cada célula na partição mantém uma lista de referências a objetos que nela estão (parcialmente) contidos. Como os objetos só podem se interceptar se se sobrepuserem à mesma região do espaço, o número de testes de pares de objetos é drasticamente reduzido.
 
-Um esquema muito eficaz de subdivisão espacial consiste em sobrepor um espaço com uma grade regular. Essa grade divide o espaço em várias células de tamanho igual. Cada objeto é então associado às células com as quais se sobrepõem, como ilustrado na Figura~\ref{fig:grade-uniforme}.
+\subsection*{Grade uniforme}
 
+Um esquema muito eficaz de subdivisão espacial consiste em dividir um espaço em várias células de tamanho igual formando uma grade. Cada objeto é então associado às células com as quais se sobrepõem, como ilustrado na Figura~\ref{fig:grade-uniforme}.
+
+\textbf{VETORIZAR FIGURA}
 \begin{figure}[htb]
 	\caption{Divisão espacial em grade uniforme}
 	\centering
@@ -138,6 +118,8 @@ Um esquema muito eficaz de subdivisão espacial consiste em sobrepor um espaço 
 \end{figure}
 
 Devido à uniformidade da grade, acessar uma célula correspondente a uma determinada coordenada é simples e rápido: os valores das coordenadas do mundo são simplesmente divididos pelo tamanho da célula para obter as coordenadas da célula. Dadas as coordenadas de uma célula específica, localizar as células vizinhas também é trivial.
+
+\textbf{EXPLICAR INICIALIZAÇÃO DA GRADE UNIFORME}
 
 Em termos de desempenho, um dos aspectos mais importantes dos métodos baseados em grade é a escolha de um tamanho de célula apropriado. Existem quatro questões relacionadas ao tamanho da célula que podem prejudicar o desempenho:
 \begin{enumerate}
@@ -148,9 +130,9 @@ Em termos de desempenho, um dos aspectos mais importantes dos métodos baseados 
 \end{enumerate}
 O ideal é que cada objeto caiba exatamente no tamanho de uma célula.
 
-\section{Narrow Phase}
+\textbf{INSERIR ALGORITMO DE GRADE UNIFORME}
 
-Após a \textit{Broad Phase} reduzir a lista de pares, a \textit{Narrow Phase} realiza testes geométricos precisos. Esta fase utiliza algoritmos complexos como:
+Após filtrar a lista de pares, a \textit{Narrow Phase} realiza testes geométricos precisos. Esta fase utiliza algoritmos complexos como:
 \begin{itemize}
 	\item SAT (Separating Axis Theorem) para polígonos/poliedros convexos.
 	\item GJK (Gilbert–Johnson–Keerthi) para formas convexas arbitrárias.
@@ -197,7 +179,7 @@ Para garantir estabilidade, utiliza-se um passo fixo de simulação e um acumula
 	\label{alg:fisica-passo-fixo}
 \end{algorithm}
 
-\section{Simulação física multi-thread}
+\section{Simulação física separada}
 
 Em programas interativos tradicionais a lógica, a física e a renderização são executadas em uma única \textit{thread}. Nesse modelo, a renderização só ocorre após a conclusão da etapa de física, e qualquer uma das etapas pode se tornar gargalo.
 
