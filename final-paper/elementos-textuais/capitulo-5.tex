@@ -8,20 +8,20 @@ Reduzir o custo associado ao teste de pares afetará o tempo de execução apena
 
 Neste capítulo, descrevemos as estratégias clássicas de otimização aplicadas à detecção e resolução de colisões, com foco na divisão entre \textit{Broad Phase} e \textit{Narrow Phase}, no uso de estruturas espaciais, na adoção de passos temporais fixos e na execução multi-thread de simulações físicas.
 
-\section{Volumes Delimitadores}
+\section{Objetos delimitadores}
 
 Em sistemas de simulação física e detecção de colisões, a representação geométrica dos objetos influencia diretamente a eficiência dos cálculos. Formas complexas, com muitos vértices ou superfícies não convexas, tornam tais testes significativamente mais custosos. Uma solução comum é empregar aproximações convexas que possibilitam testes rápidos sem sacrificar excessivamente a precisão da simulação.
 
 \begin{figure}[htb]
 	\centering
 	\includesvg[width=0.7\linewidth]{fecho-convexo-interseccao}
-	\caption{À esquerda os volumes delimitadors se intersectam porém os objetos não colidem. À direita os volumes delimitadores se intersectam e os objetos colidem.}
+	\caption{Em (A) os objetos delimitadores não se intersectam, em (B) eles se intersectam porém os objetos não se intersectam, em (C) eles se intersectam e os objetos se intersectam.}
 	\label{fig:fecho-convexo-interseccao}
 \end{figure}
 
-A principal motivação para o uso de volumes delimitadores é que formas mais simples (como caixas ou esferas) permitem testes de sobreposição muito mais baratos do que a geometria original que envolvem. Além disso, se os objetos se intersectam então os seus volumes delimitadors se intersectam, como ilustrado na Figura~\ref{fig:fecho-convexo-interseccao}. Esse fato pode ser usado para acelerar os testes de colisão, como veremos posteriormente. 
+A principal motivação para o uso de objetos delimitadores é que formas mais simples (como caixas ou esferas) permitem testes de sobreposição muito mais baratos do que a geometria original que envolvem. Além disso, se eles se intersectam não necessariamente os objetos se intersectam, mas caso não se intersectam necessariamente os objetos não se intersectam, como ilustrado na Figura~\ref{fig:fecho-convexo-interseccao}. Esse fato pode ser usado para acelerar os testes de colisão, como veremos posteriormente. 
 
-Segundo \citeonline{moller2018}, nem todos os objetos geométricos servem como volumes delimitadores eficazes. As propriedades desejáveis para volumes delimitadores incluem:
+Segundo \citeonline{moller2018}, nem todos os objetos geométricos servem como objetos delimitadores eficazes. As propriedades desejáveis para objetos delimitadores incluem:
 \begin{itemize}
 	\item Testes de interseção de baixo custo
 	\item Ajuste preciso
@@ -32,9 +32,10 @@ Segundo \citeonline{moller2018}, nem todos os objetos geométricos servem como v
 como ilustrado na Figura~\ref{fig:formas-fecho-convexo}.
 
 \begin{figure}[htb]
-	\caption{Comparação entre formas de fecho convexo}
+	\caption{Comparação entre objetos delimitadores}
 	\centering
 	\includesvg[width=\linewidth]{bounding_volumes}
+	\caption{Da esquerda para direita esfera delimitadora, caixa delimitadora alinhada aos eixos, caixa delimitadora orientada, K-DOP e fecho convexo.}
 	\label{fig:formas-fecho-convexo}
 \end{figure}
 
@@ -44,11 +45,11 @@ As esferas constituem o volume delimitador mais simples, definidas apenas por um
 $$
 \text{Sphere} = \{ x \in \mathbb{R}^3 \; | \; \|x - c\| \le r \}.
 $$
-Testes de colisão entre esferas são rápidos, porém inadequados para objetos de proporções irregulares. Elipsoides oferecem melhor ajuste, mas aumentam o custo de teste. Por isso, essas formas são frequentemente utilizadas em fases preliminares da detecção, ou como nós intermediários em hierarquias de volumes delimitadores (BVH).
+Testes de colisão entre esferas são rápidos, porém inadequados para objetos de proporções irregulares. Elipsoides oferecem melhor ajuste, mas aumentam o custo de teste. Por isso, essas formas são frequentemente utilizadas em fases preliminares da detecção, ou como nós intermediários em hierarquias de volumes delimitadores (BVH, do inglês \textit{Bouding Volume Hierarchy}).
 
-\subsection*{Caixa Delimitadora Alinhada ao Eixo Coordenado (AABB)}
+\subsection*{Caixa Delimitadora Alinhada ao Eixo Coordenado}
 
-A caixa delimitadora alinhada aos eixos (AABB) é um dos volumes delimitadores mais comuns. Trata-se de um paralelepípedo (ou retângulo, em 2D) cujas faces são paralelas aos eixos do sistema de coordenadas. Seu teste de interseção é simples como no Algoritmo~\ref{alg:interseccao-aabb}.
+A caixa delimitadora alinhada aos eixos (AABB, do inglês \textit{Axis Align Bounding Box}) é um dos objetos delimitadores mais comuns. Trata-se de um paralelepípedo (ou retângulo, em 2D) cujas faces são paralelas aos eixos do sistema de coordenadas. Seu teste de interseção é simples como no Algoritmo~\ref{alg:interseccao-aabb}.
 \begin{algorithm}[htb]
 	\caption{Teste de Intersecção AABB}
 	\KwIn{A e B: volumes AABB}
@@ -66,19 +67,19 @@ A caixa delimitadora alinhada aos eixos (AABB) é um dos volumes delimitadores m
 	\Return{True}
 	\label{alg:interseccao-aabb}
 \end{algorithm}
-Neste trabalho foram usadas AABBs por serem simples de implementar e eficientes, porém perdem precisão quando o objeto sofre rotações, pois a caixa permanece alinhada aos eixos globais.
+% Neste trabalho foram usadas AABBs por serem simples de implementar e eficientes, porém perdem precisão quando o objeto sofre rotações, pois a caixa permanece alinhada aos eixos globais.
 
-\subsection*{Caixa Delimitadora Orientada (OBB)}
+\subsection*{Caixa Delimitadora Orientada}
 
-Uma Caixa Delimitadora Orientada (OBB) é uma caixa retangular que pode estar arbitrariamente rotacionada em relação aos eixos do sistema de coordenadas. A representação mais comum é feita por um ponto central $c$, por três vetores ortogonais $\hat{u}_i$ que compõem sua orientação e por extensões $e_i$, que são assumidas serem positivas.
+Uma Caixa Delimitadora Orientada (OBB, do inglês \textit{Oriented Bouding Box}) é uma caixa retangular que pode estar arbitrariamente rotacionada em relação aos eixos do sistema de coordenadas. A representação mais comum é feita por um ponto central $c$, por três vetores ortogonais $\hat{u}_i$ que compõem sua orientação e por extensões $e_i$, que são assumidas serem positivas.
 
 OBBs geralmente oferecem melhor ajuste, especialmente para objetos alongados ou rotacionados, reduzindo falsos positivos. Porém, o teste de interseção é mais caro que o das AABBs e geralmente é feito usando o SAT.
 
 \subsection*{Fecho Convexo}
 
-O Fecho Convexo (FC) de um conjunto p é definido como a menor região convexa que contém todos os seus pontos, sendo frequentemente utilizado como um volume delimitador. Determinar o fecho convexo é um problema recorrente em computação geométrica, especialmente quando se deseja organizar pontos em estruturas mais simples ou acelerar operações posteriores, como testes de colisão.
+O Fecho Convexo (FC) de um conjunto finito de pontos p é definido como a menor região convexa que contém todos os pontos em p, sendo frequentemente utilizado como um objeto delimitador. Determinar o fecho convexo é um problema recorrente em computação geométrica, especialmente quando se deseja organizar pontos em estruturas mais simples ou acelerar operações posteriores, como testes de colisão.
 
-O \textit{Quickhull} é um algoritmo para o cálculo do fecho convexo de um conjunto finito de pontos em qualquer dimensão, adotando uma estratégia de divisão e conquista semelhante ao \textit{quicksort} \cite{barber1996quickhull}.
+Existem vários algoritmos, entre os quais o \textit{Quickhull} é um algoritmo para o cálculo do fecho convexo de um conjunto finito de pontos em qualquer dimensão, adotando uma estratégia de divisão e conquista semelhante ao \textit{quicksort} \cite{barber1996quickhull}.
 
 O Quickhull parte de um conjunto de pontos $S$ e constrói o polígono (ou poliedro) convexo que os contém.  O processo para 2 dimensões pode ser descrito em linhas gerais como no Algoritmo~\ref{alg:quickhull_2d}.
 \begin{algorithm}[htb]
@@ -97,17 +98,15 @@ O Quickhull parte de um conjunto de pontos $S$ e constrói o polígono (ou polie
 \end{algorithm}
 Apresenta complexidade média $O(n \log n)$ em 2D, podendo chegar a $O(n^2)$ em casos degenerados. Em 3D, adapta-se a construções poliedrais mais complexas, mantendo o mesmo princípio recursivo.
 
-\section{Filtragem e}
+\section{Filtragem e Refinamento}
 
-A fase de filtragem é chamada de \textit{Broad Phase} e tem como objetivo descartar rapidamente pares de objetos que seguramente não estão colidindo. Segundo \citeonline{ericson2004real}, ``nada é mais rápido do que não ter que realizar uma tarefa''. Portanto, a melhor otimização é reduzir a quantidade de trabalho o mais cedo possível.
+Divide-se o processo de detecção de colisão em duas partes: uma filtragem dos pares que não precisam ser testados pois, claramente não estão em colisão, e um refinamento nos pares que podem ou não colidir. Essa ideia consiste em fazer testes rápidos entre os objetos para descartar pares que seguramente não estão em colisão. Para isso usa-se a ideia de objetos delimitadores e também o conceito de localização espacial. 
 
-Como objetos só podem colidir com outros que estejam próximos, a \textit{Broad Phase} utiliza consultas espaciais para identificar apenas aqueles que compartilham regiões próximas do espaço. O teste mais simples usado nesta etapa é o teste de interseção entre volumes delimitadores primitivos como no Algoritmo~\ref{alg:broad-phase}, devido ao seu baixo custo computacional.
+Nessa primeira parte, chamada de \textit{Broad Phase}, são feitos testes conservadores com objetos delimitadores para evitar testes com geometira consideravelmente complexas. E também como os objetos só podem colidir com outros que estejam próximos, utiliza-se consultas espaciais para identificar apenas aqueles que compartilham regiões próximas do espaço.
 
-As técnicas de partição do espaço é o processo pelo qual o espaço é subdividido em regiões convexas, chamadas células. Cada célula na partição mantém uma lista de referências a objetos que nela estão (parcialmente) contidos. Como os objetos só podem se interceptar se se sobrepuserem à mesma região do espaço, o número de testes de pares de objetos é drasticamente reduzido.
+As técnicas de partição do espaço são os métodos usados para dividir um espaço em regiões menores e mais simples. Isso é feito para organizar dados espacialmente e melhorar operações de busca e consulta de proxidade. Processo pelo qual o espaço é subdividido em regiões, normalmente células convexas, cada célula na partição mantém uma lista de referências a objetos que nela estão contidos. Como os objetos só podem se interceptar se se sobrepuserem à mesma célula, o número de testes de pares de objetos é drasticamente reduzido.
 
-\subsection*{Grade uniforme}
-
-Um esquema muito eficaz de subdivisão espacial consiste em dividir um espaço em várias células de tamanho igual formando uma grade. Cada objeto é então associado às células com as quais se sobrepõem, como ilustrado na Figura~\ref{fig:grade-uniforme}.
+Há muitas estruturas espaciais na literatura, como as hierarquicas: Quadtrees, Octrees, BSP Trees, K-Trees e Ball-trees. Um esquema muito eficaz de subdivisão espacial consiste em dividir um espaço em várias células de tamanho igual formando uma grade. Cada objeto é então associado às células com as quais se sobrepõem, como ilustrado na Figura~\ref{fig:grade-uniforme}.
 
 \textbf{VETORIZAR FIGURA}
 \begin{figure}[htb]
@@ -117,7 +116,7 @@ Um esquema muito eficaz de subdivisão espacial consiste em dividir um espaço e
 	\label{fig:grade-uniforme}
 \end{figure}
 
-Devido à uniformidade da grade, acessar uma célula correspondente a uma determinada coordenada é simples e rápido: os valores das coordenadas do mundo são simplesmente divididos pelo tamanho da célula para obter as coordenadas da célula. Dadas as coordenadas de uma célula específica, localizar as células vizinhas também é trivial.
+Devido à uniformidade da grade, acessar uma célula correspondente a uma determinada coordenada é simples e rápido: os valores das coordenadas do mundo são simplesmente divididos pelo tamanho da célula para obter as coordenadas da célula. Dadas as coordenadas de uma célula específica, localizar as células vizinhas também é trivial. Isso é chamado de subdivisão espacial em grade uniforme.
 
 \textbf{EXPLICAR INICIALIZAÇÃO DA GRADE UNIFORME}
 

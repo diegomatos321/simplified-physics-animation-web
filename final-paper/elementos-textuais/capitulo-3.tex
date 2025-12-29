@@ -2,7 +2,7 @@
 
 A detecção de colisões é um componente fundamental em sistemas de simulação física e em animações baseadas em partículas. Esse processo identifica quando dois ou mais objetos entram em contato, determina pontos de interseção e, quando necessário, fornece informações como vetores de penetração e normais que servirão de entrada para a etapa subsequente de resposta física. Em contextos interativos em tempo real, a precisão geométrica absoluta costuma ser sacrificada em favor da eficiência computacional, desde que o comportamento resultante se mantenha visualmente verossímil.
 
-Este capítulo introduz os principais conceitos utilizados no âmbito deste trabalho, descrevendo as representações geométricas mais comuns para objetos convexos e apresentando dois algoritmos amplamente empregados em detecção de colisões: o Teorema do Eixo Separador (SAT) e o algoritmo Gilbert--Johnson--Keerthi (GJK). Ambos operam eficientemente em formas convexas e constituem a base de vários motores físicos modernos.
+Este capítulo introduz os principais conceitos utilizados no âmbito deste trabalho, descrevendo as representações geométricas mais comuns para objetos convexos e apresentando dois algoritmos amplamente empregados em detecção de colisões: o Teorema do Eixo Separador (SAT, do inglês \textit{Separating Axis Theorem}) e o algoritmo Gilbert-Johnson-Keerthi (GJK). Ambos operam eficientemente em formas convexas e constituem a base de vários motores físicos modernos.
 
 \section{Polígonos convexos}
 
@@ -19,7 +19,7 @@ Uma forma é considerada convexa se, para quaisquer dois pontos contidos nessa f
 \section{Teorema do Eixo Separador (SAT)}
 \label{sec:sat}
 
-O Teorema do Eixo Separador é um dos métodos mais difundidos para detecção de colisão entre polígonos convexos. Além de identificar a presença ou ausência de interseção, o SAT também pode ser utilizado para calcular o vetor de translação mínima (MTV), útil para correções geométricas e resposta física.
+O Teorema do Eixo Separador é um dos métodos mais difundidos para detecção de colisão entre polígonos convexos. Além de identificar a presença ou ausência de interseção, o SAT também pode ser utilizado para calcular o vetor de translação mínima (MTV, do inglês \textit{Minimum Translation Vector}), útil para correções geométricas e resposta física.
 
 O SAT é um algoritmo genérico rápido que pode remover a necessidade de ter código de detecção de colisão para cada par tipo de forma, reduzindo assim o código e a manutenção. Ao traçar raios paralelos sob dois objetos (a partir de uma fonte luminosa, por exemplo) se as sombras formadas estiverem separadas então não há colisão, repita esse processo ao redor das formas, caso não encontre uma sombra que esteja separada uma da outra os objetos estão em colisão. O SAT se baseia no teorema geométrico que afirma:
 
@@ -76,7 +76,7 @@ O SAT pode ser estendido para calcular a penetração mínima. Caso todos os eix
 \end{algorithm},
 onde $\epsilon$ é um valor numérico para tratar erros de operação flutuante e deve-se ser um valor baixo. O método possui complexidade linear no número de arestas e é bastante eficiente para polígonos convexos em 2D. Em 3D, entretanto, o número de eixos candidatos cresce significativamente, reduzindo sua praticidade em relação a alternativas como o GJK.
 
-\section{Algoritmo Gilbert–Johnson–Keerthi (GJK)}
+\section{Algoritmo Gilbert-Johnson-Keerthi (GJK)}
 
 O algoritmo original de \citeonline{gjk} calcula a distância mínima entre dois conjuntos convexos, neste trabalho faremos uma versão simplificada, apresentada por \citeonline{muratori2016implementingGJK}, que realiza um teste Booleano GJK (BGJK) para o caso de dois objetos estarem em intersecção, com otimização usando regiões de Voronoi. Esse algoritmo funciona para ambientes 2D, é particularmente eficiente em 3D e é amplamente adotado em motores físicos por sua robustez e excelente desempenho.
 
@@ -105,9 +105,9 @@ $$
 que pode ser pensado como um processo de varredura que calcula o vetor distância para cada ponto de $B$ em $A$. Neste trabalho, usaremos esse termo para referir a essa operação quando necessário.
 
 A diferença de Minkowski também é chamada de configuração do espaço de
-obstáculos (CSO). Esse espaço possui uma propriedade muito útil de que A e B se intersectam se, e somente se, sua CSO contém a origem. Isso se deve ao fato de que se existe um ponto em comum entre A e B onde a diferença de Minkowski é igual a zero, logo, esse ponto coincide com a origem O.
+obstáculos (CSO, do inglês \textit{Configuration Space Obstacles}). Esse espaço possui uma propriedade muito útil de que A e B se intersectam se, e somente se, sua CSO contém a origem. Isso se deve ao fato de que se existe um ponto em comum entre A e B onde a diferença de Minkowski é igual a zero, logo, esse ponto coincide com a origem O.
 
-Assim o objetivo do BGJK reduz para determinar se a CSO contém ou não a origem. A grande coisa do BGJK é que você não precisa calcular todo CSO, apenas uma amostra do CSO modificando iterativamente um Simplex dentro da OSC até que o Simplex contenha a origem ou pare por não ser possível a origem estar contida no Simplex.
+Assim o objetivo do BGJK reduz para determinar se a CSO contém ou não a origem. A grande coisa do BGJK é que você não precisa calcular todo CSO, apenas uma amostra do CSO modificando iterativamente um Simplex dentro da CSO até que o Simplex contenha a origem ou pare por não ser possível a origem estar contida no Simplex.
 
 Um Simplex é definido como a forma mais simples possível em um espaço de k-dimensão. Dessa forma um ponto é 0-simplex, um segmento de reta é 1-simplex, um triângulo é 2-simplex, um tetraedro é 3-simplex, como na Figura~\ref{fig:simplex}.
 

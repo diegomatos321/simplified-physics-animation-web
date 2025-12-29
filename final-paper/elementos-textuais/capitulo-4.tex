@@ -27,7 +27,7 @@ Os métodos baseados em restrições formulam os contatos como equações que de
 
 \section{Processo de Separação}
 
-A metodologia de \citeonline{jakobsen2001advanced} pode ser compreendida como uma precursora da moderna \textit{Position Based Dynamics} (PBD)~\cite{muller2007position}. Diferentemente das abordagens que atuam sobre a velocidade ou aceleração, \citeonline{jakobsen2001advanced} trata colisões como restrições geométricas adicionais que devem ser satisfeitas durante o processo iterativo de relaxamento da simulação. Assim, objetos penetrando um ao outro são corrigidos exclusivamente por modificações de posição.
+A metodologia de \citeonline{jakobsen2001advanced} pode ser compreendida como uma precursora da moderna dinâmica baseada em posição (PBD, do inglês \textit{Position Based Dynamics})~\cite{muller2007position}. Diferentemente das abordagens que atuam sobre a velocidade ou aceleração, \citeonline{jakobsen2001advanced} trata colisões como restrições geométricas adicionais que devem ser satisfeitas durante o processo iterativo de relaxamento da simulação. Assim, objetos penetrando um ao outro são corrigidos exclusivamente por modificações de posição.
 
 A resposta à colisão envolve dois passos principais. O primeiro consiste em separar os elementos geométricos (vértices, arestas ou faces) que se encontram em interpenetração, o que caracteriza um processo estritamente geométrico. O segundo passo corresponde a um processo iterativo de relaxamento, no qual os elementos afetados ajustam suas posições de acordo com as restrições impostas pelo sistema físico.
 
@@ -74,9 +74,9 @@ Isso garante que a geometria original é preservada e que o ponto $\vec{p}$, def
 
 \section{Algoritmo de Expansão de Politopos (EPA)}
 
-Enquanto o SAT fornece naturalmente o MTV, o algoritmo BGJK apenas informa se há interseção (retornando um \textit{simplex} interno à diferença de Minkowski). Para obter a profundidade e a normal da colisão necessárias para a resposta física, utiliza-se o Algoritmo de Expansão de Politopos (EPA).
+Enquanto o SAT fornece naturalmente o MTV, o algoritmo BGJK apenas informa se há interseção (retornando um \textit{Simplex} interno à diferença de Minkowski). Para obter a profundidade e a normal da colisão necessárias para a resposta física, utiliza-se o Algoritmo de Expansão de Politopos (EPA, do inglês \textit{Expanding Polytope Algorithm}).
 
-O Algoritmo~\ref{alg:epa} expande o \textit{simplex} final do GJK iterativamente até encontrar a fronteira da diferença de Minkowski mais próxima da origem. A distância entre o ponto mais próximo com a origem é a profundidade de penetração. Além disso, o vetor normal para o ponto mais próximo é a direção de separação (ponto de contato). A solução ingênua é usar a normal da face mais próxima da origem, porém um \textit{simplex} não precisa conter nenhuma das faces do polígono original, o que pode levar ao cálculo de uma normal incorreta.
+O Algoritmo~\ref{alg:epa} expande o \textit{simplex} final do BGJK iterativamente até encontrar a fronteira da diferença de Minkowski mais próxima da origem. A distância entre o ponto mais próximo com a origem é a profundidade de penetração. Além disso, o vetor normal para o ponto mais próximo é a direção de separação (ponto de contato). A solução ingênua é usar a normal da face mais próxima da origem, porém um \textit{simplex} não precisa conter nenhuma das faces do polígono original, o que pode levar ao cálculo de uma normal incorreta.
 \begin{algorithm}[htb]
 	\caption{EPA}
 	\KwIn{Simplex}
