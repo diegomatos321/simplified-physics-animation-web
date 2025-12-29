@@ -100,27 +100,32 @@ Apresenta complexidade média $O(n \log n)$ em 2D, podendo chegar a $O(n^2)$ em 
 
 \section{Filtragem e Refinamento}
 
-Divide-se o processo de detecção de colisão em duas partes: uma filtragem dos pares que não precisam ser testados pois, claramente não estão em colisão, e um refinamento nos pares que podem ou não colidir. Essa ideia consiste em fazer testes rápidos entre os objetos para descartar pares que seguramente não estão em colisão. Para isso usa-se a ideia de objetos delimitadores e também o conceito de localização espacial. 
+Em geral, o número de objetos em colisão é muito pequeno e gastar $O(n^2)$ é demais, deseja-se reduzir o tempo esperado para $O(n)$ ou $O(nlogn)$. Para isso divide-se o processo de detecção de colisão em duas partes: uma filtragem dos pares que não precisam ser testados pois, claramente não estão em colisão, e um refinamento nos pares que podem ou não colidir. Para isso usa-se a ideia de objetos delimitadores e também o conceito de localização espacial. 
 
 Nessa primeira parte, chamada de \textit{Broad Phase}, são feitos testes conservadores com objetos delimitadores para evitar testes com geometira consideravelmente complexas. E também como os objetos só podem colidir com outros que estejam próximos, utiliza-se consultas espaciais para identificar apenas aqueles que compartilham regiões próximas do espaço.
 
-As técnicas de partição do espaço são os métodos usados para dividir um espaço em regiões menores e mais simples. Isso é feito para organizar dados espacialmente e melhorar operações de busca e consulta de proxidade. Processo pelo qual o espaço é subdividido em regiões, normalmente células convexas, cada célula na partição mantém uma lista de referências a objetos que nela estão contidos. Como os objetos só podem se interceptar se se sobrepuserem à mesma célula, o número de testes de pares de objetos é drasticamente reduzido.
+As técnicas de partição do espaço são os métodos usados para dividir um espaço em regiões menores e mais simples. Isso é feito para organizar dados espacialmente e melhorar operações de busca e consulta de proxidade. Processo pelo qual o espaço é subdividido em regiões, normalmente células convexas, cada célula na partição mantém uma lista de referências a objetos que nela estão contidos (completamente ou parcialmente). Como os objetos só podem se interceptar se se sobrepuserem à mesma célula, o número de testes de pares de objetos é drasticamente reduzido.
 
-Há muitas estruturas espaciais na literatura, como as hierarquicas: Quadtrees, Octrees, BSP Trees, K-Trees e Ball-trees. Um esquema muito eficaz de subdivisão espacial consiste em dividir um espaço em várias células de tamanho igual formando uma grade. Cada objeto é então associado às células com as quais se sobrepõem, como ilustrado na Figura~\ref{fig:grade-uniforme}.
+Há muitas estruturas espaciais na literatura, como as hierarquicas: Quadtrees, Octrees, BSP Trees, K-Trees e Ball-trees. Grades uniforme constituem um esquema muito usado de subdivisão espacial. Uma grade pode dividir o espaço em vários células de tamanho igual. Cada objeto é então associado às células com as quais se sobrepõem, como ilustrado na Figura~\ref{fig:grade-uniforme}.
 
-\textbf{VETORIZAR FIGURA}
 \begin{figure}[htb]
 	\caption{Divisão espacial em grade uniforme}
 	\centering
-	\includegraphics[width=0.5\textwidth]{Partition-of-a-2D-scene-by-a-4x4-uniform-grid.png}
+	\includesvg[width=0.5\textwidth]{uniform-grid}
 	\label{fig:grade-uniforme}
 \end{figure}
 
-Devido à uniformidade da grade, acessar uma célula correspondente a uma determinada coordenada é simples e rápido: os valores das coordenadas do mundo são simplesmente divididos pelo tamanho da célula para obter as coordenadas da célula. Dadas as coordenadas de uma célula específica, localizar as células vizinhas também é trivial. Isso é chamado de subdivisão espacial em grade uniforme.
+Devido à uniformidade da grade, acessar uma célula correspondente a uma determinada coordenada é simples e rápido: os valores das coordenadas do mundo são simplesmente divididos pelo tamanho da célula para obter as coordenadas da célula. Dadas as coordenadas de uma célula específica, localizar as células vizinhas também é trivial.
+
+\textbf{Explicar sobre a inicialização da grade}
+
+\textbf{Explicar sobre o gerenciamento da grade}
 
 \textbf{EXPLICAR INICIALIZAÇÃO DA GRADE UNIFORME}
 
-Em termos de desempenho, um dos aspectos mais importantes dos métodos baseados em grade é a escolha de um tamanho de célula apropriado. Existem quatro questões relacionadas ao tamanho da célula que podem prejudicar o desempenho:
+Em termos de desempenho, um dos aspectos mais importantes dos métodos baseados em grade é a escolha de um tamanho de célula apropriado. A célula deve ter um tamanho aproximado da maior parte dos objetos da cena. Se todos os objetos cabem numa célula de tamanho x por x, então necessariamente cada objeto pode intersectar, no pior caso, até 4 células em 2D ou 8 células em 3D.
+
+Segundo \citeonline{ericson2004real}, existem quatro questões relacionadas ao tamanho da célula que podem prejudicar o desempenho:
 \begin{enumerate}
 	\item Células muito pequenas geram atualizações excessivas.
 	\item Células grandes demais fazem com que muitos objetos sejam agrupados, reduzindo a eficácia da Broad Phase.
@@ -131,52 +136,48 @@ O ideal é que cada objeto caiba exatamente no tamanho de uma célula.
 
 \textbf{INSERIR ALGORITMO DE GRADE UNIFORME}
 
-Após filtrar a lista de pares, a \textit{Narrow Phase} realiza testes geométricos precisos. Esta fase utiliza algoritmos complexos como:
-\begin{itemize}
-	\item SAT (Separating Axis Theorem) para polígonos/poliedros convexos.
-	\item GJK (Gilbert–Johnson–Keerthi) para formas convexas arbitrárias.
-	\item EPA (Expanding Polytope Algorithm) para obtenção da profundidade de penetração.
-\end{itemize}
-A complexidade é reduzida aos pares realmente necessários, tipicamente em número linear no tamanho da cena.
+\textbf{REALIZAR ANÁLISE DE COMPLEXIDADE}
+
+Após filtrar a lista de pares, é feito um segundo passo de refinamento que realiza testes geométricos precisos, essa fase é chamada de \textit{Narrow Phase}. Utiliza-se algoritmos complexos como: SAT, GJK e EPA como visto anteriormente. A complexidade é reduzida aos pares realmente necessários, tipicamente em número linear no tamanho da cena.
 
 \section{Física com passo de tempo fixo}
 
 A forma mais ingênua de simular física é utilizar o tempo decorrido entre quadros como passo de simulação, como ilustrado no Algoritmo~\ref{alg:fisica-passo-variavel}. Embora simples, isso introduz instabilidade numérica: simulações podem divergir em altas taxas de quadros, apresentar \textit{tunneling} e se comportar de maneira não determinística. Essa abordagem trás um passo variável que será executada mais rápido ou mais lento dependendo do computador do usuário.
-\begin{algorithm}[htb]
-	\caption{Simulação física com passo variável}
-	tempo\_anterior $\leftarrow$ agora() \\
-	\While{!sair}{
-		tempo\_agora $\leftarrow$ agora() \\
-		dt $\leftarrow$ tempo\_agora - tempo\_anterior \\
-		tempo\_anterior $\leftarrow$ tempo\_agora \\
-		Física(dt) \\
-		Renderizar() 
-	}
-	\label{alg:fisica-passo-variavel}
-\end{algorithm}
+% \begin{algorithm}[htb]
+% 	\caption{Simulação física com passo variável}
+% 	tempo\_anterior $\leftarrow$ agora() \\
+% 	\While{!sair}{
+% 		tempo\_agora $\leftarrow$ agora() \\
+% 		dt $\leftarrow$ tempo\_agora - tempo\_anterior \\
+% 		tempo\_anterior $\leftarrow$ tempo\_agora \\
+% 		Física(dt) \\
+% 		Renderizar() 
+% 	}
+% 	\label{alg:fisica-passo-variavel}
+% \end{algorithm}
 
 Para garantir estabilidade, utiliza-se um passo fixo de simulação e um acumulador de tempo como no Algoritmo~\ref{alg:fisica-passo-fixo}.
-\begin{algorithm}[htb]
-	\caption{Simulação física com passo fixo}
-	tempo passado $\leftarrow$ agora() \\
-	fixed dt $\leftarrow$ $\frac{1}{50}$ \\
-	acumulador $\leftarrow$ 0 \\
-	\While{!sair}{
-		tempo agora $\leftarrow$ agora() \\
-		dt $\leftarrow$ tempo agora - tempo anterior \\
-		tempo anterior $\leftarrow$ tempo agora \\
-		acumulador $\leftarrow$ acumulador + dt
+% \begin{algorithm}[htb]
+% 	\caption{Simulação física com passo fixo}
+% 	tempo passado $\leftarrow$ agora() \\
+% 	fixed dt $\leftarrow$ $\frac{1}{50}$ \\
+% 	acumulador $\leftarrow$ 0 \\
+% 	\While{!sair}{
+% 		tempo agora $\leftarrow$ agora() \\
+% 		dt $\leftarrow$ tempo agora - tempo anterior \\
+% 		tempo anterior $\leftarrow$ tempo agora \\
+% 		acumulador $\leftarrow$ acumulador + dt
 		
-		\While{acumulador <= fixed dt}{
-			Física(dt) \\
-			acumulador $\leftarrow$ acumulador - fixed dt
-		}
+% 		\While{acumulador <= fixed dt}{
+% 			Física(dt) \\
+% 			acumulador $\leftarrow$ acumulador - fixed dt
+% 		}
 		
-		Física(dt) \\
-		Renderizar() 
-	}
-	\label{alg:fisica-passo-fixo}
-\end{algorithm}
+% 		Física(dt) \\
+% 		Renderizar() 
+% 	}
+% 	\label{alg:fisica-passo-fixo}
+% \end{algorithm}
 
 \section{Simulação física separada}
 
