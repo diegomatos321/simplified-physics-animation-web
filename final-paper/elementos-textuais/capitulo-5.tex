@@ -115,15 +115,24 @@ Há muitas estruturas espaciais na literatura, como as hierarquicas: Quadtrees, 
 	\label{fig:grade-uniforme}
 \end{figure}
 
-Devido à uniformidade da grade, acessar uma célula correspondente a uma determinada coordenada é simples e rápido: os valores das coordenadas do mundo são simplesmente divididos pelo tamanho da célula para obter as coordenadas da célula. Dadas as coordenadas de uma célula específica, localizar as células vizinhas também é trivial.
+Uma forma natural de se representar a grade é alocar uma matriz de dimensão correspondente, neste trabalho será feito em 2D, onde cada elemento é uma lista com todos objetos na célula. Esse método sofre com matrizes esparsas, alto consumo de memória, e um tamanho fixo do mundo. Outra forma de representar e evitar esses problema é:
+\begin{itemize}
+	\item Crie uma tabela hash onde cada elemento representa uma célula e armazena uma lista de objetos que ela contém.
+	\item Para um ponto as coordenadas de células inteiras (i, j) são calculadas dividindo as coordenadas contínuas do ponto (x, y) pelo tamanho da célula e tomando o piso do resultado
+	$$i = \lfloor{\frac{x}{C}}\rceil, \quad j = \lceil{\frac{y}{C}}\rceil,
+	$$
+	onde C é o tamanho da célula.
+	\item Use como função hash $H(i, j) = (i \oplus p_1 + j \oplus p_2) \mod m$, onde $p_1$ e $p_2$ são números primos e m o tamanho da tabela.
+	\item Para cada objeto, calcule sua caixa delimitadora e traverse todas as células ocupadas. Salve o objeto em cada célula ocupada ao longo da extensão de sua caixa delimitadora.
+	$$$$
+\end{itemize}
+Dessa forma temos uma grade regular que mepeia um mundo de tamanho arbitrário (possivelmente infinito) em um grade regular de tamanho constante.
 
-\textbf{Explicar sobre a inicialização da grade}
+Além disso, deve-se tratar o caso em que o mundo seja dinâmico, com objetos se movendo, sendo adicionados e removidos. Para um mundo estático basta inicializar a grade como visto anteriormente, mas para um mundo dinâmico é necessário sempre que um objeto for adicionado na simulação também adiciona-lo à grade, quando um objeto for removido, também remove-lo da grade e a todo passo de tempo recalcular em quais células os objetos que se moveram estão e atualizar na grade. Neste trabalho, por motivos de simplicidade, a grade será limpa a todo passo de tempo e reinicializada.
 
-\textbf{Explicar sobre o gerenciamento da grade}
+% Devido à uniformidade da grade, acessar uma célula correspondente a uma determinada coordenada é simples e rápido: os valores das coordenadas do mundo são simplesmente divididos pelo tamanho da célula para obter as coordenadas da célula. Dadas as coordenadas de uma célula específica, localizar as células vizinhas também é trivial.
 
-\textbf{EXPLICAR INICIALIZAÇÃO DA GRADE UNIFORME}
-
-Em termos de desempenho, um dos aspectos mais importantes dos métodos baseados em grade é a escolha de um tamanho de célula apropriado. A célula deve ter um tamanho aproximado da maior parte dos objetos da cena. Se todos os objetos cabem numa célula de tamanho x por x, então necessariamente cada objeto pode intersectar, no pior caso, até 4 células em 2D ou 8 células em 3D.
+Em termos de desempenho, um dos aspectos mais importantes dos métodos baseados em grade é a escolha de um tamanho de célula apropriado. A célula deve ter um tamanho aproximado da maior parte dos objetos da cena. Se todos os objetos cabem numa célula de tamanho C, então necessariamente cada objeto pode intersectar, no pior caso, até 4 células em 2D ou 8 células em 3D.
 
 Segundo \citeonline{ericson2004real}, existem quatro questões relacionadas ao tamanho da célula que podem prejudicar o desempenho:
 \begin{enumerate}
@@ -134,11 +143,9 @@ Segundo \citeonline{ericson2004real}, existem quatro questões relacionadas ao t
 \end{enumerate}
 O ideal é que cada objeto caiba exatamente no tamanho de uma célula.
 
-\textbf{INSERIR ALGORITMO DE GRADE UNIFORME}
+Com essa etapa de filtragem usando grade uniforme concluída temos uma lista de pares de candidatos a colisão P e também uma melhora significativa no tempo esperado de $O(n^2)$ para $O(n)$, onde no pior caso, se muitos (se não todos) objetos cairem sobre a mesma célula continuamos com $O(n^2)$.
 
-\textbf{REALIZAR ANÁLISE DE COMPLEXIDADE}
-
-Após filtrar a lista de pares, é feito um segundo passo de refinamento que realiza testes geométricos precisos, essa fase é chamada de \textit{Narrow Phase}. Utiliza-se algoritmos complexos como: SAT, GJK e EPA como visto anteriormente. A complexidade é reduzida aos pares realmente necessários, tipicamente em número linear no tamanho da cena.
+O segundo passo de refinamento realiza testes geométricos precisos nos pares de candidatos P, essa fase é chamada de \textit{Narrow Phase}. Utiliza-se algoritmos complexos como: SAT, GJK e EPA como visto anteriormente para determinar se os objetos estão de fato colidindo. 
 
 \section{Física com passo de tempo fixo}
 
