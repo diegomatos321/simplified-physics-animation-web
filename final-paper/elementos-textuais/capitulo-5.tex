@@ -106,7 +106,7 @@ Nessa primeira parte, chamada de \textit{Broad Phase}, são feitos testes conser
 
 As técnicas de partição do espaço são os métodos usados para dividir um espaço em regiões menores e mais simples. Isso é feito para organizar dados espacialmente e melhorar operações de busca e consulta de proxidade. Processo pelo qual o espaço é subdividido em regiões, normalmente células convexas, cada célula na partição mantém uma lista de referências a objetos que nela estão contidos (completamente ou parcialmente). Como os objetos só podem se interceptar se se sobrepuserem à mesma célula, o número de testes de pares de objetos é drasticamente reduzido.
 
-Há muitas estruturas espaciais na literatura, como as hierarquicas: Quadtrees, Octrees, BSP Trees, K-Trees e Ball-trees. Grades uniforme constituem um esquema muito usado de subdivisão espacial. Uma grade pode dividir o espaço em vários células de tamanho igual. Cada objeto é então associado às células com as quais se sobrepõem, como ilustrado na Figura~\ref{fig:grade-uniforme}.
+Há muitas estruturas espaciais na literatura, como as hierarquicas: Quadtrees, Octrees, BSP Trees, K-Trees e Ball-trees. Grades uniforme constituem um esquema muito usado de subdivisão espacial. Uma grade pode dividir o espaço em várias células de tamanho igual. Cada objeto é então associado às células com as quais se sobrepõem, como ilustrado na Figura~\ref{fig:grade-uniforme}.
 
 \begin{figure}[htb]
 	\caption{Divisão espacial em grade uniforme}
@@ -119,16 +119,19 @@ Uma forma natural de se representar a grade é alocar uma matriz de dimensão co
 \begin{itemize}
 	\item Crie uma tabela hash onde cada elemento representa uma célula e armazena uma lista de objetos que ela contém.
 	\item Para um ponto as coordenadas de células inteiras (i, j) são calculadas dividindo as coordenadas contínuas do ponto (x, y) pelo tamanho da célula e tomando o piso do resultado
-	$$i = \lfloor{\frac{x}{C}}\rceil, \quad j = \lceil{\frac{y}{C}}\rceil,
+	$$i = \lfloor{\frac{x}{C}}\rfloor, \quad j = \lceil{\frac{y}{C}}\rfloor,
 	$$
 	onde C é o tamanho da célula.
 	\item Use como função hash $H(i, j) = (i \oplus p_1 + j \oplus p_2) \mod m$, onde $p_1$ e $p_2$ são números primos e m o tamanho da tabela.
 	\item Para cada objeto, calcule sua caixa delimitadora e traverse todas as células ocupadas. Salve o objeto em cada célula ocupada ao longo da extensão de sua caixa delimitadora.
+	\item Para cada célula ordene os objetos por id
 	$$$$
 \end{itemize}
-Dessa forma temos uma grade regular que mepeia um mundo de tamanho arbitrário (possivelmente infinito) em um grade regular de tamanho constante.
+Dessa forma, temos uma grade uniforme que mepeia um mundo de tamanho arbitrário (possivelmente infinito) em um grade uniforme de tamanho constante.
 
 Além disso, deve-se tratar o caso em que o mundo seja dinâmico, com objetos se movendo, sendo adicionados e removidos. Para um mundo estático basta inicializar a grade como visto anteriormente, mas para um mundo dinâmico é necessário sempre que um objeto for adicionado na simulação também adiciona-lo à grade, quando um objeto for removido, também remove-lo da grade e a todo passo de tempo recalcular em quais células os objetos que se moveram estão e atualizar na grade. Neste trabalho, por motivos de simplicidade, a grade será limpa a todo passo de tempo e reinicializada.
+
+A fase de filtragem usa essa estrutura de dados para ao invés de testar todos os pares de objetos, testar apenas os pares de objetos que estão contidos na mesma célula da grade, usando suas caixas delimitadoras correspondente. Para isso é necessário ser feito eliminação de duplicatas, pois se dois objetos A e B caem na mesma célula é preciso testar apenas o par (A, B) e não repetir para o par (B, A). 
 
 % Devido à uniformidade da grade, acessar uma célula correspondente a uma determinada coordenada é simples e rápido: os valores das coordenadas do mundo são simplesmente divididos pelo tamanho da célula para obter as coordenadas da célula. Dadas as coordenadas de uma célula específica, localizar as células vizinhas também é trivial.
 
@@ -143,48 +146,15 @@ Segundo \citeonline{ericson2004real}, existem quatro questões relacionadas ao t
 \end{enumerate}
 O ideal é que cada objeto caiba exatamente no tamanho de uma célula.
 
-Com essa etapa de filtragem usando grade uniforme concluída temos uma lista de pares de candidatos a colisão P e também uma melhora significativa no tempo esperado de $O(n^2)$ para $O(n)$, onde no pior caso, se muitos (se não todos) objetos cairem sobre a mesma célula continuamos com $O(n^2)$.
+Com essa etapa de filtragem usando grade uniforme concluída temos uma lista de pares de candidatos a colisão P e também uma melhora significativa no tempo esperado de $O(n^2)$ para $O(n)$, onde no pior caso, se muitos (se não todos) objetos cairem sobre a mesma célula, continuamos com $O(n^2)$.
 
-O segundo passo de refinamento realiza testes geométricos precisos nos pares de candidatos P, essa fase é chamada de \textit{Narrow Phase}. Utiliza-se algoritmos complexos como: SAT, GJK e EPA como visto anteriormente para determinar se os objetos estão de fato colidindo. 
+O segundo passo de refinamento realiza testes geométricos precisos nos pares de candidatos P, essa fase é chamada de \textit{Narrow Phase}. Utiliza-se algoritmos mais sofisticados para determinar se os objetos estão de fato colidindo, como SAT, GJK e EPA, vistos anteriormente. Essa fase nem sempre é obrigatória pois, sua aplicação pode se tratar de objetos retangulares que caibam justamente nas dimensões de sua caixa delimitadora.
 
-\section{Física com passo de tempo fixo}
+\section{Como determinar o intervalo de integração da física}
 
-A forma mais ingênua de simular física é utilizar o tempo decorrido entre quadros como passo de simulação, como ilustrado no Algoritmo~\ref{alg:fisica-passo-variavel}. Embora simples, isso introduz instabilidade numérica: simulações podem divergir em altas taxas de quadros, apresentar \textit{tunneling} e se comportar de maneira não determinística. Essa abordagem trás um passo variável que será executada mais rápido ou mais lento dependendo do computador do usuário.
-% \begin{algorithm}[htb]
-% 	\caption{Simulação física com passo variável}
-% 	tempo\_anterior $\leftarrow$ agora() \\
-% 	\While{!sair}{
-% 		tempo\_agora $\leftarrow$ agora() \\
-% 		dt $\leftarrow$ tempo\_agora - tempo\_anterior \\
-% 		tempo\_anterior $\leftarrow$ tempo\_agora \\
-% 		Física(dt) \\
-% 		Renderizar() 
-% 	}
-% 	\label{alg:fisica-passo-variavel}
-% \end{algorithm}
+Em física é preciso estabelecer um valor para o passo de tempo, normalmente chamado de dt (do inglês \textit{Delta Time}). Isso depende muito, se o seu problema tiver muitos objetos e restrito ao tempo, usa-se um dt alto, mas se não estiver restrito ao tempo usa-se o melhor dt possível para obter uma simulação suave. Em muitos casos não é interessante usar todo tempo da máquina para simulação física, mas também para renderização.
 
-Para garantir estabilidade, utiliza-se um passo fixo de simulação e um acumulador de tempo como no Algoritmo~\ref{alg:fisica-passo-fixo}.
-% \begin{algorithm}[htb]
-% 	\caption{Simulação física com passo fixo}
-% 	tempo passado $\leftarrow$ agora() \\
-% 	fixed dt $\leftarrow$ $\frac{1}{50}$ \\
-% 	acumulador $\leftarrow$ 0 \\
-% 	\While{!sair}{
-% 		tempo agora $\leftarrow$ agora() \\
-% 		dt $\leftarrow$ tempo agora - tempo anterior \\
-% 		tempo anterior $\leftarrow$ tempo agora \\
-% 		acumulador $\leftarrow$ acumulador + dt
-		
-% 		\While{acumulador <= fixed dt}{
-% 			Física(dt) \\
-% 			acumulador $\leftarrow$ acumulador - fixed dt
-% 		}
-		
-% 		Física(dt) \\
-% 		Renderizar() 
-% 	}
-% 	\label{alg:fisica-passo-fixo}
-% \end{algorithm}
+No geral existem dois esquemas de integração física. A forma mais simples é usar uma integração de passo fixo usando sempre o mesmo dt e garante que a simulação seja reprodutível. Outra forma é integração com passo variável, ela é a forma mais comum de realizar integração física pois é sempre computada o mais rápido possível olhando o dt depende do tempo decorrido do relógio, o problema disso que dependendo da máquina pode fazer mais passos ou menos passos de simulação, em geral fazer mais passos da simulação trás um resultado mais plausível. 
 
 \section{Simulação física separada}
 
