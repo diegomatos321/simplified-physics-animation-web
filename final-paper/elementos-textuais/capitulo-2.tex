@@ -1,6 +1,6 @@
 \chapter{Animação Baseada em Física}
 
-A animação baseada em física é uma abordagem de geração de movimento que aparenta seguir princípios físicos básicos, mesmo que as equações envolvidas sejam tratadas de forma aproximada ou altamente simplificada. Diferentemente da animação tradicional, na qual o animador define manualmente posições e rotações ao longo do tempo (\textit{keyframe animation}), a animação física permite que o comportamento dos objetos emerja naturalmente das forças, restrições e interações entre os corpos simulados.
+A animação baseada em física é uma abordagem de geração de movimento que aparenta seguir princípios físicos básicos, mesmo que as equações envolvidas sejam tratadas de forma aproximada ou altamente simplificada. Diferentemente da animação tradicional, na qual o animador define manualmente posições e rotações ao longo do tempo (do inglês, \textit{keyframe animation}), a animação física permite que o comportamento dos objetos emerja naturalmente das forças, restrições e interações entre os corpos simulados.
 
 Nesse contexto, a animação física simplificada busca um equilíbrio entre precisão e desempenho: modelos matemáticos são utilizados como guia, mas a prioridade está na estabilidade visual e na resposta interativa. Diferentemente da simulação científica, onde precisão e correção numérica são cruciais, na animação para fins gráficos ou interativos o objetivo não é obter resultados fisicamente corretos, mas sim verossimilhança visual (plausibilidade). O foco está em transmitir sensação de peso, inércia e colisões de maneira convincente ao usuário, mesmo quando obtidos por heurísticas.
 
@@ -88,7 +88,7 @@ A representação matemática de um corpo rígido é dada por:
 
 Enquanto a dinâmica de corpos rígidos assume que a distância entre os pontos constituintes do objeto permanece inalterada, a simulação de corpos deformáveis lida com objetos que alteram sua forma sob a ação de forças externas. Esta categoria abrange uma vasta gama de fenômenos físicos, desde o comportamento elástico de uma bola de borracha até a dinâmica complexa de tecidos, cabelos e fluidos.
 
-Na mecânica do contínuo, a deformação é descrita pela mudança na configuração métrica do material, gerando tensões internas que tendem a restaurar o objeto ao seu estado de repouso ou dissipar energia na forma de deformação plástica. No contexto da computação gráfica em tempo real, no entanto, modelos discretos simplificados, tipicamente baseados em partículas, são preferidos em relação a métodos mais complexos, como por exemplo os Métodos de Elementos Finitos (FEM).
+Na mecânica do contínuo, a deformação é descrita pela mudança na configuração métrica do material, gerando tensões internas que tendem a restaurar o objeto ao seu estado de repouso ou dissipar energia na forma de deformação plástica. No contexto da computação gráfica em tempo real, no entanto, modelos discretos simplificados, tipicamente baseados em partículas, são preferidos em relação a métodos mais complexos, como por exemplo os Métodos de Elementos Finitos (FEM, do inglês \textit{Finit Element Methods}).
 
 \subsection*{Sistemas Massa-Mola}
 
@@ -119,7 +119,7 @@ A simulação de movimento depende da solução numérica das equações diferen
 
 \subsection*{Método de Euler}
 
-O método de Euler explícito é o mais simples e intuitivo. Ele atualiza a posição e a velocidade de acordo com a aceleração atual:
+O método de Euler é o mais simples e intuitivo. Ele atualiza a posição e a velocidade de acordo com a aceleração atual:
 \begin{align*}
 	\vec{v}_{t+\Delta t} &= \vec{v}_t + \vec{a}_t \Delta t, \\
 	\vec{x}_{t+\Delta t} &= \vec{x}_t + \vec{v}_t \Delta t.

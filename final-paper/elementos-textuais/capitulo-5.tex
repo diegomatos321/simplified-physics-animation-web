@@ -162,7 +162,7 @@ Em programas interativos tradicionais a lógica, a física e a renderização s�
 
 Para um sistema single-thread, a renderização só pode começar depois que a física tiver sido simulada, ou seja, é impossível renderizar antes que a simulação física seja feita, como ilustrado na Figura~\ref{fig:diagrama-threaded}. Nos casos em que uma alta quantidade de cálculo é necessária para a simulação de física, a renderização seria atrasada e a simulação o gargalo, resultando em baixas taxas de quadros e falhas gráficas. O contrário também pode ocorrer: a renderização demorar resulta em um atraso na leitura da entrada do usuário e no processo de simulação física.
 
-Para solucionar esse problema, a simulação física pode ser movida para um \textit{thread} dedicada. A \textit{thread} principal renderiza continuamente utilizando o estado físico mais recente, enquanto o \textit{thread} secundário calcula atualizações físicas em paralelo, como ilustrado na Figura~\ref{fig:diagrama-threaded}.
+Para solucionar esse problema, a simulação física pode ser movida para um \textit{thread} dedicada. A \textit{thread} principal renderiza continuamente utilizando o estado físico mais recente, enquanto a \textit{thread} secundária calcula atualizações físicas em paralelo, como ilustrado na Figura~\ref{fig:diagrama-threaded}.
 
 \begin{figure}[htb]
 	\centering
