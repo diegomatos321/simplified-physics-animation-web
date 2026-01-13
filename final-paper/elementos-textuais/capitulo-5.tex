@@ -79,9 +79,9 @@ OBBs geralmente oferecem melhor ajuste, especialmente para objetos alongados ou 
 
 O Fecho Convexo (FC) de um conjunto finito de pontos p é definido como a menor região convexa que contém todos os pontos em p, sendo frequentemente utilizado como um objeto delimitador. Determinar o fecho convexo é um problema recorrente em computação geométrica, especialmente quando se deseja organizar pontos em estruturas mais simples ou acelerar operações posteriores, como testes de colisão.
 
-Existem vários algoritmos, entre os quais o \textit{Quickhull} é um algoritmo para o cálculo do fecho convexo de um conjunto finito de pontos em qualquer dimensão, adotando uma estratégia de divisão e conquista semelhante ao \textit{quicksort} \cite{barber1996quickhull}.
+Existem vários algoritmos, entre os quais o \textit{Quickhull} é um algoritmo bastante conhecido para o cálculo do fecho convexo de um conjunto finito de pontos em qualquer dimensão, adotando uma estratégia de divisão e conquista semelhante ao \textit{quicksort} \cite{barber1996quickhull}.
 
-O Quickhull parte de um conjunto de pontos $S$ e constrói o polígono (ou poliedro) convexo que os contém.  O processo para 2 dimensões pode ser descrito em linhas gerais como no Algoritmo~\ref{alg:quickhull_2d}.
+O Quickhull parte de um conjunto de pontos $S$ e constrói o polígono (ou poliedro) convexo que os contém.  O processo para 2 dimensões é ilustrado na Figura~\ref{fig:quickhull_2d} e pode ser descrito em linhas gerais como no Algoritmo~\ref{alg:quickhull_2d}.
 \begin{algorithm}[htb]
 	\caption{Quickhull 2D}
 	\LinesNumbered
@@ -98,15 +98,24 @@ O Quickhull parte de um conjunto de pontos $S$ e constrói o polígono (ou polie
 \end{algorithm}
 Apresenta complexidade média $O(n \log n)$ em 2D, podendo chegar a $O(n^2)$ em casos degenerados. Em 3D, adapta-se a construções poliedrais mais complexas, mantendo o mesmo princípio recursivo.
 
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=\textwidth]{quickhull_steps.jpg}
+    \caption{Etapas do quickjull Fonte: \cite{clustering_explanation2024}.}
+    \label{fig:quickhull_2d}
+\end{figure}
+
 \section{Filtragem e Refinamento}
 
-Em geral, o número de objetos em colisão é muito pequeno e gastar $O(n^2)$ é demais, deseja-se reduzir o tempo esperado para $O(n)$ ou $O(nlogn)$. Para isso divide-se o processo de detecção de colisão em duas partes: uma filtragem dos pares que não precisam ser testados pois, claramente não estão em colisão, e um refinamento nos pares que podem ou não colidir. Para isso usa-se a ideia de objetos delimitadores e também o conceito de localização espacial. 
+Em sistemas de simulação física com muitos objetos, o custo computacional da detecção de colisão pode rapidamente tornar-se inviável. Uma abordagem ingênua, baseada na verificação de todos os pares possíveis de objetos, apresenta complexidade $O(n^2)$, inviável mesmo para quantidades moderadas de entidades dinâmicas. Observa-se, entretanto, que em cenários realistas apenas uma pequena fração dos objetos encontra-se efetivamente próxima o suficiente para colidir em um dado instante. A partir dessa constatação, a detecção de colisão é tradicionalmente decomposta em duas etapas conceitualmente distintas: Filtragem (\textit{Broad Phase}) e Refinamento (\textit{Narrow Phase}).
 
-Nessa primeira parte, chamada de \textit{Broad Phase}, são feitos testes conservadores com objetos delimitadores para evitar testes com geometira consideravelmente complexas. E também como os objetos só podem colidir com outros que estejam próximos, utiliza-se consultas espaciais para identificar apenas aqueles que compartilham regiões próximas do espaço.
+A etapa de Filtragem tem como objetivo reduzir drasticamente o número de pares candidatos à colisão por meio de testes conservadores e de baixo custo computacional. Nessa fase, não se busca determinar com exatidão se dois objetos colidem, mas apenas descartar, com segurança, aqueles pares cuja colisão é geometricamente impossível. Para isso, empregam-se objetos delimitadores simples, como caixas alinhadas aos eixos (AABB, do inglês \textit{Axis-Aligned Bounding Boxes}), em conjunto com estruturas de localização espacial que exploram a coerência espacial da cena. A premissa fundamental é que objetos só podem interagir se estiverem suficientemente próximos.
 
-As técnicas de partição do espaço são os métodos usados para dividir um espaço em regiões menores e mais simples. Isso é feito para organizar dados espacialmente e melhorar operações de busca e consulta de proxidade. Processo pelo qual o espaço é subdividido em regiões, normalmente células convexas, cada célula na partição mantém uma lista de referências a objetos que nela estão contidos (completamente ou parcialmente). Como os objetos só podem se interceptar se se sobrepuserem à mesma célula, o número de testes de pares de objetos é drasticamente reduzido.
+As técnicas de partição espacial constituem um dos principais instrumentos da Filtragem. Essas técnicas subdividem o domínio contínuo da simulação em regiões menores, tipicamente convexas, cada uma associada a um conjunto de referências aos objetos que nela se encontram total ou parcialmente. Dois objetos só podem colidir se compartilharem ao menos uma dessas regiões, o que reduz significativamente o número de testes de pares necessários. Tal redução, embora dependente da distribuição espacial dos objetos, permite alcançar tempo esperado próximo de $O(n)$ ou $O(n \log n)$ em cenários bem comportados.
 
-Há muitas estruturas espaciais na literatura, como as hierarquicas: Quadtrees, Octrees, BSP Trees, K-Trees e Ball-trees. Grades uniforme constituem um esquema muito usado de subdivisão espacial. Uma grade pode dividir o espaço em várias células de tamanho igual. Cada objeto é então associado às células com as quais se sobrepõem, como ilustrado na Figura~\ref{fig:grade-uniforme}.
+A literatura apresenta diversas estruturas de dados voltadas à organização espacial, incluindo abordagens hierárquicas como \textit{Quadtrees}, \textit{Octrees}, \textit{Binary Space Partitioning Trees} (BSP), \textit{K-d Trees} e \textit{Ball Trees}. As grades uniformes (\textit{Uniform Grids}) constituem um esquema muito usado de subdivisão espacial. 
+
+Uma grade uniforme subdivide o espaço em células de tamanho fixo e igual, associando cada objeto às células que sua caixa delimitadora intercepta, conforme ilustrado na Figura~\ref{fig:grade-uniforme}. Essa abordagem assume implicitamente que a escala dos objetos é relativamente homogênea, hipótese que influencia diretamente sua eficiência.
 
 \begin{figure}[htb]
 	\caption{Divisão espacial em grade uniforme}
@@ -115,40 +124,33 @@ Há muitas estruturas espaciais na literatura, como as hierarquicas: Quadtrees, 
 	\label{fig:grade-uniforme}
 \end{figure}
 
-Uma forma natural de se representar a grade é alocar uma matriz de dimensão correspondente, neste trabalho será feito em 2D, onde cada elemento é uma lista com todos objetos na célula. Esse método sofre com matrizes esparsas, alto consumo de memória, e um tamanho fixo do mundo. Outra forma de representar e evitar esses problema é:
-\begin{itemize}
-	\item Crie uma tabela hash onde cada elemento representa uma célula e armazena uma lista de objetos que ela contém.
-	\item Para um ponto as coordenadas de células inteiras (i, j) são calculadas dividindo as coordenadas contínuas do ponto (x, y) pelo tamanho da célula e tomando o piso do resultado
-	$$i = \lfloor{\frac{x}{C}}\rfloor, \quad j = \lceil{\frac{y}{C}}\rfloor,
-	$$
-	onde C é o tamanho da célula.
-	\item Use como função hash $H(i, j) = (i \oplus p_1 + j \oplus p_2) \mod m$, onde $p_1$ e $p_2$ são números primos e m o tamanho da tabela.
-	\item Para cada objeto, calcule sua caixa delimitadora e traverse todas as células ocupadas. Salve o objeto em cada célula ocupada ao longo da extensão de sua caixa delimitadora.
-	\item Para cada célula ordene os objetos por id
-	$$$$
-\end{itemize}
-Dessa forma, temos uma grade uniforme que mepeia um mundo de tamanho arbitrário (possivelmente infinito) em um grade uniforme de tamanho constante.
+Uma implementação direta da grade uniforme poderia empregar uma matriz bidimensional, na qual cada célula armazena uma lista de objetos. Contudo, essa representação apresenta limitações relevantes, como elevado consumo de memória em cenários esparsos, tamanho fixo do mundo e baixa flexibilidade para ambientes potencialmente infinitos. Para contornar essas restrições, adota-se neste trabalho uma abordagem baseada em \textit{hashing espacial}.
 
-Além disso, deve-se tratar o caso em que o mundo seja dinâmico, com objetos se movendo, sendo adicionados e removidos. Para um mundo estático basta inicializar a grade como visto anteriormente, mas para um mundo dinâmico é necessário sempre que um objeto for adicionado na simulação também adiciona-lo à grade, quando um objeto for removido, também remove-lo da grade e a todo passo de tempo recalcular em quais células os objetos que se moveram estão e atualizar na grade. Neste trabalho, por motivos de simplicidade, a grade será limpa a todo passo de tempo e reinicializada.
+Nessa estratégia, cada célula da grade é identificada por coordenadas inteiras $(i, j)$, obtidas a partir das coordenadas contínuas $(x, y)$ do objeto, segundo:
+$$
+i = \left\lfloor \frac{x}{C} \right\rfloor, \quad
+j = \left\lfloor \frac{y}{C} \right\rfloor,
+$$
+onde $C$ representa o tamanho da célula. As células são mapeadas para uma tabela hash por meio de uma função de espalhamento que combina essas coordenadas inteiras, permitindo armazenar apenas as células efetivamente ocupadas. Cada objeto é inserido em todas as células interceptadas por sua caixa delimitadora, o que garante a propriedade conservadora da Filtragem.
 
-A fase de filtragem usa essa estrutura de dados para ao invés de testar todos os pares de objetos, testar apenas os pares de objetos que estão contidos na mesma célula da grade, usando suas caixas delimitadoras correspondente. Para isso é necessário ser feito eliminação de duplicatas, pois se dois objetos A e B caem na mesma célula é preciso testar apenas o par (A, B) e não repetir para o par (B, A). 
+Essa representação permite mapear um espaço de simulação conceitualmente ilimitado em uma estrutura de tamanho controlado, ao custo de possíveis colisões na tabela hash. Tais colisões, entretanto, não comprometem a correção do algoritmo, apenas impactam o desempenho, sendo mitigadas por funções hash adequadas e pelo dimensionamento apropriado da tabela.
 
-% Devido à uniformidade da grade, acessar uma célula correspondente a uma determinada coordenada é simples e rápido: os valores das coordenadas do mundo são simplesmente divididos pelo tamanho da célula para obter as coordenadas da célula. Dadas as coordenadas de uma célula específica, localizar as células vizinhas também é trivial.
+Em ambientes dinâmicos, nos quais objetos se movem continuamente e podem ser criados ou removidos, a manutenção incremental da grade torna-se um aspecto crítico. Embora seja possível atualizar apenas as células afetadas por cada objeto em movimento, essa abordagem exige controle adicional e estruturas auxiliares. Neste trabalho, opta-se deliberadamente por uma estratégia mais simples: a grade é completamente reinicializada a cada passo de tempo. Essa decisão representa um trade-off arquitetural, privilegiando simplicidade e previsibilidade de execução em detrimento de possíveis otimizações incrementais, escolha particularmente adequada ao contexto de execução em JavaScript e ambientes baseados na Web.
 
-Em termos de desempenho, um dos aspectos mais importantes dos métodos baseados em grade é a escolha de um tamanho de célula apropriado. A célula deve ter um tamanho aproximado da maior parte dos objetos da cena. Se todos os objetos cabem numa célula de tamanho C, então necessariamente cada objeto pode intersectar, no pior caso, até 4 células em 2D ou 8 células em 3D.
+Uma vez construída a grade, a Filtragem consiste em gerar pares candidatos à colisão a partir dos objetos que compartilham uma mesma célula. Para evitar testes redundantes, é necessário eliminar duplicatas, se dois objetos A e B caem na mesma célula é preciso testar apenas o par (A, B) e não repetir para o par (B, A). Essa etapa é essencial para preservar os ganhos de desempenho proporcionados pela filtragem espacial.
 
-Segundo \citeonline{ericson2004real}, existem quatro questões relacionadas ao tamanho da célula que podem prejudicar o desempenho:
+O desempenho de métodos baseados em grade uniforme é fortemente influenciado pela escolha do tamanho da célula. Idealmente, cada objeto deveria ocupar aproximadamente uma única célula; nesse caso, em duas dimensões, um objeto pode interceptar no máximo quatro células adjacentes. Segundo \citeonline{ericson2004real}, escolhas inadequadas para esse parâmetro podem degradar significativamente o desempenho, destacando-se quatro fatores principais:
 \begin{enumerate}
-	\item Células muito pequenas geram atualizações excessivas.
-	\item Células grandes demais fazem com que muitos objetos sejam agrupados, reduzindo a eficácia da Broad Phase.
-	\item Objetos muito complexos demandam subdivisão para melhorar a qualidade dos testes.
-	\item Cenários mistos exigem grades hierárquicas ou abordagens híbridas.
+	\item células excessivamente pequenas aumentam o custo de atualização da estrutura;
+	\item células grandes demais agrupam muitos objetos, reduzindo a eficácia da filtragem;
+	\item objetos de geometria complexa podem exigir subdivisão adicional;
+	\item cenários com grande variação de escala demandam abordagens hierárquicas ou híbridas.
 \end{enumerate}
-O ideal é que cada objeto caiba exatamente no tamanho de uma célula.
+Assim, a adoção de uma grade uniforme não constitui uma solução universal, mas uma decisão arquitetural dependente das características da cena simulada.
 
-Com essa etapa de filtragem usando grade uniforme concluída temos uma lista de pares de candidatos a colisão P e também uma melhora significativa no tempo esperado de $O(n^2)$ para $O(n)$, onde no pior caso, se muitos (se não todos) objetos cairem sobre a mesma célula, continuamos com $O(n^2)$.
+Ao término da Filtragem, obtém-se um conjunto $P$ de pares candidatos à colisão, com redução significativa do custo computacional em relação ao método quadrático. Ainda assim, no pior caso, quando muitos objetos se concentram em uma única célula, a complexidade pode degradar novamente para $O(n^2)$, evidenciando o caráter heurístico dessa etapa.
 
-O segundo passo de refinamento realiza testes geométricos precisos nos pares de candidatos P, essa fase é chamada de \textit{Narrow Phase}. Utiliza-se algoritmos mais sofisticados para determinar se os objetos estão de fato colidindo, como SAT, GJK e EPA, vistos anteriormente. Essa fase nem sempre é obrigatória pois, sua aplicação pode se tratar de objetos retangulares que caibam justamente nas dimensões de sua caixa delimitadora.
+A etapa de Refinamento realiza testes geométricos precisos nos pares de candidatos P, essa fase é chamada de Narrow Phase. Utiliza-se algoritmos mais sofisticados para determinar se os objetos estão de fato colidindo, como SAT, GJK e EPA, vistos anteriormente. Essa fase nem sempre é obrigatória pois, sua aplicação pode se tratar de objetos retangulares que caibam justamente nas dimensões de sua caixa delimitadora.
 
 \section{Como determinar o intervalo de integração da física}
 
@@ -156,13 +158,15 @@ Em física é preciso estabelecer um valor para o passo de tempo, normalmente ch
 
 No geral existem dois esquemas de integração física. A forma mais simples é usar uma integração de passo fixo usando sempre o mesmo dt e garante que a simulação seja reprodutível. Outra forma é integração com passo variável, ela é a forma mais comum de realizar integração física pois é sempre computada o mais rápido possível olhando o dt depende do tempo decorrido do relógio, o problema disso que dependendo da máquina pode fazer mais passos ou menos passos de simulação, em geral fazer mais passos da simulação trás um resultado mais plausível. 
 
-\section{Simulação física separada}
+\section{Execução Paralela e Paralelismo de Dados na Simulação Física}
 
-Em programas interativos tradicionais a lógica, a física e a renderização são executadas em uma única \textit{thread}. Nesse modelo, a renderização só ocorre após a conclusão da etapa de física, e qualquer uma das etapas pode se tornar gargalo.
+A simulação física em aplicações interativas apresenta elevado custo computacional, especialmente quando envolve integração temporal, detecção de colisões e resolução iterativa de restrições. No contexto da Web, esse custo torna-se ainda mais relevante devido às limitações da thread principal, responsável não apenas pela execução do código da aplicação, mas também pela renderização gráfica, tratamento de eventos de entrada e atualização da interface do usuário. Dessa forma, torna-se necessário discutir estratégias de paralelismo que permitam manter a responsividade da aplicação sem comprometer a estabilidade e a previsibilidade da simulação física.
 
-Para um sistema single-thread, a renderização só pode começar depois que a física tiver sido simulada, ou seja, é impossível renderizar antes que a simulação física seja feita, como ilustrado na Figura~\ref{fig:diagrama-threaded}. Nos casos em que uma alta quantidade de cálculo é necessária para a simulação de física, a renderização seria atrasada e a simulação o gargalo, resultando em baixas taxas de quadros e falhas gráficas. O contrário também pode ocorrer: a renderização demorar resulta em um atraso na leitura da entrada do usuário e no processo de simulação física.
+% \subsection{Separação entre Simulação Física e Renderização}
 
-Para solucionar esse problema, a simulação física pode ser movida para um \textit{thread} dedicada. A \textit{thread} principal renderiza continuamente utilizando o estado físico mais recente, enquanto a \textit{thread} secundária calcula atualizações físicas em paralelo, como ilustrado na Figura~\ref{fig:diagrama-threaded}.
+Uma abordagem amplamente adotada consiste na separação conceitual entre os processos de renderização e simulação física. Enquanto a renderização é executada na thread principal, geralmente sincronizada com o ciclo de atualização visual por meio de mecanismos como \textit{requestAnimationFrame}, a simulação física pode ser executada em uma thread separada, utilizando \textit{Web Workers}. Essa separação reduz a probabilidade de bloqueios na interface e permite que o cálculo físico seja realizado de forma assíncrona em relação ao processo de desenho.
+
+Nesse modelo, a thread responsável pela simulação apenas escreve o estado físico mais atual e a renderização consome apenas o estado físico mais recente disponível, como ilustrado na Figura~\ref{fig:diagrama-threaded}.
 
 \begin{figure}[htb]
 	\centering
@@ -171,11 +175,45 @@ Para solucionar esse problema, a simulação física pode ser movida para um \te
 	\label{fig:diagrama-threaded}
 \end{figure}
 
-Essa separação permite:
-\begin{itemize}
-	\item melhor utilização de múltiplos núcleos;
-	\item redução da latência na renderização;
-	\item maior taxa de quadros mesmo em cenas fisicamente complexas;
-	\item desacoplamento total entre física e renderização.
-\end{itemize}
-Dessa forma, a arquitetura é essencial em jogos modernos e simulações interativas, especialmente em ambientes Web utilizando \textit{Web Workers}.
+% \subsection{Problemas de Programação Concorrente na Simulação Física}
+
+A simulação física apresenta dependências de dados que dificultam sua paralelização completa. Na resolução de colisões e restrições, múltiplas interações podem envolver um mesmo corpo rígido ou partícula. Por exemplo, colisões entre os pares $(A,B)$ e $(B,C)$ compartilham o corpo $B$, o que exige coordenação cuidadosa para evitar inconsistências. No método de Jakobsen, em particular, a ordem de aplicação das restrições influencia o resultado final, tornando a execução paralela ainda mais sensível a variações na ordem de processamento.
+
+Embora a execução da simulação em múltiplas threads pareça uma solução natural para aumentar o desempenho, a programação concorrente introduz uma série de desafios. Um dos principais problemas está relacionado à distribuição de carga (\textit{load balancing}). Em simulações físicas, o custo computacional não é uniforme: regiões do espaço com maior densidade de corpos exigem mais testes de colisão e mais iterações de resolução de restrições, enquanto regiões esparsas demandam pouco processamento. Como essa distribuição varia dinamicamente ao longo do tempo, torna-se difícil dividir o trabalho de forma equilibrada entre várias threads.
+
+Outro desafio fundamental refere-se à consistência dos dados. Em um ambiente multithread, diferentes threads podem acessar e modificar simultaneamente os mesmos estados físicos, como posições e orientações dos corpos. Essa situação pode levar a condições de corrida, resultados inconsistentes e instabilidade numérica. Em simulações físicas, utilizar estados parcialmente atualizados é particularmente problemático, pois pequenas inconsistências podem se propagar e amplificar ao longo das iterações.
+
+Além disso, a necessidade de mecanismos de sincronização, como travas (\textit{locks}), operações atômicas e barreiras, introduz sobrecarga adicional e pode reduzir significativamente os ganhos esperados com o paralelismo. Em muitos casos, o custo de sincronização supera o benefício obtido com a execução paralela, especialmente quando a granularidade das tarefas é fina, como na resolução individual de colisões.
+
+% \subsection{Dificuldades da Física Multithread}
+
+
+Outro aspecto relevante é o não-determinismo introduzido pela execução concorrente. A ordem de escalonamento das threads pode variar entre execuções, levando a resultados físicos ligeiramente diferentes mesmo sob condições iniciais idênticas. Esse comportamento dificulta a depuração, a reprodução de simulações e a implementação de funcionalidades como \textit{replays} ou sincronização em aplicações distribuídas.
+
+Por essas razões, muitas engines físicas modernas optam por paralelizar apenas etapas bem definidas e fracamente acopladas da simulação, como a detecção de colisão na fase filtragem, a resolução de colisões na fase de refinamento e a resposta a colisão em um único thread lógico.
+
+% \subsection{Paralelismo de Dados: SIMD como Alternativa}
+
+Nem todo paralelismo está associado à execução em múltiplas threads. O paralelismo de dados, explorado por meio de instruções SIMD (\textit{Single Instruction, Multiple Data}), permite aplicar a mesma operação a múltiplos elementos simultaneamente dentro de um único fluxo de execução. Esse modelo é particularmente adequado para etapas da simulação física que envolvem operações homogêneas sobre grandes conjuntos de dados, como a integração temporal das posições, a atualização de velocidades implícitas e testes simples de colisão.
+
+Ao contrário do paralelismo baseado em threads, SIMD não introduz condições de corrida nem exige mecanismos complexos de sincronização, uma vez que todas as operações ocorrem de forma determinística dentro de um único contexto de execução. No contexto da Web, o suporte a SIMD em WebAssembly permite explorar esse tipo de paralelismo de forma eficiente, desde que os dados estejam organizados em layouts de memória apropriados, como \textit{Structure of Arrays} (SoA).
+
+% \subsection{WebAssembly e Execução Física em Thread Único}
+
+O uso de WebAssembly (WASM) oferece vantagens significativas para a implementação de simulações físicas intensivas. Por possuir tipagem estática, memória linear e maior previsibilidade de desempenho, WASM é mais adequado para laços computacionais intensivos do que JavaScript tradicional. Quando combinado com SIMD, um único thread de execução em WASM pode atingir desempenho comparável ou superior a implementações JavaScript multithread, sem incorrer nos problemas de sincronização e não-determinismo associados à concorrência.
+
+Essa abordagem justifica arquiteturas nas quais a simulação física completa é executada em um único worker utilizando WASM, enquanto a thread principal permanece responsável pela renderização e interação com o usuário. Dessa forma, o paralelismo é explorado verticalmente, por meio de instruções vetoriais e melhor uso do hardware subjacente, em vez de horizontalmente, por meio da criação de múltiplas threads concorrentes.
+
+% \subsection{WebGPU e Paralelismo Massivo}
+
+O WebGPU introduz a possibilidade de explorar paralelismo massivo por meio da GPU, sendo particularmente adequado para tarefas altamente paralelizáveis e com baixo acoplamento entre dados. Na simulação física, isso inclui etapas como a detecção de colisão em fase de filtragem, a construção de grades uniformes e a geração de pares candidatos à colisão. Essas operações envolvem grandes volumes de dados independentes e se beneficiam diretamente do modelo de execução da GPU.
+
+Entretanto, a resolução iterativa de restrições físicas, especialmente em métodos como o de Jakobsen, apresenta dependências complexas que limitam sua adequação à execução na GPU. Assim, o uso de WebGPU deve ser encarado como complementar, e não como substituto direto, da simulação física tradicional executada na CPU.
+
+% \subsection{Arquitetura Híbrida Proposta}
+
+Com base nas considerações discutidas, uma arquitetura híbrida mostra-se mais adequada para simulações físicas simplificadas na Web. Nessa arquitetura, a renderização é realizada na \textit{main thread}, a simulação física principal é executada em um worker dedicado utilizando WebAssembly, e o paralelismo de dados é explorado por meio de SIMD. Opcionalmente, etapas específicas e fracamente acopladas, como a fase ampla da detecção de colisões, podem ser delegadas à GPU via WebGPU.
+
+Essa abordagem reduz a complexidade associada à programação concorrente, melhora a previsibilidade dos resultados e mantém um equilíbrio entre desempenho e robustez, sendo particularmente adequada para aplicações Web interativas e educacionais.
+
+% \subsection{Considerações Finais}
