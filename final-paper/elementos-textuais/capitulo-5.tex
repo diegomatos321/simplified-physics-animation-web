@@ -164,7 +164,7 @@ A simulação física em aplicações interativas apresenta elevado custo comput
 
 % \subsection{Separação entre Simulação Física e Renderização}
 
-Uma abordagem amplamente adotada consiste na separação conceitual entre os processos de renderização e simulação física. Enquanto a renderização é executada na thread principal, geralmente sincronizada com o ciclo de atualização visual por meio de mecanismos como \textit{requestAnimationFrame}, a simulação física pode ser executada em uma thread separada, utilizando \textit{Web Workers}. Essa separação reduz a probabilidade de bloqueios na interface e permite que o cálculo físico seja realizado de forma assíncrona em relação ao processo de desenho.
+Uma abordagem amplamente adotada consiste na separação conceitual entre as rotinas de renderização e simulação física. Enquanto a renderização é executada na thread principal, geralmente sincronizada com o ciclo de atualização visual por meio de mecanismos como \textit{requestAnimationFrame}, a simulação física pode ser executada em uma thread separada, utilizando \textit{Web Workers}. Essa separação reduz a probabilidade de bloqueios na interface e permite que o cálculo físico seja realizado de forma assíncrona em relação ao processo de desenho.
 
 Nesse modelo, a thread responsável pela simulação apenas escreve o estado físico mais atual e a renderização consome apenas o estado físico mais recente disponível, como ilustrado na Figura~\ref{fig:diagrama-threaded}.
 
@@ -177,7 +177,7 @@ Nesse modelo, a thread responsável pela simulação apenas escreve o estado fí
 
 % \subsection{Problemas de Programação Concorrente na Simulação Física}
 
-A simulação física apresenta dependências de dados que dificultam sua paralelização completa. Na resolução de colisões e restrições, múltiplas interações podem envolver um mesmo corpo rígido ou partícula. Por exemplo, colisões entre os pares $(A,B)$ e $(B,C)$ compartilham o corpo $B$, o que exige coordenação cuidadosa para evitar inconsistências. No método de Jakobsen, em particular, a ordem de aplicação das restrições influencia o resultado final, tornando a execução paralela ainda mais sensível a variações na ordem de processamento.
+A simulação física apresenta dependências de dados que dificultam sua paralelização completa. Na resolução de colisões e restrições, múltiplas interações podem envolver um mesmo corpo rígido ou partícula. Por exemplo, colisões entre os pares $(A,B)$ e $(B,C)$ compartilham o corpo $B$, o que exige coordenação cuidadosa para evitar inconsistências. No método de \citeonline{jakobsen2001advanced}, em particular, a ordem de aplicação das restrições influencia o resultado final, tornando a execução paralela ainda mais sensível a variações na ordem de processamento.
 
 Embora a execução da simulação em múltiplas threads pareça uma solução natural para aumentar o desempenho, a programação concorrente introduz uma série de desafios. Um dos principais problemas está relacionado à distribuição de carga (\textit{load balancing}). Em simulações físicas, o custo computacional não é uniforme: regiões do espaço com maior densidade de corpos exigem mais testes de colisão e mais iterações de resolução de restrições, enquanto regiões esparsas demandam pouco processamento. Como essa distribuição varia dinamicamente ao longo do tempo, torna-se difícil dividir o trabalho de forma equilibrada entre várias threads.
 
@@ -208,7 +208,7 @@ Essa abordagem justifica arquiteturas nas quais a simulação física completa �
 
 O WebGPU introduz a possibilidade de explorar paralelismo massivo por meio da GPU, sendo particularmente adequado para tarefas altamente paralelizáveis e com baixo acoplamento entre dados. Na simulação física, isso inclui etapas como a detecção de colisão em fase de filtragem, a construção de grades uniformes e a geração de pares candidatos à colisão. Essas operações envolvem grandes volumes de dados independentes e se beneficiam diretamente do modelo de execução da GPU.
 
-Entretanto, a resolução iterativa de restrições físicas, especialmente em métodos como o de Jakobsen, apresenta dependências complexas que limitam sua adequação à execução na GPU. Assim, o uso de WebGPU deve ser encarado como complementar, e não como substituto direto, da simulação física tradicional executada na CPU.
+Entretanto, a resolução iterativa de restrições físicas, especialmente em métodos como o de \citeonline{jakobsen2001advanced}, apresenta dependências complexas que limitam sua adequação à execução na GPU. Assim, o uso de WebGPU deve ser encarado como complementar, e não como substituto direto, da simulação física tradicional executada na CPU.
 
 % \subsection{Arquitetura Híbrida Proposta}
 
