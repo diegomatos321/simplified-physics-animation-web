@@ -179,9 +179,6 @@ export default class Engine {
     }
 
     public broadPhase_GridSpatialPartition() {
-        // O mesmo corpo pode cair em várias células
-        // Se BodyA e BodyB aparecem juntos em duas células diferentes
-        // broadphase vai processar A-B duas vezes.
         const seen = new Set<string>();
 
         for (const bodyA of this.bodies) {
@@ -206,39 +203,6 @@ export default class Engine {
                 }
             }
         }
-
-        // for (let i = 0; i < this.spatialPartition.nrows; i++) {
-        //     this.collisionsTests += 1;
-        //     for (let j = 0; j < this.spatialPartition.ncols; j++) {
-        //         const cell = this.spatialPartition.grid[i][j];
-        //         const cellArr = Array.from(cell);
-
-        //         this.collisionsTests += 1;
-        //         for (let ii = 0; ii < cellArr.length - 1; ii++) {
-        //             const bodyA = cellArr[ii];
-
-        //             for (let jj = ii + 1; jj < cellArr.length; jj++) {
-        //                 const bodyB = cellArr[jj];
-        //                 const idA = bodyA.id;
-        //                 const idB = bodyB.id;
-        //                 const keyPair = idA < idB ? `${idA}|${idB}` : `${idB}|${idA}`;
-        //                 if (seen.has(keyPair)) {
-        //                     continue;
-        //                 }
-
-        //                 seen.add(keyPair);
-
-        //                 const boundingBoxA = bodyA.getAABB();
-        //                 const boundingBoxB = bodyB.getAABB();
-
-        //                 this.collisionsTests += 1;
-        //                 if (boundingBoxA.intersects(boundingBoxB)) {
-        //                     this.contactPairs.push([bodyA, bodyB]);
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
     }
 
     public broadPhase_Naive() {

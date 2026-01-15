@@ -47,7 +47,7 @@ This will compile the TypeScript source into a local distributable package locat
 #### For the homepage project:
 
 ```bash
-cd ../homepage
+cd homepage
 npm install
 ```
 
@@ -61,7 +61,7 @@ npm link ../package
 
 ## 🚀 Running the Demo
 
-After linking the library and installing dependencies, start the Vue.js demo:
+After linking the library and installing dependencies, start the Vue.js demo at homepage folder:
 
 ```bash
 npm run dev

@@ -63,7 +63,6 @@ export default class GridSpatialPartition {
         const gx1 = Math.floor(aabb.max[0] / this.cellsize);
         const gy1 = Math.floor(aabb.max[1] / this.cellsize);
 
-        // const out: Array<[number, number]> = [];
         for (let gy = gy0; gy <= gy1; gy++) {
             for (let gx = gx0; gx <= gx1; gx++) {
                 if (gx < 0 || gx >= this.ncols || gy < 0 || gy >= this.nrows) {
@@ -73,6 +72,5 @@ export default class GridSpatialPartition {
                 yield [gx, gy];
             }
         }
-        // return out;
     }
 }
