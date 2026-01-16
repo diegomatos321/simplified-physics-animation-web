@@ -6,6 +6,7 @@ import { epa } from './core/collision/epa';
 import gjk from './core/collision/gjk';
 import sat from './core/collision/sat';
 import GridSpatialPartition from './core/GridSpatialPartition';
+import SpatialHashGrid from './core/SpatialHashGrid';
 
 export enum BroadPhaseMode {
     Naive,
@@ -40,11 +41,12 @@ export default class Engine {
     public constraintsCount: number = 0;
     public collisionsTests: number = 0;
 
-    protected spatialPartition: GridSpatialPartition = new GridSpatialPartition(
-        0,
-        0,
-        1,
-    );
+    // protected spatialPartition: GridSpatialPartition = new GridSpatialPartition(
+    //     0,
+    //     0,
+    //     1,
+    // );
+    protected spatialHashGrid: SpatialHashGrid;
     protected NUM_ITERATIONS: number = 3;
 
     constructor(public config: Config) {
@@ -53,11 +55,12 @@ export default class Engine {
                 config.worldBoundings.right[0] - config.worldBoundings.top[0];
             const worldHeight =
                 config.worldBoundings.right[1] - config.worldBoundings.top[1];
-            this.spatialPartition = new GridSpatialPartition(
-                worldWidth,
-                worldHeight,
-                config.gridSize,
-            );
+            // this.spatialPartition = new GridSpatialPartition(
+            //     worldWidth,
+            //     worldHeight,
+            //     config.gridSize,
+            // );
+            this.spatialHashGrid = new SpatialHashGrid(config.gridSize);
         }
 
         this.gravity = config.gravity;
@@ -76,7 +79,8 @@ export default class Engine {
         this.collidersInfo.length = 0;
 
         if (this.config.BroadPhase == BroadPhaseMode.GridSpatialPartition) {
-            this.spatialPartition.clear();
+            // this.spatialPartition.clear();
+            this.spatialHashGrid.clear();
         }
 
         for (const body of this.bodies) {
@@ -90,7 +94,9 @@ export default class Engine {
             this.integrate(body, dt);
 
             if (this.config.BroadPhase == BroadPhaseMode.GridSpatialPartition) {
-                this.spatialPartition.insert(body);
+                // this.spatialPartition.insert(body);
+                body._cellKey.length = 0;
+                this.spatialHashGrid.insert(body);
             }
         }
 
@@ -180,29 +186,54 @@ export default class Engine {
 
     public broadPhase_GridSpatialPartition() {
         const seen = new Set<string>();
-
         for (const bodyA of this.bodies) {
-            const candidates = this.spatialPartition.query(bodyA.getAABB());
+            for (const cellKey of bodyA._cellKey) {
+                const candidates = this.spatialHashGrid.cells[cellKey];
+                for (const bodyB of candidates) {
+                    const idA = bodyA.id;
+                    const idB = bodyB.id;
+                    const keyPair =
+                        idA < idB ? `${idA}|${idB}` : `${idB}|${idA}`;
+                    if (idA === idB || seen.has(keyPair)) {
+                        continue;
+                    }
 
-            for (const bodyB of candidates) {
-                const idA = bodyA.id;
-                const idB = bodyB.id;
-                const keyPair = idA < idB ? `${idA}|${idB}` : `${idB}|${idA}`;
-                if (idA === idB || seen.has(keyPair)) {
-                    continue;
-                }
+                    seen.add(keyPair);
 
-                seen.add(keyPair);
+                    const boundingBoxA = bodyA.getAABB();
+                    const boundingBoxB = bodyB.getAABB();
 
-                const boundingBoxA = bodyA.getAABB();
-                const boundingBoxB = bodyB.getAABB();
-
-                this.collisionsTests += 1;
-                if (boundingBoxA.intersects(boundingBoxB)) {
-                    this.contactPairs.push([bodyA, bodyB]);
+                    this.collisionsTests += 1;
+                    if (boundingBoxA.intersects(boundingBoxB)) {
+                        this.contactPairs.push([bodyA, bodyB]);
+                    }
                 }
             }
         }
+        // const seen = new Set<string>();
+
+        // for (const bodyA of this.bodies) {
+        //     const candidates = this.spatialPartition.query(bodyA.getAABB());
+
+        //     for (const bodyB of candidates) {
+        //         const idA = bodyA.id;
+        //         const idB = bodyB.id;
+        //         const keyPair = idA < idB ? `${idA}|${idB}` : `${idB}|${idA}`;
+        //         if (idA === idB || seen.has(keyPair)) {
+        //             continue;
+        //         }
+
+        //         seen.add(keyPair);
+
+        //         const boundingBoxA = bodyA.getAABB();
+        //         const boundingBoxB = bodyB.getAABB();
+
+        //         this.collisionsTests += 1;
+        //         if (boundingBoxA.intersects(boundingBoxB)) {
+        //             this.contactPairs.push([bodyA, bodyB]);
+        //         }
+        //     }
+        // }
     }
 
     public broadPhase_Naive() {

@@ -4,7 +4,7 @@ export enum ObjectType {
     Triangle,
     Rectangle,
     Polygon,
-    Trellis
+    Trellis,
 }
 
 // Representa o estado de um único objeto na simulação

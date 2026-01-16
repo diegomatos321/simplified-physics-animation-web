@@ -4,11 +4,11 @@ import AABB from '../core/AABB';
 import type IConstraint from '../core/constraints/IConstraint';
 import type Particle from '../core/Particle';
 import type PolygonBody from './PolygonBody';
-// import PolygonBody from "./PolygonBody";
 
 export default abstract class Body {
     // public colliders: Collider[] = [];
     public readonly id: number;
+    public _cellKey: string[] = [];
     public constraintsIndices: number[] = []; // Particles indices that belongs to constraints
 
     // cache convex hull
