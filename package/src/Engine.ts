@@ -90,11 +90,12 @@ export default class Engine {
             // Invalidate caches
             body.aabb = null;
             body._convexHull = null;
-
+            
             this.integrate(body, dt);
-
+            
             if (this.config.BroadPhase == BroadPhaseMode.GridSpatialPartition) {
                 // this.spatialPartition.insert(body);
+                body.cellsKeys.clear()
                 this.spatialHashGrid?.insert(body);
             }
         }
@@ -188,13 +189,13 @@ export default class Engine {
 
         const seen = new Set();
 
-        for (const [key, cell] of this.spatialHashGrid.cells.entries()) {
-            if (cell.size < 2) {
-                continue
-            }
+        for (const bodyA of this.bodies) {
+            // O objeto está contido no máximo 4 células em 2D
+            for (const cell of bodyA.cellsKeys) {
+                const candidates = this.spatialHashGrid.cells.get(cell)
+                if (candidates === undefined) continue
 
-            for (const bodyA of cell) {
-                for (const bodyB of cell) {
+                for (const bodyB of candidates) {
                     if (bodyA.id === bodyB.id) continue
 
                     const idA = bodyA.id;
@@ -213,35 +214,9 @@ export default class Engine {
                     if (boundingBoxA.intersects(boundingBoxB)) {
                         this.contactPairs.push([bodyA, bodyB]);
                     }
-
                 }
             }
         }
-
-        // const seen = new Set<string>();
-
-        // for (const bodyA of this.bodies) {
-        //     const candidates = this.spatialPartition.query(bodyA.getAABB());
-
-        //     for (const bodyB of candidates) {
-        //         const idA = bodyA.id;
-        //         const idB = bodyB.id;
-        //         const keyPair = idA < idB ? `${idA}|${idB}` : `${idB}|${idA}`;
-        //         if (idA === idB || seen.has(keyPair)) {
-        //             continue;
-        //         }
-
-        //         seen.add(keyPair);
-
-        //         const boundingBoxA = bodyA.getAABB();
-        //         const boundingBoxB = bodyB.getAABB();
-
-        //         this.collisionsTests += 1;
-        //         if (boundingBoxA.intersects(boundingBoxB)) {
-        //             this.contactPairs.push([bodyA, bodyB]);
-        //         }
-        //     }
-        // }
     }
 
     public broadPhase_Naive() {
