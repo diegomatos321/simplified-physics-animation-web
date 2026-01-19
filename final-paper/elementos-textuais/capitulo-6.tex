@@ -15,17 +15,7 @@ Os experimentos foram conduzidos em um computador com as seguintes especificaç�
 
 Três grupos de experimentos foram definidos, cada um com foco em um aspecto distinto do sistema proposto:
 
-\subsection*{Experimento 1 - Integrador de Jakobsen}
-
-O primeiro experimento avaliou a estabilidade do método de Verlet em comparação com o integrador de Euler explícito. Foram criados sistemas de partículas conectadas por restrições lineares, representando tecidos e correntes.
-
-\textbf{INSERIR IMAGENS}
-
-Cada sistema foi submetido a diferentes passos de tempo ($\Delta t = 1/30s$, $1/60s$ e $1/120s$) e número de iterações de correção de restrições (de 1 a 10). Observou-se o comportamento visual e a divergência de energia ao longo da simulação.
-
-O integrador de Verlet apresenta maior estabilidade sob altas iterações de restrição, ainda que introduza pequenas imprecisões de posição em sistemas altamente rígidos.
-
-\subsection*{Experimento 2 — Detecção de Colisões Convexas (SAT e GJK)}
+\subsection*{Experimento 1 — Detecção de Colisões Entre Objetos Convexas}
 
 O segundo experimento teve como objetivo comparar os algoritmos de detecção de colisão SAT e GJK em termos de precisão e custo computacional. Foram utilizados objetos convexos de 3 a 8 vértices (em 2D). Cada cenário variou de 2 até 100 objetos móveis, gerando colisões dinâmicas com rotações e translações aleatórias.
 
@@ -36,11 +26,15 @@ Os tempos médios de detecção e a taxa de acertos foram medidos com e sem a ut
 	\item A introdução da \textit{Broad Phase} reduziu significativamente o número de pares testados na \textit{Narrow Phase}, resultando em ganho médio de até 65\% em desempenho.
 \end{itemize}
 
-\subsection*{Experimento 3 — Simulação Multi-Threaded}
+\subsection*{Experimento 2 — Simulação Multi-Threaded}
 
 O terceiro experimento avaliou os benefícios do uso de concorrência na simulação física. A implementação utilizou a API \textit{Web Workers} para distribuir a atualização das partículas e as verificações de colisão entre múltiplas threads.
 
 A execucação da física em uma thread separada apresentou estabilidade na renderização.
+
+\subsection{Experimento 3 - Comparação Com Box2D}
+
+
 
 \section{Resultados e Discussão}
 

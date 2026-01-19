@@ -17,7 +17,7 @@ export default class SpatialHashGrid {
                 this.cells.set(key, new Set());
             }
             this.cells.get(key)!.add(body);
-            body.cellsKeys.add(key)
+            body.cellsKeys.add(key);
         }
     }
 
