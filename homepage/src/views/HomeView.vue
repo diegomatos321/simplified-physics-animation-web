@@ -7,11 +7,18 @@ import { RouterLink } from 'vue-router';
     <section id="intro" class="py-20">
         <div class="container mx-auto px-6">
             <h1 class="text-4xl font-bold text-blue-600 mb-4">Animação Física Simplificada na Web</h1>
-            <p class="text-lg text-gray-600">Este trabalho apresenta o desenvolvimento de um sistema de animação física simplificada para aplicações Web, fundamentado no método de Jakobsen (2001). O objetivo é investigar e demonstrar como técnicas de simulação leve podem produzir movimentos coerentes,estáveis e visualmente naturais, mesmo em ambientes com recursos computacionais limitados, como navegadores modernos.</p>
+            <p class="text-lg text-gray-600">
+                Este trabalho apresenta o desenvolvimento de um sistema de animação física simplificada para aplicações Web, fundamentado no método de Jakobsen
+                (2001). O objetivo é investigar e demonstrar como técnicas de simulação leve podem produzir movimentos coerentes,estáveis e visualmente
+                naturais, mesmo em ambientes com recursos computacionais limitados, como navegadores modernos.
+            </p>
 
             <p class="text-gray-600 mb-4">
                 Este trabalho demonstrou a viabilidade de implementar simulações físicas simplificadas diretamente no navegador, com resultados satisfatórios
-                para fins didáticos e acadêmicos. Veja a metodologia e os resultados em detalhes <a href="https://github.com/diegomatos321/simplified-physics-animation-web/blob/main/final-paper/main.pdf" class="text-blue-600 hover:underline">clicando aqui.</a>
+                para fins didáticos e acadêmicos. Veja a metodologia e os resultados em detalhes
+                <a href="https://github.com/diegomatos321/simplified-physics-animation-web/blob/main/final-paper/main.pdf" class="text-blue-600 hover:underline"
+                    >clicando aqui.</a
+                >
             </p>
         </div>
     </section>

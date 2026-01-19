@@ -5,7 +5,7 @@ import ColliderInfo from './core/ColliderInfo';
 import { epa } from './core/collision/epa';
 import gjk from './core/collision/gjk';
 import sat from './core/collision/sat';
-import GridSpatialPartition from './core/GridSpatialPartition';
+// import GridSpatialPartition from './core/GridSpatialPartition';
 import SpatialHashGrid from './core/SpatialHashGrid';
 
 export enum BroadPhaseMode {
@@ -46,15 +46,15 @@ export default class Engine {
     //     0,
     //     1,
     // );
-    protected spatialHashGrid: SpatialHashGrid;
+    protected spatialHashGrid: SpatialHashGrid | undefined;
     protected NUM_ITERATIONS: number = 3;
 
     constructor(public config: Config) {
         if (config.BroadPhase == BroadPhaseMode.GridSpatialPartition) {
-            const worldWidth =
-                config.worldBoundings.right[0] - config.worldBoundings.top[0];
-            const worldHeight =
-                config.worldBoundings.right[1] - config.worldBoundings.top[1];
+            // const worldWidth =
+            //     config.worldBoundings.right[0] - config.worldBoundings.top[0];
+            // const worldHeight =
+            //     config.worldBoundings.right[1] - config.worldBoundings.top[1];
             // this.spatialPartition = new GridSpatialPartition(
             //     worldWidth,
             //     worldHeight,
@@ -80,7 +80,7 @@ export default class Engine {
 
         if (this.config.BroadPhase == BroadPhaseMode.GridSpatialPartition) {
             // this.spatialPartition.clear();
-            this.spatialHashGrid.clear();
+            this.spatialHashGrid?.clear();
         }
 
         for (const body of this.bodies) {
@@ -95,8 +95,7 @@ export default class Engine {
 
             if (this.config.BroadPhase == BroadPhaseMode.GridSpatialPartition) {
                 // this.spatialPartition.insert(body);
-                body._cellKey.length = 0;
-                this.spatialHashGrid.insert(body);
+                this.spatialHashGrid?.insert(body);
             }
         }
 
@@ -185,15 +184,22 @@ export default class Engine {
     }
 
     public broadPhase_GridSpatialPartition() {
-        const seen = new Set<string>();
-        for (const bodyA of this.bodies) {
-            for (const cellKey of bodyA._cellKey) {
-                const candidates = this.spatialHashGrid.cells[cellKey];
-                for (const bodyB of candidates) {
+        if (this.spatialHashGrid === undefined) return;
+
+        const seen = new Set();
+
+        for (const [key, cell] of this.spatialHashGrid.cells.entries()) {
+            if (cell.size < 2) {
+                continue
+            }
+
+            for (const bodyA of cell) {
+                for (const bodyB of cell) {
+                    if (bodyA.id === bodyB.id) continue
+
                     const idA = bodyA.id;
                     const idB = bodyB.id;
-                    const keyPair =
-                        idA < idB ? `${idA}|${idB}` : `${idB}|${idA}`;
+                    const keyPair = idA < idB ? `${idA}|${idB}` : `${idB}|${idA}`;
                     if (idA === idB || seen.has(keyPair)) {
                         continue;
                     }
@@ -207,9 +213,11 @@ export default class Engine {
                     if (boundingBoxA.intersects(boundingBoxB)) {
                         this.contactPairs.push([bodyA, bodyB]);
                     }
+
                 }
             }
         }
+
         // const seen = new Set<string>();
 
         // for (const bodyA of this.bodies) {
@@ -350,6 +358,7 @@ export default class Engine {
 
     public addBody(body: Body) {
         this.bodies.push(body);
-        this.spatialPartition.insert(body);
+        // this.spatialPartition.insert(body);
+        this.spatialHashGrid?.insert(body)
     }
 }

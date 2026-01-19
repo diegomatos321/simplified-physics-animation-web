@@ -17,7 +17,6 @@ export default class SpatialHashGrid {
                 this.cells.set(key, new Set());
             }
             this.cells.get(key)!.add(body);
-            body._cellKey.push(key);
         }
     }
 
@@ -27,26 +26,6 @@ export default class SpatialHashGrid {
         const y = Math.floor(position[1] / this.cellSize);
         // Combine coordinates into a single string key
         return `${x}_${y}`;
-    }
-
-    getNearby(body: Body): Set<Body> {
-        const result = new Set<Body>();
-        const aabb = body.getAABB();
-
-        for (const position of this.cellsForAABB(aabb)) {
-            const key = this.getCellKey(position);
-            const cell = this.cells.get(key);
-            if (!cell) {
-                continue;
-            }
-
-            for (const other of cell) {
-                if (body.id == other.id) continue;
-                result.add(other);
-            }
-        }
-
-        return result;
     }
 
     clear() {
