@@ -84,6 +84,7 @@ Existem vários algoritmos, entre os quais o \textit{Quickhull} é um algoritmo 
 O Quickhull parte de um conjunto de pontos $S$ e constrói o polígono (ou poliedro) convexo que os contém.  O processo para 2 dimensões é ilustrado na Figura~\ref{fig:quickhull_2d} e pode ser descrito em linhas gerais como no Algoritmo~\ref{alg:quickhull_2d}.
 \begin{algorithm}[htb]
 	\caption{Quickhull 2D}
+	\label{alg:quickhull_2d}
 	\LinesNumbered
 	\SetAlgoLined
 	\KwIn{Polígono Convexo}
@@ -94,7 +95,6 @@ O Quickhull parte de um conjunto de pontos $S$ e constrói o polígono (ou polie
 	Para cada subconjunto, encontre o ponto mais distante da linha; ele forma um triângulo que exclui pontos interiores.\\
 	Repita recursivamente os dois passos anteriores nas duas linhas formadas pelos dois novos lados do triângulo. \\
 	O processo termina quando todos os subconjuntos estão vazios.
-	\label{alg:quickhull_2d}
 \end{algorithm}
 Apresenta complexidade média $O(n \log n)$ em 2D, podendo chegar a $O(n^2)$ em casos degenerados. Em 3D, adapta-se a construções poliedrais mais complexas, mantendo o mesmo princípio recursivo.
 
