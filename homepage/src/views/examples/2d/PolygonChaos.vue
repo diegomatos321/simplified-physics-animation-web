@@ -52,7 +52,7 @@ canvas {
 
                 <div class="flex justify-between">
                     <label for="pauseOnCollision">Pause on Collision</label>
-                    <!-- <input id="pauseOnCollision" name="pauseOnCollision" type="checkbox" v-model="engine.pauseOnCollision" @click="OnPauseCollisionBtn" /> -->
+                    <input id="pauseOnCollision" name="pauseOnCollision" type="checkbox" v-model="engine.pauseOnCollision" @click="OnPauseCollisionBtn" />
                 </div>
 
                 <div class="flex justify-between">
@@ -74,7 +74,8 @@ canvas {
                     <select
                         style="max-width: 100px"
                         name="collisionDetectionMode"
-                        id="collisionDetectionMode"
+                        id="col        this.cells.length = 0;
+lisionDetectionMode"
                         v-model="engine.config.CollisionDetection"
                         class="border border-slate-200 rounded"
                     >
@@ -113,6 +114,7 @@ const threaded = false;
 const fps = ref(0);
 
 // Main thread mode variables
+const gridSize = 40
 const engine = new Engine({
     worldBoundings: {
         top: [0, 0],
@@ -121,7 +123,7 @@ const engine = new Engine({
     BroadPhase: BroadPhaseMode.GridSpatialPartition,
     CollisionDetection: CollisionDetectionMode.GjkEpa,
     gravity: vec3.fromValues(0, 0, 0),
-    gridSize: 40,
+    gridSize,
 });
 const entities: Body[] = [];
 
@@ -157,6 +159,8 @@ function start() {
         worker = createEngineWorker();
         worker.addEventListener('message', OnWorkerEvent);
     }
+
+    window.addEventListener('keydown', handleKeyDown)
 }
 
 async function setup(p: p5) {
@@ -223,10 +227,6 @@ async function setup(p: p5) {
 
             engine.addBody(body);
             entities.push(body);
-
-            // if (isStatic === false && !player) {
-            //     player = entity;
-            // }
         }
     }
 }
@@ -240,12 +240,12 @@ function loop(p: p5) {
     p.strokeWeight(1);
 
     // linhas verticais
-    for (let x = 0; x <= p.width; x += 40) {
+    for (let x = 0; x <= p.width; x += gridSize) {
         p.line(x + 0.5, 0, x + 0.5, p.height); // 0.5 corrige artefatos de subpixel
     }
 
     // linhas horizontais
-    for (let y = 0; y <= p.height; y += 40) {
+    for (let y = 0; y <= p.height; y += gridSize) {
         p.line(0, y + 0.5, p.width, y + 0.5);
     }
 
@@ -253,20 +253,10 @@ function loop(p: p5) {
 
     fps.value = Math.round(p.frameRate());
 
-    // const velocity = vec3.fromValues(dirX, dirY, 0);
-    // vec3.normalize(velocity, velocity);
-    // vec3.scale(velocity, velocity, speed);
-
-    // player.body.move(velocity);
-
-    // dirX = 0;
-    // dirY = 0;
-
     if (threaded) {
         Render_Threaded(p);
     } else {
         engine.step(p.deltaTime / 1000);
-
         Render_MainThread(p);
     }
 }
@@ -285,7 +275,7 @@ onBeforeUnmount(() => {
         worker = null;
     }
 
-    // window.removeEventListener('keydown', handleKeyDown);
+    window.removeEventListener('keydown', handleKeyDown);
 });
 
 function Render_Threaded(p: p5) {
@@ -413,29 +403,16 @@ function Render_MainThread(p: p5) {
     p.endShape();
 }
 
-// function OnPauseCollisionBtn() {
-//     engine.pauseOnCollision = !engine.pauseOnCollision;
-// }
+function OnPauseCollisionBtn() {
+    engine.pauseOnCollision = !engine.pauseOnCollision;
+}
 
-// function handleKeyDown(e: KeyboardEvent) {
-//     if (e.code === 'KeyW') {
-//         dirY = -1;
-//     }
-//     if (e.code === 'KeyS') {
-//         dirY = 1;
-//     }
-//     if (e.code === 'KeyD') {
-//         dirX = 1;
-//     }
-//     if (e.code === 'KeyA') {
-//         dirX = -1;
-//     }
-
-//     if (e.code == 'Space') {
-//         engine.isPaused = !engine.isPaused;
-//         engine.skip = !engine.skip;
-//     }
-// }
+function handleKeyDown(e: KeyboardEvent) {
+    if (e.code == 'Space') {
+        engine.isPaused = !engine.isPaused;
+        engine.skip = !engine.skip;
+    }
+}
 
 function OnWorkerEvent(e: MessageEvent<WorkerToMainMessage>) {
     const msg = e.data;

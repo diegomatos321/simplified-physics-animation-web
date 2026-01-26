@@ -26,15 +26,15 @@ canvas {
                 </div>
                 <div class="flex justify-between">
                     <p>Particles</p>
-                    <p>{{ engine.particlesCount }}</p>
+                    <!-- <p>{{ engine.particlesCount }}</p> -->
                 </div>
                 <div class="flex justify-between">
                     <p>Constraints</p>
-                    <p>{{ engine.constraintsCount }}</p>
+                    <!-- <p>{{ engine.constraintsCount }}</p> -->
                 </div>
                 <div class="flex justify-between">
                     <p>Collision Tests</p>
-                    <p>{{ engine.collisionsTests }}</p>
+                    <!-- <p>{{ engine.collisionsTests }}</p> -->
                 </div>
 
                 <hr class="my-4 border-slate-200" />

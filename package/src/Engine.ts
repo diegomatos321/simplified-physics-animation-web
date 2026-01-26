@@ -5,7 +5,6 @@ import ColliderInfo from './core/ColliderInfo';
 import { epa } from './core/collision/epa';
 import gjk from './core/collision/gjk';
 import sat from './core/collision/sat';
-// import GridSpatialPartition from './core/GridSpatialPartition';
 import SpatialHashGrid from './core/SpatialHashGrid';
 
 export enum BroadPhaseMode {
@@ -36,7 +35,6 @@ export default class Engine {
     public metrics: any = {
         objectsCount: [],
         particlesCount: [],
-        constraintsCount: [],
         collisionsTests: [],
         frametime: [],
     };
@@ -61,15 +59,18 @@ export default class Engine {
         }
 
         this.metrics.frametime.push(dt);
+        this.contactPairs.length = 0
+        this.collidersInfo.length = 0
 
         if (this.config.BroadPhase == BroadPhaseMode.GridSpatialPartition) {
             this.spatialHashGrid?.clear();
         }
 
-        this.metrics.objectsCount.push(this.bodies.length);
+        // this.metrics.objectsCount.push(this.bodies.length);
+
         for (const body of this.bodies) {
-            this.metrics.particlesCount.push(body.particles.length);
-            this.metrics.constraintsCount.push(body.constraints.length);
+            // this.metrics.particlesCount.push(body.particles.length);
+            // this.metrics.constraintsCount.push(body.constraints.length);
 
             // Invalidate caches
             body.aabb = null;
@@ -78,8 +79,6 @@ export default class Engine {
             this.integrate(body, dt);
 
             if (this.config.BroadPhase == BroadPhaseMode.GridSpatialPartition) {
-                // this.spatialPartition.insert(body);
-                body.cellsKeys.clear();
                 this.spatialHashGrid?.insert(body);
             }
         }
@@ -171,33 +170,25 @@ export default class Engine {
     public broadPhase_GridSpatialPartition() {
         if (this.spatialHashGrid === undefined) return;
 
-        const seen = new Set();
+        const seen = new Set<string>()
+        const orderedCells = this.spatialHashGrid.cells.sort((a, b) => a[0] - b[0])
+        for (let i = 0; i < orderedCells.length - 1; i++) {
+            const cellA = orderedCells[i];
 
-        for (const bodyA of this.bodies) {
-            // O objeto está contido no máximo 4 células em 2D
-            for (const cell of bodyA.cellsKeys) {
-                const candidates = this.spatialHashGrid.cells.get(cell);
-                if (candidates === undefined) continue;
+            for (let j = i + 1; j < orderedCells.length; j++) {
+                const cellB = orderedCells[j];
 
-                for (const bodyB of candidates) {
-                    if (bodyA.id === bodyB.id) continue;
+                if (cellA[0] !== cellB[0]) break
 
-                    const idA = bodyA.id;
-                    const idB = bodyB.id;
-                    const keyPair =
-                        idA < idB ? `${idA}|${idB}` : `${idB}|${idA}`;
-                    if (idA === idB || seen.has(keyPair)) {
-                        continue;
-                    }
+                const idA = cellA[1].id;
+                const idB = cellB[1].id;
+                const keyPair = idA < idB ? `${idA}|${idB}` : `${idB}|${idA}`;
+                if (idA === idB || seen.has(keyPair)) continue
 
-                    seen.add(keyPair);
+                seen.add(keyPair);
 
-                    const boundingBoxA = bodyA.getAABB();
-                    const boundingBoxB = bodyB.getAABB();
-
-                    if (boundingBoxA.intersects(boundingBoxB)) {
-                        this.contactPairs.push([bodyA, bodyB]);
-                    }
+                if (cellA[1].getAABB().intersects(cellB[1].getAABB())) {
+                    this.contactPairs.push([cellA[1], cellB[1]])
                 }
             }
         }
@@ -221,7 +212,7 @@ export default class Engine {
     }
 
     public narrowPhase_SAT() {
-        let testsSum = 0;
+        // let testsSum = 0;
         for (const pair of this.contactPairs) {
             const bodyA = pair[0];
             const bodyB = pair[1];
@@ -231,7 +222,7 @@ export default class Engine {
 
             // The direction of the separation plane goes from A to B
             // So the separation required for A is in the oppositive direction
-            testsSum += 1;
+            // testsSum += 1;
             const hit = sat(convexHullA, convexHullB);
             if (hit) {
                 const colliderA = new ColliderInfo(
@@ -248,11 +239,11 @@ export default class Engine {
             }
         }
 
-        this.metrics.collisionsTests.push(testsSum);
+        // this.metrics.collisionsTests.push(testsSum);
     }
 
     public narrowPhase_GJK() {
-        let testsSum = 0;
+        // let testsSum = 0;
         for (const pair of this.contactPairs) {
             const bodyA = pair[0];
             const bodyB = pair[1];
@@ -262,7 +253,7 @@ export default class Engine {
 
             // The direction of the separation plane goes from A to B!
             // So the separation required for A is in the oppositive direction
-            testsSum += 1;
+            // testsSum += 1;
             const hit = gjk(convexHullA, convexHullB);
             if (hit) {
                 const mvp = epa(convexHullA, convexHullB, hit);
@@ -280,7 +271,7 @@ export default class Engine {
             }
         }
 
-        this.metrics.collisionsTests.push(testsSum);
+        // this.metrics.collisionsTests.push(testsSum);
     }
 
     public resolveCollisions() {
@@ -316,13 +307,10 @@ export default class Engine {
 
                 particle.move(correction);
             }
-            // console.log(c);
         }
     }
 
     public addBody(body: Body) {
         this.bodies.push(body);
-        // this.spatialPartition.insert(body);
-        this.spatialHashGrid?.insert(body);
     }
 }

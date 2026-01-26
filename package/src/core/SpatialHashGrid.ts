@@ -5,7 +5,7 @@ import type { Body } from '@/bodies';
 import type AABB from './AABB';
 
 export default class SpatialHashGrid {
-    public cells: Map<string, Set<Body>> = new Map();
+    public cells: [number, Body][] = [];
 
     constructor(protected cellSize: number) {}
 
@@ -13,35 +13,30 @@ export default class SpatialHashGrid {
         const aabb = body.getAABB();
         for (const position of this.cellsForAABB(aabb)) {
             const key = this.getCellKey(position);
-            if (!this.cells.has(key)) {
-                this.cells.set(key, new Set());
-            }
-            this.cells.get(key)!.add(body);
-            body.cellsKeys.add(key);
+            this.cells.push([key, body]);
         }
     }
 
     // A simple hash function to get the cell ID
-    getCellKey(position: vec3): string {
+    getCellKey(position: vec3): number {
         const x = Math.floor(position[0] / this.cellSize);
         const y = Math.floor(position[1] / this.cellSize);
         // Combine coordinates into a single string key
-        return `${x}_${y}`;
+        return x + y * this.cellSize;
     }
 
     clear() {
-        this.cells.clear();
+        this.cells.length = 0;
     }
 
     protected *cellsForAABB(aabb: AABB) {
-        const gx0 = aabb.min[0];
-        const gy0 = aabb.min[1];
-        const gx1 = aabb.max[0];
-        const gy1 = aabb.max[1];
+        const gx0 = Math.floor(aabb.min[0] / this.cellSize);
+        const gy0 = Math.floor(aabb.min[1] / this.cellSize);
+        const gx1 = Math.floor(aabb.max[0] / this.cellSize);
+        const gy1 = Math.floor(aabb.max[1] / this.cellSize);
 
         for (let gy = gy0; gy <= gy1; gy++) {
             for (let gx = gx0; gx <= gx1; gx++) {
-                // out.push([gx, gy]);
                 yield [gx, gy];
             }
         }
