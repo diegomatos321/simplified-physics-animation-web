@@ -109,16 +109,18 @@ import {
 
 // Component States
 let hasStarted = false;
-const totalEntities = 20;
+let totalEntities = 20;
 const threaded = false;
 const fps = ref(0);
 
 // Main thread mode variables
-const gridSize = 40
+const worldBoundings = 600;
+const gridArea = worldBoundings ** 2;
+let gridSize = Math.sqrt(gridArea / (totalEntities * 5));
 const engine = new Engine({
     worldBoundings: {
         top: [0, 0],
-        right: [600, 600],
+        right: [worldBoundings, worldBoundings],
     },
     BroadPhase: BroadPhaseMode.GridSpatialPartition,
     CollisionDetection: CollisionDetectionMode.GjkEpa,
@@ -160,13 +162,16 @@ function start() {
         worker.addEventListener('message', OnWorkerEvent);
     }
 
-    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keydown', handleKeyDown);
 }
 
 async function setup(p: p5) {
     if (sketchContainer.value === null) return;
 
-    p.createCanvas(600, 600).parent(sketchContainer.value);
+    p.createCanvas(worldBoundings, worldBoundings).parent(sketchContainer.value);
+
+    gridSize = Math.sqrt(gridArea / (totalEntities * 5));
+    console.log(gridSize);
 
     if (threaded && worker) {
         const objects: ObjectBuilderArgs[] = [];
@@ -176,7 +181,7 @@ async function setup(p: p5) {
 
             const type = Math.random();
             const isStatic = Math.random() < 0.2 ? true : false;
-            const size = 40;
+            const size = gridSize;
             let obj: ObjectBuilderArgs;
             if (type <= 0.25) {
                 obj = { type: ObjectType.Triangle, x, y, size, isStatic };
@@ -196,12 +201,12 @@ async function setup(p: p5) {
             config: {
                 worldBoundings: {
                     top: [0, 0],
-                    right: [600, 600],
+                    right: [worldBoundings, worldBoundings],
                 },
                 BroadPhase: BroadPhaseMode.GridSpatialPartition,
                 CollisionDetection: CollisionDetectionMode.GjkEpa,
                 gravity: vec3.fromValues(0, 0, 0),
-                gridSize: 40,
+                gridSize: gridSize,
             },
             objects,
         };
@@ -213,7 +218,7 @@ async function setup(p: p5) {
 
             const type = Math.random();
             const isStatic = Math.random() < 0.2 ? true : false;
-            const size = 40;
+            const size = gridSize;
             let body: Body;
             if (type <= 0.25) {
                 body = new TriangleBody(x, y, size, isStatic);

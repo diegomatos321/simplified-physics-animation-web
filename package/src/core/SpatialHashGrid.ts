@@ -18,11 +18,8 @@ export default class SpatialHashGrid {
     }
 
     // A simple hash function to get the cell ID
-    getCellKey(position: vec3): number {
-        const x = Math.floor(position[0] / this.cellSize);
-        const y = Math.floor(position[1] / this.cellSize);
-        // Combine coordinates into a single string key
-        return x + y * this.cellSize;
+    getCellKey(cellPosition: vec3): number {
+        return cellPosition[0] + cellPosition[1] * this.cellSize;
     }
 
     clear() {

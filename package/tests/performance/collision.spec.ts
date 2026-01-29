@@ -1,5 +1,5 @@
 import { vec3 } from 'gl-matrix';
-import { describe, it, test } from 'vitest';
+import { describe, it } from 'vitest';
 
 import Engine, {
     BroadPhaseMode,
@@ -7,50 +7,71 @@ import Engine, {
 } from '../../src/Engine';
 import * as utils from '../utils';
 
-describe('Collision detection - load test', () => {
-    const testCases = [
-        {
-            worldBoudings: 1000,
-            objects: 100
-        },
-        {
-            worldBoudings: 2000,
-            objects: 1000
-        },
-        {
-            worldBoudings: 6000,
-            objects: 10_000
-        },
-    ]
+const testCases = [
+    {
+        objects: 100,
+        worldBoundings: 1000,
+        broadPhaseMode: BroadPhaseMode.GridSpatialPartition,
+        collisionDetection: CollisionDetectionMode.GjkEpa,
+    },
+    {
+        objects: 1000,
+        worldBoundings: 1000,
+        broadPhaseMode: BroadPhaseMode.GridSpatialPartition,
+        collisionDetection: CollisionDetectionMode.Sat,
+    },
+    {
+        objects: 10000,
+        worldBoundings: 1000,
+        broadPhaseMode: BroadPhaseMode.GridSpatialPartition,
+        collisionDetection: CollisionDetectionMode.Sat,
+    },
+];
 
-    it('runs performance tests on naive mode and exports CSV', () => {
-        for (const testCase of testCases) {
-            console.log(`Teste com ${testCase.objects} objetos`)
+describe('Collision detection – load experiment', () => {
+    for (let i = 0; i < testCases.length; i++) {
+        it(`Starting test ${i}`, () => {
+            const testCase = testCases[i];
+
+            const gridArea = testCase.worldBoundings ** 2;
+            const gridSize = Math.sqrt(gridArea / (testCase.objects * 5));
 
             const engine = new Engine({
                 worldBoundings: {
                     top: [0, 0],
-                    right: [testCase.worldBoudings, testCase.worldBoudings],
+                    right: [testCase.worldBoundings, testCase.worldBoundings],
                 },
-                BroadPhase: BroadPhaseMode.GridSpatialPartition,
-                CollisionDetection: CollisionDetectionMode.GjkEpa,
+                BroadPhase: testCase.broadPhaseMode,
+                CollisionDetection: testCase.collisionDetection,
                 gravity: vec3.fromValues(0, 0, 0),
-                gridSize: 50,
+                gridSize,
             });
 
-            const bodies = utils.generateBodies(testCase.objects, testCase.worldBoudings, 50);
+            const bodies = utils.generateBodies(
+                testCase.objects,
+                testCase.worldBoundings,
+                gridSize,
+            );
             for (const body of bodies) {
                 engine.addBody(body);
             }
 
-            for (let i = 0; i < 60; i++) {
+            for (let i = 0; i < 60 * 3; i++) {
                 engine.step(1 / 60);
             }
 
-            utils.exportCSV(
-                engine.metrics,
-                `collision-test-grid-mode-${testCase.objects}-objects`,
-            );
-        }
-    });
+            const now = new Date();
+            let filename = 'collision-test';
+            if (testCase.broadPhaseMode === BroadPhaseMode.Naive) {
+                filename += '-naive-mode';
+            } else if (
+                testCase.broadPhaseMode === BroadPhaseMode.GridSpatialPartition
+            ) {
+                filename += '-grid-mode';
+            }
+            filename += `-${testCase.objects}-objects-${now.toISOString()}`;
+
+            utils.exportCSV(engine.metrics, filename);
+        });
+    }
 });

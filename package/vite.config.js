@@ -20,7 +20,7 @@ export default defineConfig({
         rollupOptions: {
             external: ['earcut', 'gl-matrix'],
         },
-        watch: {},
+        // watch: {},
     },
     plugins: [tsconfigPaths()],
 });

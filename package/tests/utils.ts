@@ -6,7 +6,11 @@ import RectangleBody from '../src/bodies/RectangleBody';
 import TriangleBody from '../src/bodies/TriangleBody';
 import { Metrics } from '../src/Engine';
 
-export function generateBodies(count: number, worldDimensions: number, size: number) {
+export function generateBodies(
+    count: number,
+    worldDimensions: number,
+    size: number,
+) {
     const bodies: Body[] = [];
 
     for (let i = 0; i < count; i++) {
@@ -38,15 +42,13 @@ export function exportCSV(metrics: Metrics, name: string) {
         mkdirSync(dir, { recursive: true });
     }
 
-    const header = 'particles,constraints,broadphase_time,narrowphase_time\n';
-    let rows = ''
-    const rowsCount = metrics.particlesCount.length
+    const header =
+        'particles,constraints,collision_count,broadphase_time,narrowphase_time\n';
+    let rows = '';
+    const rowsCount = metrics.particlesCount.length;
     for (let i = 0; i < rowsCount; i++) {
-      rows += `${metrics.particlesCount[i]},${metrics.constraintsCount[i]},${metrics.broadphaseTime[i]},${metrics.narrowphaseTime[i]}\n`
+        rows += `${metrics.particlesCount[i]},${metrics.constraintsCount[i]},${metrics.collisionCount[i]},${metrics.broadphaseTime[i]},${metrics.narrowphaseTime[i]}\n`;
     }
-    // const rows = data
-    //     .map((r) => `${r.bodies},${r.iterations},${r.avgTimeMs}`)
-    //     .join('\n');
 
     writeFileSync(`${dir}/${name}.csv`, header + rows);
 }
