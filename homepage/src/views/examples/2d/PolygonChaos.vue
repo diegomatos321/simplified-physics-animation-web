@@ -21,7 +21,7 @@ canvas {
                     <p>{{ fps }}</p>
                 </div>
                 <div class="flex justify-between">
-                    <label for="totalEntities">Entities</label>
+                    <label for="totalthis.Entities">Entities</label>
                     <input
                         id="totalEntities"
                         class="border border-slate-200 rounded text-right"
@@ -29,19 +29,20 @@ canvas {
                         step="1"
                         v-model="totalEntities"
                         :disabled="hasStarted"
+                        @change="OnTotalEntitiesChange"
                     />
                 </div>
                 <div class="flex justify-between">
                     <p>Particles</p>
-                    <p>{{ simulation_state.particlesCount }}</p>
+                    <p>{{ getParticlesCount() }}</p>
                 </div>
                 <div class="flex justify-between">
                     <p>Constraints</p>
-                    <p>{{ simulation_state.constraintsCount }}</p>
+                    <p>{{ getConstraintsCount() }}</p>
                 </div>
                 <div class="flex justify-between">
                     <p>Collision Tests</p>
-                    <p>{{ simulation_state.collisionsTests }}</p>
+                    <p>{{ getCollisionsCount() }}</p>
                 </div>
 
                 <hr class="my-4 border-slate-200" />
@@ -52,7 +53,7 @@ canvas {
 
                 <div class="flex justify-between">
                     <label for="pauseOnCollision">Pause on Collision</label>
-                    <input id="pauseOnCollision" name="pauseOnCollision" type="checkbox" v-model="engine.pauseOnCollision" @click="OnPauseCollisionBtn" />
+                    <!-- <input id="pauseOnCollision" name="pauseOnCollision" type="checkbox" v-model="engine.pauseOnCollision" @click="OnPauseCollisionBtn" /> -->
                 </div>
 
                 <div class="flex justify-between">
@@ -61,7 +62,7 @@ canvas {
                         style="max-width: 100px"
                         name="broadPhaseMode"
                         id="broadPhaseMode"
-                        v-model="engine.config.BroadPhase"
+                        v-model="broadPhase"
                         class="border border-slate-200 rounded"
                     >
                         <option value="0">Naive</option>
@@ -74,9 +75,8 @@ canvas {
                     <select
                         style="max-width: 100px"
                         name="collisionDetectionMode"
-                        id="col        this.cells.length = 0;
-lisionDetectionMode"
-                        v-model="engine.config.CollisionDetection"
+                        id="collisionDetectionMode"
+                        v-model="collisionDetection"
                         class="border border-slate-200 rounded"
                     >
                         <option value="0">GJK/EPA</option>
@@ -98,46 +98,27 @@ import { onBeforeUnmount, ref } from 'vue';
 import p5 from 'p5';
 import { PolygonBody, type Body, TriangleBody, RectangleBody } from '@devdiegomatos/liso-engine/bodies';
 import { BroadPhaseMode, CollisionDetectionMode, Engine } from '@devdiegomatos/liso-engine';
-import {
-    createEngineWorker,
-    type MainToWorkerMessage,
-    type WorkerToMainMessage,
-    type ObjectBuilderArgs,
-    ObjectType,
-    type SimulationState,
-} from '@devdiegomatos/liso-engine/worker';
+import { createEngineWorker, type MainToWorkerMessage, type WorkerToMainMessage, type ObjectBuilderArgs, ObjectType } from '@devdiegomatos/liso-engine/worker';
+import Scene from '@/scenes/Scene';
+import type IScene from '@/scenes/IScene';
+import SceneThreaded from '@/scenes/SceneThreaded';
 
 // Component States
 let hasStarted = false;
-let totalEntities = 20;
-const threaded = false;
+let totalEntities = 100;
+let broadPhase: BroadPhaseMode = BroadPhaseMode.Naive
+let collisionDetection: CollisionDetectionMode = CollisionDetectionMode.Sat
+const threaded = true;
 const fps = ref(0);
 
 // Main thread mode variables
 const worldBoundings = 600;
 const gridArea = worldBoundings ** 2;
 let gridSize = Math.sqrt(gridArea / (totalEntities * 5));
-const engine = new Engine({
-    worldBoundings: {
-        top: [0, 0],
-        right: [worldBoundings, worldBoundings],
-    },
-    BroadPhase: BroadPhaseMode.GridSpatialPartition,
-    CollisionDetection: CollisionDetectionMode.GjkEpa,
-    gravity: vec3.fromValues(0, 0, 0),
-    gridSize,
-});
-const entities: Body[] = [];
+let scene: IScene | null = null;
 
 // Threaded mode variables
 let worker: Worker | null = null;
-let simulation_state: SimulationState = {
-    objects: [],
-    collidersInfo: [],
-    particlesCount: 0,
-    constraintsCount: 0,
-    collisionsTests: 0,
-};
 
 // P5 variables
 const sketchContainer = ref<HTMLDivElement | null>(null);
@@ -159,10 +140,8 @@ function start() {
 
     if (threaded) {
         worker = createEngineWorker();
-        worker.addEventListener('message', OnWorkerEvent);
+        worker?.addEventListener('message', OnWorkerEvent);
     }
-
-    window.addEventListener('keydown', handleKeyDown);
 }
 
 async function setup(p: p5) {
@@ -170,10 +149,9 @@ async function setup(p: p5) {
 
     p.createCanvas(worldBoundings, worldBoundings).parent(sketchContainer.value);
 
-    gridSize = Math.sqrt(gridArea / (totalEntities * 5));
-    console.log(gridSize);
-
     if (threaded && worker) {
+        scene = new SceneThreaded();
+
         const objects: ObjectBuilderArgs[] = [];
         for (let i = 0; i < totalEntities; i++) {
             const x = Math.random() * p.width;
@@ -203,8 +181,8 @@ async function setup(p: p5) {
                     top: [0, 0],
                     right: [worldBoundings, worldBoundings],
                 },
-                BroadPhase: BroadPhaseMode.GridSpatialPartition,
-                CollisionDetection: CollisionDetectionMode.GjkEpa,
+                BroadPhase: broadPhase,
+                CollisionDetection: collisionDetection,
                 gravity: vec3.fromValues(0, 0, 0),
                 gridSize: gridSize,
             },
@@ -212,6 +190,19 @@ async function setup(p: p5) {
         };
         worker.postMessage(msg);
     } else {
+        scene = new Scene(
+            new Engine({
+                worldBoundings: {
+                    top: [0, 0],
+                    right: [worldBoundings, worldBoundings],
+                },
+                BroadPhase: broadPhase,
+                CollisionDetection: collisionDetection,
+                gravity: vec3.fromValues(0, 0, 0),
+                gridSize,
+            }),
+        );
+
         for (let i = 0; i < totalEntities; i++) {
             const x = Math.random() * p.width;
             const y = Math.random() * p.height;
@@ -230,13 +221,14 @@ async function setup(p: p5) {
                 body = PolygonBody.PolygonBuilder(x, y, size, 6, isStatic);
             }
 
-            engine.addBody(body);
-            entities.push(body);
+            scene.add(body);
         }
     }
 }
 
 function loop(p: p5) {
+    if (!scene) return;
+
     p.background('#ffffff');
 
     // Draw grid
@@ -258,12 +250,8 @@ function loop(p: p5) {
 
     fps.value = Math.round(p.frameRate());
 
-    if (threaded) {
-        Render_Threaded(p);
-    } else {
-        engine.step(p.deltaTime / 1000);
-        Render_MainThread(p);
-    }
+    scene.step(p.deltaTime / 1000);
+    scene.render(p);
 }
 
 onBeforeUnmount(() => {
@@ -279,150 +267,43 @@ onBeforeUnmount(() => {
         worker.terminate();
         worker = null;
     }
-
-    window.removeEventListener('keydown', handleKeyDown);
 });
 
-function Render_Threaded(p: p5) {
-    // Batch draw all constraints as lines
-    p.stroke(0, 0, 0);
-    p.strokeWeight(1);
-    p.beginShape(p.LINES);
-    for (const obj of simulation_state.objects) {
-        if (obj.isStatic) {
-            continue;
-        }
-        for (const ci of obj.constraintsIndices) {
-            const x0 = obj.particles[ci * 2];
-            const y0 = obj.particles[ci * 2 + 1];
-            p.vertex(x0, y0);
-        }
+function getParticlesCount() {
+    if (!scene) {
+        return 0;
     }
-    p.endShape();
 
-    // Batch draw all constraints of static particles in red
-    p.stroke(255, 0, 0);
-    p.strokeWeight(1);
-    p.beginShape(p.LINES);
-    for (const obj of simulation_state.objects) {
-        if (obj.isStatic === false) {
-            continue;
-        }
-        for (const ci of obj.constraintsIndices) {
-            const x0 = obj.particles[ci * 2];
-            const y0 = obj.particles[ci * 2 + 1];
-            p.vertex(x0, y0);
-        }
-    }
-    p.endShape();
-
-    // Batch draw all convex hull in blue
-    p.stroke(150, 200, 255);
-    p.strokeWeight(1);
-    p.beginShape(p.LINES);
-    for (const colliderInfo of simulation_state.collidersInfo) {
-        // convex hull layout: x0, y0, x1, y1, x2, y2, ...
-        const totalParticles = colliderInfo.convexHull.length / 2;
-        for (let i = 0; i < totalParticles; i++) {
-            const x0 = colliderInfo.convexHull[i * 2];
-            const y0 = colliderInfo.convexHull[i * 2 + 1];
-            p.vertex(x0, y0);
-
-            const j = (i + 1) * 2; // next particle indice
-            const x1 = colliderInfo.convexHull[j % colliderInfo.convexHull.length];
-            const y1 = colliderInfo.convexHull[(j + 1) % colliderInfo.convexHull.length];
-            p.vertex(x1, y1);
-        }
-    }
-    p.endShape();
-
-    // Batch draw all contact points in red
-    p.stroke(255, 0, 0);
-    p.strokeWeight(2);
-    p.beginShape(p.POINTS);
-    for (const colliderInfo of simulation_state.collidersInfo) {
-        // Draw the contact points
-        for (let i = 0; i < colliderInfo.contactPoints.length; i += 2) {
-            const x0 = colliderInfo.contactPoints[i];
-            const y0 = colliderInfo.contactPoints[i + 1];
-            p.vertex(x0, y0);
-        }
-    }
-    p.endShape();
+    return scene.getParticlesCount();
 }
 
-function Render_MainThread(p: p5) {
-    // Batch draw all constraints as lines
-    p.stroke(0, 0, 0);
-    p.strokeWeight(1);
-    p.beginShape(p.LINES);
-    for (const entity of entities) {
-        for (const constraint of entity.constraints) {
-            p.vertex(constraint.p0.position[0], constraint.p0.position[1]);
-            p.vertex(constraint.p1.position[0], constraint.p1.position[1]);
-        }
+function getConstraintsCount() {
+    if (!scene) {
+        return 0
     }
-    p.endShape();
 
-    // Batch draw all convex hull in blue
-    p.stroke(150, 200, 255);
-    p.strokeWeight(1);
-    p.beginShape(p.LINES);
-    for (const colliderInfo of engine.collidersInfo) {
-        const body = colliderInfo.body;
-        const convexHull = body.convexHull();
-
-        for (let i = 0; i < convexHull.particles.length; i++) {
-            const v1 = convexHull.particles[i];
-            const v2 = convexHull.particles[(i + 1) % convexHull.particles.length];
-            p.vertex(v1.position[0], v1.position[1]);
-            p.vertex(v2.position[0], v2.position[1]);
-        }
-    }
-    p.endShape();
-
-    // Batch draw all contact points in red
-    p.stroke(255, 0, 0);
-    p.strokeWeight(2);
-    p.beginShape(p.POINTS);
-    for (const colliderInfo of engine.collidersInfo) {
-        // Draw the contact points and normal direction
-        for (const particle of colliderInfo.contactPoints) {
-            p.vertex(particle.position[0], particle.position[1]);
-        }
-    }
-    p.endShape();
-
-    // Batch draw all separation normals in red
-    p.stroke(255, 0, 0);
-    p.strokeWeight(1);
-    p.beginShape(p.LINES);
-    for (const colliderInfo of engine.collidersInfo) {
-        for (const particle of colliderInfo.contactPoints) {
-            const delta = vec3.scale(vec3.create(), colliderInfo.normal, 5);
-            const p2 = vec3.add(vec3.create(), particle.position, delta);
-            p.vertex(particle.position[0], particle.position[1]);
-            p.vertex(p2[0], p2[1]);
-        }
-    }
-    p.endShape();
+    return scene.getConstraintsCount()
 }
 
-function OnPauseCollisionBtn() {
-    engine.pauseOnCollision = !engine.pauseOnCollision;
+function getCollisionsCount() {
+    if (!scene) {
+        return 0
+    }
+
+    return scene.getCollisionsCount()
 }
 
-function handleKeyDown(e: KeyboardEvent) {
-    if (e.code == 'Space') {
-        engine.isPaused = !engine.isPaused;
-        engine.skip = !engine.skip;
-    }
+function OnTotalEntitiesChange(e) {
+    gridSize = Math.sqrt(gridArea / (totalEntities * 5));
 }
 
 function OnWorkerEvent(e: MessageEvent<WorkerToMainMessage>) {
+    if (!scene) return
+    if (!(scene instanceof SceneThreaded)) return
+
     const msg = e.data;
     if (msg.type === 'simulation_state') {
-        simulation_state = msg.state;
+        scene.simulation_state = msg.state;
     }
 }
 </script>

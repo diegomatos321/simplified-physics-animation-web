@@ -75,16 +75,25 @@ function step() {
     }
 
     // 3. Empacote o estado
-    // const state: SimulationState = {
-    //     objects: objectsState,
-    //     collidersInfo,
-    //     particlesCount: engine.particlesCount,
-    //     constraintsCount: engine.constraintsCount,
-    //     collisionsTests: engine.collisionsTests,
-    // };
+    const state: SimulationState = {
+        objects: objectsState,
+        collidersInfo,
+        particlesCount:
+            engine.metrics.particlesCount[
+                engine.metrics.particlesCount.length - 1
+            ],
+        constraintsCount:
+            engine.metrics.constraintsCount[
+                engine.metrics.particlesCount.length - 1
+            ],
+        collisionsTests:
+            engine.metrics.collisionCount[
+                engine.metrics.particlesCount.length - 1
+            ],
+    };
 
     // 4. Envie o estado para a Main Thread
-    // self.postMessage({ type: 'simulation_state', state });
+    self.postMessage({ type: 'simulation_state', state });
 
     // schedule next iteration with minimal delay
     self.setTimeout(step, 0);
