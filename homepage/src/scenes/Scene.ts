@@ -80,10 +80,10 @@ export default class Scene implements IScene {
     }
 
     getCollisionsCount(): number {
-        return this.engine.metrics.collisionCount[this.engine.metrics.particlesCount.length-1]
+        return this.engine.metrics.collisionCount[this.engine.metrics.particlesCount.length - 1];
     }
 
     getConstraintsCount(): number {
-        return this.engine.metrics.constraintsCount[this.engine.metrics.constraintsCount.length-1]
+        return this.engine.metrics.constraintsCount[this.engine.metrics.constraintsCount.length - 1];
     }
 }

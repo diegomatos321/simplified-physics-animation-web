@@ -25,15 +25,15 @@ canvas {
                 </div>
                 <div class="flex justify-between">
                     <p>Particles</p>
-                    <p>{{ engine.particlesCount }}</p>
+                    <p>{{ getParticlesCount() }}</p>
                 </div>
                 <div class="flex justify-between">
                     <p>Constraints</p>
-                    <p>{{ engine.constraintsCount }}</p>
+                    <p>{{ getConstraintsCount() }}</p>
                 </div>
                 <div class="flex justify-between">
                     <p>Collision Tests</p>
-                    <p>{{ engine.collisionsTests }}</p>
+                    <p>{{ getCollisionsCount() }}</p>
                 </div>
 
                 <hr class="my-4 border-slate-200" />
@@ -42,10 +42,10 @@ canvas {
                     <input id="threaded" name="threaded" type="checkbox" v-model="threaded" />
                 </div>
 
-                <div class="flex justify-between">
+                <!-- <div class="flex justify-between">
                     <label for="pauseOnCollision">Pause on Collision</label>
                     <input id="pauseOnCollision" name="pauseOnCollision" type="checkbox" v-bind:value="engine.pauseOnCollision" @click="OnPauseCollisionBtn" />
-                </div>
+                </div> -->
 
                 <div class="flex justify-between">
                     <label for="broadPhaseMode">Broad Phase</label>
@@ -71,16 +71,12 @@ canvas {
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import p5 from 'p5';
 import { vec3 } from 'gl-matrix';
-import { type Body, PolygonBody, TrellisBody } from '@devdiegomatos/liso-engine/bodies';
+import { PolygonBody, TrellisBody } from '@devdiegomatos/liso-engine/bodies';
 import { Engine, BroadPhaseMode, CollisionDetectionMode } from '@devdiegomatos/liso-engine';
-import {
-    createEngineWorker,
-    ObjectType,
-    type MainToWorkerMessage,
-    type ObjectBuilderArgs,
-    type SimulationState,
-    type WorkerToMainMessage,
-} from '@devdiegomatos/liso-engine/worker';
+import { createEngineWorker, ObjectType, type MainToWorkerMessage, type ObjectBuilderArgs, type WorkerToMainMessage } from '@devdiegomatos/liso-engine/worker';
+import Scene from '@/scenes/Scene';
+import type IScene from '@/scenes/IScene';
+import SceneThreaded from '@/scenes/SceneThreaded';
 
 // Component States
 let hasStarted = false;
@@ -89,27 +85,12 @@ const threaded = false;
 const fps = ref(0);
 
 // Main thread mode variables
-const engine = new Engine({
-    worldBoundings: {
-        top: [0, 0],
-        right: [600, 600],
-    },
-    BroadPhase: BroadPhaseMode.GridSpatialPartition,
-    CollisionDetection: CollisionDetectionMode.GjkEpa,
-    gravity: vec3.fromValues(0, 98, 0),
-    gridSize: 40,
-});
-const entities: Body[] = [];
+const worldBoundings = 600;
+const gridSize = 40;
+let scene: IScene | null = null;
 
 // Threaded mode variables
 let worker: Worker | null = null;
-let simulation_state: SimulationState = {
-    objects: [],
-    collidersInfo: [],
-    particlesCount: 0,
-    constraintsCount: 0,
-    collisionsTests: 0,
-};
 
 // P5 variables
 const sketchContainer = ref<HTMLDivElement | null>(null);
@@ -138,7 +119,7 @@ onMounted(() => {
 async function setup(p: p5) {
     if (sketchContainer.value === null) return;
 
-    p.createCanvas(600, 600).parent(sketchContainer.value);
+    p.createCanvas(worldBoundings, worldBoundings).parent(sketchContainer.value);
 
     if (threaded && worker) {
         const objects: ObjectBuilderArgs[] = [];
@@ -189,40 +170,59 @@ async function setup(p: p5) {
             config: {
                 worldBoundings: {
                     top: [0, 0],
-                    right: [600, 600],
+                    right: [worldBoundings, worldBoundings],
                 },
                 BroadPhase: BroadPhaseMode.GridSpatialPartition,
                 CollisionDetection: CollisionDetectionMode.GjkEpa,
                 gravity: vec3.fromValues(0, 98, 0),
-                gridSize: 40,
+                gridSize,
             },
             objects,
         };
         worker.postMessage(msg);
     } else {
+        scene = new Scene(
+            new Engine({
+                worldBoundings: {
+                    top: [0, 0],
+                    right: [worldBoundings, worldBoundings],
+                },
+                BroadPhase: BroadPhaseMode.GridSpatialPartition,
+                CollisionDetection: CollisionDetectionMode.GjkEpa,
+                gravity: vec3.fromValues(0, 98, 0),
+                gridSize,
+            }),
+        );
+
         const trelis1 = new TrellisBody(vec3.fromValues(130, 200, 0), vec3.fromValues(100, 100, 0), 4, 4, true, true);
         trelis1.particles[0].isStatic = true;
+        scene.add(trelis1);
         // trelis1.particles[10].isStatic = true;
-        engine.addBody(trelis1);
-        entities.push(trelis1);
+        // engine.addBody(trelis1);
+        // entities.push(trelis1);
 
         const trelis2 = new TrellisBody(vec3.fromValues(100, 450, 0), vec3.fromValues(200, 100, 0), 3, 2, true);
-        engine.addBody(trelis2);
-        entities.push(trelis2);
+        scene.add(trelis2);
+        // engine.addBody(trelis2);
+        // entities.push(trelis2);
 
         const cloth = new TrellisBody(vec3.fromValues(250, 200, 0), vec3.fromValues(100, 100, 0), 10, 10);
         cloth.particles[0].isStatic = true;
         cloth.particles[10].isStatic = true;
-        engine.addBody(cloth);
-        entities.push(cloth);
+        scene.add(cloth);
+        // engine.addBody(cloth);
+        // entities.push(cloth);
 
         const pentagonPoly = PolygonBody.PolygonBuilder(200, 50, 100, 5);
-        engine.addBody(pentagonPoly);
-        entities.push(pentagonPoly);
+        scene.add(pentagonPoly);
+        // engine.addBody(pentagonPoly);
+        // entities.push(pentagonPoly);
     }
 }
 
 function loop(p: p5) {
+    if (!scene) return;
+
     p.background('#ffffff');
 
     // Draw grid
@@ -231,12 +231,12 @@ function loop(p: p5) {
     p.strokeWeight(1);
 
     // linhas verticais
-    for (let x = 0; x <= p.width; x += engine.config.gridSize) {
+    for (let x = 0; x <= p.width; x += gridSize) {
         p.line(x + 0.5, 0, x + 0.5, p.height); // 0.5 corrige artefatos de subpixel
     }
 
     // linhas horizontais
-    for (let y = 0; y <= p.height; y += engine.config.gridSize) {
+    for (let y = 0; y <= p.height; y += gridSize) {
         p.line(0, y + 0.5, p.width, y + 0.5);
     }
 
@@ -244,13 +244,8 @@ function loop(p: p5) {
 
     fps.value = Math.round(p.frameRate());
 
-    if (threaded) {
-        Render_Threaded(p);
-    } else {
-        engine.step(p.deltaTime / 1000);
-
-        Render_MainThread(p);
-    }
+    scene.step(p.deltaTime / 1000);
+    scene.render(p);
 }
 
 onBeforeUnmount(() => {
@@ -268,145 +263,36 @@ onBeforeUnmount(() => {
     }
 });
 
-function Render_Threaded(p: p5) {
-    // Batch draw all constraints as lines
-    p.stroke(0, 0, 0);
-    p.strokeWeight(1);
-    p.beginShape(p.LINES);
-    for (const obj of simulation_state.objects) {
-        if (obj.isStatic) {
-            continue;
-        }
-        for (const ci of obj.constraintsIndices) {
-            const x0 = obj.particles[ci * 2];
-            const y0 = obj.particles[ci * 2 + 1];
-            p.vertex(x0, y0);
-        }
+function getParticlesCount() {
+    if (!scene) {
+        return 0;
     }
-    p.endShape();
 
-    // Batch draw all constraints of static particles in red
-    p.stroke(255, 0, 0);
-    p.strokeWeight(1);
-    p.beginShape(p.LINES);
-    for (const obj of simulation_state.objects) {
-        if (obj.isStatic === false) {
-            continue;
-        }
-        for (const ci of obj.constraintsIndices) {
-            const x0 = obj.particles[ci * 2];
-            const y0 = obj.particles[ci * 2 + 1];
-            p.vertex(x0, y0);
-        }
-    }
-    p.endShape();
-
-    // Batch draw all convex hull in blue
-    p.stroke(150, 200, 255);
-    p.strokeWeight(1);
-    p.beginShape(p.LINES);
-    for (const colliderInfo of simulation_state.collidersInfo) {
-        // convex hull layout: x0, y0, x1, y1, x2, y2, ...
-        const totalParticles = colliderInfo.convexHull.length / 2;
-        for (let i = 0; i < totalParticles; i++) {
-            const x0 = colliderInfo.convexHull[i * 2];
-            const y0 = colliderInfo.convexHull[i * 2 + 1];
-            p.vertex(x0, y0);
-
-            const j = (i + 1) * 2; // next particle indice
-            const x1 = colliderInfo.convexHull[j % colliderInfo.convexHull.length];
-            const y1 = colliderInfo.convexHull[(j + 1) % colliderInfo.convexHull.length];
-            p.vertex(x1, y1);
-        }
-    }
-    p.endShape();
-
-    // Batch draw all contact points in red
-    p.stroke(255, 0, 0);
-    p.strokeWeight(2);
-    p.beginShape(p.POINTS);
-    for (const colliderInfo of simulation_state.collidersInfo) {
-        // Draw the contact points
-        for (let i = 0; i < colliderInfo.contactPoints.length; i += 2) {
-            const x0 = colliderInfo.contactPoints[i];
-            const y0 = colliderInfo.contactPoints[i + 1];
-            p.vertex(x0, y0);
-        }
-    }
-    p.endShape();
+    return scene.getParticlesCount();
 }
 
-function Render_MainThread(p: p5) {
-    // Batch draw all constraints as lines
-    p.stroke(0, 0, 0);
-    p.strokeWeight(1);
-    p.beginShape(p.LINES);
-    for (const entity of entities) {
-        for (const constraint of entity.constraints) {
-            p.vertex(constraint.p0.position[0], constraint.p0.position[1]);
-            p.vertex(constraint.p1.position[0], constraint.p1.position[1]);
-        }
+function getConstraintsCount() {
+    if (!scene) {
+        return 0;
     }
-    p.endShape();
 
-    // Batch draw all convex hull in blue
-    p.stroke(150, 200, 255);
-    p.strokeWeight(1);
-    p.beginShape(p.LINES);
-    for (const colliderInfo of engine.collidersInfo) {
-        const body = colliderInfo.body;
-        const convexHull = body.convexHull();
-
-        for (let i = 0; i < convexHull.particles.length; i++) {
-            const v1 = convexHull.particles[i];
-            const v2 = convexHull.particles[(i + 1) % convexHull.particles.length];
-            p.vertex(v1.position[0], v1.position[1]);
-            p.vertex(v2.position[0], v2.position[1]);
-        }
-    }
-    p.endShape();
-
-    // Batch draw all contact points in red
-    p.stroke(255, 0, 0);
-    p.strokeWeight(2);
-    p.beginShape(p.POINTS);
-    for (const colliderInfo of engine.collidersInfo) {
-        // Draw the contact points and normal direction
-        for (const particle of colliderInfo.contactPoints) {
-            p.vertex(particle.position[0], particle.position[1]);
-        }
-    }
-    p.endShape();
-
-    // Batch draw all separation normals in red
-    p.stroke(255, 0, 0);
-    p.strokeWeight(1);
-    p.beginShape(p.LINES);
-    for (const colliderInfo of engine.collidersInfo) {
-        for (const particle of colliderInfo.contactPoints) {
-            const delta = vec3.scale(vec3.create(), colliderInfo.normal, 5);
-            const p2 = vec3.add(vec3.create(), particle.position, delta);
-            p.vertex(particle.position[0], particle.position[1]);
-            p.vertex(p2[0], p2[1]);
-        }
-    }
-    p.endShape();
+    return scene.getConstraintsCount();
 }
 
-function OnPauseCollisionBtn() {
-    engine.pauseOnCollision = !engine.pauseOnCollision;
+function getCollisionsCount() {
+    if (!scene) {
+        return 0;
+    }
+
+    return scene.getCollisionsCount();
 }
 
 function OnWorkerEvent(e: MessageEvent<WorkerToMainMessage>) {
+    if (!scene || !(scene instanceof SceneThreaded)) return;
+
     const msg = e.data;
     if (msg.type === 'simulation_state') {
-        simulation_state = msg.state;
+        scene.simulation_state = msg.state;
     }
 }
-// function handleKeyDown(e: KeyboardEvent) {
-//     if (e.code == 'Space') {
-//         engine.isPaused = !engine.isPaused;
-//         engine.skip = !engine.skip;
-//     }
-// }
 </script>

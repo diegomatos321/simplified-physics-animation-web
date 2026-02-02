@@ -21,7 +21,7 @@ canvas {
                     <p>{{ fps }}</p>
                 </div>
                 <div class="flex justify-between">
-                    <label for="totalthis.Entities">Entities</label>
+                    <label for="totalEntities">Entities</label>
                     <input
                         id="totalEntities"
                         class="border border-slate-200 rounded text-right"
@@ -51,20 +51,14 @@ canvas {
                     <input id="threaded" name="threaded" type="checkbox" v-model="threaded" />
                 </div>
 
-                <div class="flex justify-between">
+                <!-- <div class="flex justify-between">
                     <label for="pauseOnCollision">Pause on Collision</label>
-                    <!-- <input id="pauseOnCollision" name="pauseOnCollision" type="checkbox" v-model="engine.pauseOnCollision" @click="OnPauseCollisionBtn" /> -->
-                </div>
+                    <input id="pauseOnCollision" name="pauseOnCollision" type="checkbox" v-model="engine.pauseOnCollision" @click="OnPauseCollisionBtn" />
+                </div> -->
 
                 <div class="flex justify-between">
                     <label for="broadPhaseMode">Broad Phase</label>
-                    <select
-                        style="max-width: 100px"
-                        name="broadPhaseMode"
-                        id="broadPhaseMode"
-                        v-model="broadPhase"
-                        class="border border-slate-200 rounded"
-                    >
+                    <select style="max-width: 100px" name="broadPhaseMode" id="broadPhaseMode" v-model="broadPhase" class="border border-slate-200 rounded">
                         <option value="0">Naive</option>
                         <option value="1">Grid Spatial Partition</option>
                     </select>
@@ -105,10 +99,10 @@ import SceneThreaded from '@/scenes/SceneThreaded';
 
 // Component States
 let hasStarted = false;
-let totalEntities = 100;
-let broadPhase: BroadPhaseMode = BroadPhaseMode.Naive
-let collisionDetection: CollisionDetectionMode = CollisionDetectionMode.Sat
-const threaded = true;
+let totalEntities = 100, currEntities = 0;
+let broadPhase: BroadPhaseMode = BroadPhaseMode.Naive;
+let collisionDetection: CollisionDetectionMode = CollisionDetectionMode.Sat;
+const threaded = false;
 const fps = ref(0);
 
 // Main thread mode variables
@@ -116,6 +110,9 @@ const worldBoundings = 600;
 const gridArea = worldBoundings ** 2;
 let gridSize = Math.sqrt(gridArea / (totalEntities * 5));
 let scene: IScene | null = null;
+
+const interval = 300;
+let elapsed = 0;
 
 // Threaded mode variables
 let worker: Worker | null = null;
@@ -140,7 +137,7 @@ function start() {
 
     if (threaded) {
         worker = createEngineWorker();
-        worker?.addEventListener('message', OnWorkerEvent);
+        worker.addEventListener('message', OnWorkerEvent);
     }
 }
 
@@ -152,28 +149,6 @@ async function setup(p: p5) {
     if (threaded && worker) {
         scene = new SceneThreaded();
 
-        const objects: ObjectBuilderArgs[] = [];
-        for (let i = 0; i < totalEntities; i++) {
-            const x = Math.random() * p.width;
-            const y = Math.random() * p.height;
-
-            const type = Math.random();
-            const isStatic = Math.random() < 0.2 ? true : false;
-            const size = gridSize;
-            let obj: ObjectBuilderArgs;
-            if (type <= 0.25) {
-                obj = { type: ObjectType.Triangle, x, y, size, isStatic };
-            } else if (type <= 0.5) {
-                obj = { type: ObjectType.Rectangle, x, y, width: size, height: size / 2, isStatic };
-            } else if (type <= 0.75) {
-                obj = { type: ObjectType.Polygon, x, y, size, k: 5, isStatic };
-            } else {
-                obj = { type: ObjectType.Polygon, x, y, size, k: 6, isStatic };
-            }
-
-            objects.push(obj);
-        }
-
         const msg: MainToWorkerMessage = {
             type: 'start',
             config: {
@@ -183,10 +158,9 @@ async function setup(p: p5) {
                 },
                 BroadPhase: broadPhase,
                 CollisionDetection: collisionDetection,
-                gravity: vec3.fromValues(0, 0, 0),
-                gridSize: gridSize,
+                gravity: vec3.fromValues(0, 98, 0),
+                gridSize,
             },
-            objects,
         };
         worker.postMessage(msg);
     } else {
@@ -198,36 +172,21 @@ async function setup(p: p5) {
                 },
                 BroadPhase: broadPhase,
                 CollisionDetection: collisionDetection,
-                gravity: vec3.fromValues(0, 0, 0),
+                gravity: vec3.fromValues(0, 98, 0),
                 gridSize,
             }),
         );
-
-        for (let i = 0; i < totalEntities; i++) {
-            const x = Math.random() * p.width;
-            const y = Math.random() * p.height;
-
-            const type = Math.random();
-            const isStatic = Math.random() < 0.2 ? true : false;
-            const size = gridSize;
-            let body: Body;
-            if (type <= 0.25) {
-                body = new TriangleBody(x, y, size, isStatic);
-            } else if (type <= 0.5) {
-                body = new RectangleBody(x, y, size, size / 2, isStatic);
-            } else if (type <= 0.75) {
-                body = PolygonBody.PolygonBuilder(x, y, size, 5, isStatic);
-            } else {
-                body = PolygonBody.PolygonBuilder(x, y, size, 6, isStatic);
-            }
-
-            scene.add(body);
-        }
     }
 }
 
 function loop(p: p5) {
     if (!scene) return;
+
+    elapsed += p.deltaTime;
+    while (currEntities < totalEntities && elapsed >= interval) {
+        spawnObject();
+        elapsed -= interval;
+    }
 
     p.background('#ffffff');
 
@@ -269,6 +228,51 @@ onBeforeUnmount(() => {
     }
 });
 
+function spawnObject() {
+    if (threaded && !(scene instanceof SceneThreaded)) {
+        const x = Math.random() * p.width;
+        const y = Math.random() * p.height;
+
+        const type = Math.random();
+        const isStatic = Math.random() < 0.2 ? true : false;
+        const size = gridSize;
+        let obj: ObjectBuilderArgs;
+        if (type <= 0.25) {
+            obj = { type: ObjectType.Triangle, x, y, size, isStatic };
+        } else if (type <= 0.5) {
+            obj = { type: ObjectType.Rectangle, x, y, width: size, height: size / 2, isStatic };
+        } else if (type <= 0.75) {
+            obj = { type: ObjectType.Polygon, x, y, size, k: 5, isStatic };
+        } else {
+            obj = { type: ObjectType.Polygon, x, y, size, k: 6, isStatic };
+        }
+
+        currEntities++;
+    } else {
+        if (!scene) return;
+
+        const x = Math.random() * worldBoundings;
+        const y = Math.random() * worldBoundings;
+
+        const type = Math.random();
+        const isStatic = Math.random() < 0.2 ? true : false;
+        const size = gridSize;
+        let body: Body;
+        if (type <= 0.25) {
+            body = new TriangleBody(x, y, size, isStatic);
+        } else if (type <= 0.5) {
+            body = new RectangleBody(x, y, size, size / 2, isStatic);
+        } else if (type <= 0.75) {
+            body = PolygonBody.PolygonBuilder(x, y, size, 5, isStatic);
+        } else {
+            body = PolygonBody.PolygonBuilder(x, y, size, 6, isStatic);
+        }
+
+        scene.add(body);
+        currEntities++;
+    }
+
+}
 function getParticlesCount() {
     if (!scene) {
         return 0;
@@ -279,18 +283,18 @@ function getParticlesCount() {
 
 function getConstraintsCount() {
     if (!scene) {
-        return 0
+        return 0;
     }
 
-    return scene.getConstraintsCount()
+    return scene.getConstraintsCount();
 }
 
 function getCollisionsCount() {
     if (!scene) {
-        return 0
+        return 0;
     }
 
-    return scene.getCollisionsCount()
+    return scene.getCollisionsCount();
 }
 
 function OnTotalEntitiesChange(e) {
@@ -298,8 +302,7 @@ function OnTotalEntitiesChange(e) {
 }
 
 function OnWorkerEvent(e: MessageEvent<WorkerToMainMessage>) {
-    if (!scene) return
-    if (!(scene instanceof SceneThreaded)) return
+    if (!scene || !(scene instanceof SceneThreaded)) return;
 
     const msg = e.data;
     if (msg.type === 'simulation_state') {

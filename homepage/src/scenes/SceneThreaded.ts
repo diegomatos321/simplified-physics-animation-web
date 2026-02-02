@@ -94,10 +94,10 @@ export default class SceneThreaded implements IScene {
     }
 
     getCollisionsCount(): number {
-        return this.simulation_state.collisionsTests
+        return this.simulation_state.collisionsTests;
     }
 
     getConstraintsCount(): number {
-        return this.simulation_state.constraintsCount
+        return this.simulation_state.constraintsCount;
     }
 }
