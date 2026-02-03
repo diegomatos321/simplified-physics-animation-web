@@ -79,14 +79,14 @@ import type IScene from '@/scenes/IScene';
 import SceneThreaded from '@/scenes/SceneThreaded';
 
 // Component States
-let hasStarted = false;
+let hasStarted = false,
+    threaded = false;
 const totalEntities = 4;
-let threaded = false;
 const fps = ref(0);
 
 // Main thread mode variables
-const worldBoundings = 600;
-const gridSize = 40;
+const worldBoundings = 600,
+    gridSize = 40;
 let scene: IScene | null = null;
 
 // Threaded mode variables

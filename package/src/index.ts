@@ -2,7 +2,13 @@ import Engine, {
     BroadPhaseMode,
     CollisionDetectionMode,
     type Config,
-    type Metrics
+    type Metrics,
 } from './Engine';
 
-export { BroadPhaseMode, CollisionDetectionMode, type Config, Engine,type Metrics };
+export {
+    BroadPhaseMode,
+    CollisionDetectionMode,
+    type Config,
+    Engine,
+    type Metrics,
+};

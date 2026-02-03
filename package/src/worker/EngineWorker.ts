@@ -87,7 +87,7 @@ function step() {
                 engine.metrics.particlesCount.length - 1
             ],
         collisionsTests:
-            engine.metrics.collisionCount[
+            engine.metrics.collisionsCount[
                 engine.metrics.particlesCount.length - 1
             ],
     };

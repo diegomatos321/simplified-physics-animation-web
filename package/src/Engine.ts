@@ -29,7 +29,8 @@ export interface Metrics {
     // objectsCount: number[];
     particlesCount: number[];
     constraintsCount: number[];
-    collisionCount: number[];
+    collisionsTest: number[];
+    collisionsCount: number[];
     broadphaseTime: number[];
     narrowphaseTime: number[];
     // frametime: number[];
@@ -46,7 +47,8 @@ export default class Engine {
         // objectsCount: [],
         particlesCount: [],
         constraintsCount: [],
-        collisionCount: [],
+        collisionsTest: [],
+        collisionsCount: [],
         broadphaseTime: [],
         narrowphaseTime: [],
         // frametime: [],
@@ -72,7 +74,7 @@ export default class Engine {
         }
 
         // this.metrics.frametime.push(dt);
-        this.metrics.collisionCount.push(0);
+        this.metrics.collisionsTest.push(0);
         this.contactPairs.length = 0;
         this.collidersInfo.length = 0;
 
@@ -213,8 +215,8 @@ export default class Engine {
 
                 seen.add(keyPair);
 
-                this.metrics.collisionCount[
-                    this.metrics.collisionCount.length - 1
+                this.metrics.collisionsTest[
+                    this.metrics.collisionsTest.length - 1
                 ]++;
                 if (cellA[1].getAABB().intersects(cellB[1].getAABB())) {
                     this.contactPairs.push([cellA[1], cellB[1]]);
@@ -233,8 +235,8 @@ export default class Engine {
                 const boundingBoxA = bodyA.getAABB();
                 const boundingBoxB = bodyB.getAABB();
 
-                this.metrics.collisionCount[
-                    this.metrics.collisionCount.length - 1
+                this.metrics.collisionsTest[
+                    this.metrics.collisionsTest.length - 1
                 ]++;
                 if (boundingBoxA.intersects(boundingBoxB)) {
                     this.contactPairs.push([bodyA, bodyB]);
@@ -253,11 +255,15 @@ export default class Engine {
 
             // The direction of the separation plane goes from A to B
             // So the separation required for A is in the oppositive direction
-            this.metrics.collisionCount[
-                this.metrics.collisionCount.length - 1
+            this.metrics.collisionsTest[
+                this.metrics.collisionsTest.length - 1
             ]++;
             const hit = sat(convexHullA, convexHullB);
             if (hit) {
+                this.metrics.collisionsCount[
+                    this.metrics.collisionsCount.length - 1
+                ]++;
+
                 const colliderA = new ColliderInfo(
                     bodyA,
                     vec3.negate(vec3.create(), hit.normal),
@@ -285,6 +291,10 @@ export default class Engine {
             // So the separation required for A is in the oppositive direction
             const hit = gjk(convexHullA, convexHullB);
             if (hit) {
+                this.metrics.collisionsCount[
+                    this.metrics.collisionsCount.length - 1
+                ]++;
+
                 const mvp = epa(convexHullA, convexHullB, hit);
                 const colliderA = new ColliderInfo(
                     bodyA,

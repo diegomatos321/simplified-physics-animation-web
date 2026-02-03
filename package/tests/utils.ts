@@ -4,7 +4,7 @@ import type Body from '../src/bodies/Body';
 import PolygonBody from '../src/bodies/PolygonBody';
 import RectangleBody from '../src/bodies/RectangleBody';
 import TriangleBody from '../src/bodies/TriangleBody';
-import { Metrics } from '../src/Engine';
+import type { Metrics } from '../src/Engine';
 
 export function generateBodies(
     count: number,
@@ -43,11 +43,11 @@ export function exportCSV(metrics: Metrics, name: string) {
     }
 
     const header =
-        'particles,constraints,collision_count,broadphase_time,narrowphase_time\n';
+        'particles,constraints,collisions_test,collisions_count,broadphase_time,narrowphase_time\n';
     let rows = '';
     const rowsCount = metrics.particlesCount.length;
     for (let i = 0; i < rowsCount; i++) {
-        rows += `${metrics.particlesCount[i]},${metrics.constraintsCount[i]},${metrics.collisionCount[i]},${metrics.broadphaseTime[i]},${metrics.narrowphaseTime[i]}\n`;
+        rows += `${metrics.particlesCount[i]},${metrics.constraintsCount[i]},${metrics.collisionsTest[i]},${metrics.collisionsCount[i]},${metrics.broadphaseTime[i]},${metrics.narrowphaseTime[i]}\n`;
     }
 
     writeFileSync(`${dir}/${name}.csv`, header + rows);

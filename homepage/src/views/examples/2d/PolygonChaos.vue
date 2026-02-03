@@ -93,11 +93,12 @@ import type IScene from '@/scenes/IScene';
 import SceneThreaded from '@/scenes/SceneThreaded';
 
 // Component States
-let hasStarted = false;
-let totalEntities = 100, currEntities = 0;
+let hasStarted = false,
+    threaded = false;
+let totalEntities = 100,
+    currEntities = 0;
 let broadPhase: BroadPhaseMode = BroadPhaseMode.Naive;
 let collisionDetection: CollisionDetectionMode = CollisionDetectionMode.Sat;
-let threaded = true;
 const fps = ref(0);
 
 // Main thread mode variables
@@ -105,9 +106,6 @@ const worldBoundings = 600;
 const gridArea = worldBoundings ** 2;
 let gridSize = Math.sqrt(gridArea / (totalEntities * 3));
 let scene: IScene | null = null;
-
-const interval = 300;
-let elapsed = 0;
 
 // Threaded mode variables
 let worker: Worker | null = null;
@@ -144,6 +142,27 @@ async function setup(p: p5) {
     if (threaded && worker) {
         scene = new SceneThreaded();
 
+        const objs: ObjectBuilderArgs[] = [];
+        for (let i = 0; i < totalEntities; i++) {
+            const x = Math.random() * worldBoundings;
+            const y = Math.random() * worldBoundings;
+
+            const type = Math.random();
+            const isStatic = Math.random() < 0.2 ? true : false;
+            const size = gridSize;
+            let obj: ObjectBuilderArgs;
+            if (type <= 0.25) {
+                obj = { type: ObjectType.Triangle, x, y, size, isStatic };
+            } else if (type <= 0.5) {
+                obj = { type: ObjectType.Rectangle, x, y, width: size, height: size / 2, isStatic };
+            } else if (type <= 0.75) {
+                obj = { type: ObjectType.Polygon, x, y, size, k: 5, isStatic };
+            } else {
+                obj = { type: ObjectType.Polygon, x, y, size, k: 6, isStatic };
+            }
+            objs.push(obj);
+        }
+
         const msg: MainToWorkerMessage = {
             type: 'start',
             config: {
@@ -171,17 +190,32 @@ async function setup(p: p5) {
                 gridSize,
             }),
         );
+
+        for (let i = 0; i < totalEntities; i++) {
+            const x = Math.random() * worldBoundings;
+            const y = Math.random() * worldBoundings;
+
+            const type = Math.random();
+            const isStatic = Math.random() < 0.2 ? true : false;
+            const size = gridSize;
+            let body: Body;
+            if (type <= 0.25) {
+                body = new TriangleBody(x, y, size, isStatic);
+            } else if (type <= 0.5) {
+                body = new RectangleBody(x, y, size, size / 2, isStatic);
+            } else if (type <= 0.75) {
+                body = PolygonBody.PolygonBuilder(x, y, size, 5, isStatic);
+            } else {
+                body = PolygonBody.PolygonBuilder(x, y, size, 6, isStatic);
+            }
+
+            scene.add(body);
+        }
     }
 }
 
 function loop(p: p5) {
     if (!scene) return;
-
-    elapsed += p.deltaTime;
-    while (currEntities < totalEntities && elapsed >= interval) {
-        spawnObject();
-        elapsed -= interval;
-    }
 
     p.background('#ffffff');
 
@@ -223,52 +257,6 @@ onBeforeUnmount(() => {
     }
 });
 
-function spawnObject() {
-    if (!scene) return;
-
-    if (threaded && (scene instanceof SceneThreaded)) {
-        const x = Math.random() * worldBoundings;
-        const y = Math.random() * worldBoundings;
-
-        const type = Math.random();
-        const isStatic = Math.random() < 0.2 ? true : false;
-        const size = gridSize;
-        let obj: ObjectBuilderArgs;
-        if (type <= 0.25) {
-            obj = { type: ObjectType.Triangle, x, y, size, isStatic };
-        } else if (type <= 0.5) {
-            obj = { type: ObjectType.Rectangle, x, y, width: size, height: size / 2, isStatic };
-        } else if (type <= 0.75) {
-            obj = { type: ObjectType.Polygon, x, y, size, k: 5, isStatic };
-        } else {
-            obj = { type: ObjectType.Polygon, x, y, size, k: 6, isStatic };
-        }
-
-        worker?.postMessage({ type: 'add_object', obj })
-        currEntities++;
-    } else {
-        const x = Math.random() * worldBoundings;
-        const y = Math.random() * worldBoundings;
-
-        const type = Math.random();
-        const isStatic = Math.random() < 0.2 ? true : false;
-        const size = gridSize;
-        let body: Body;
-        if (type <= 0.25) {
-            body = new TriangleBody(x, y, size, isStatic);
-        } else if (type <= 0.5) {
-            body = new RectangleBody(x, y, size, size / 2, isStatic);
-        } else if (type <= 0.75) {
-            body = PolygonBody.PolygonBuilder(x, y, size, 5, isStatic);
-        } else {
-            body = PolygonBody.PolygonBuilder(x, y, size, 6, isStatic);
-        }
-
-        scene.add(body);
-        currEntities++;
-    }
-
-}
 function getParticlesCount() {
     if (!scene) {
         return 0;
