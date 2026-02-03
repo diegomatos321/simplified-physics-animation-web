@@ -6,12 +6,13 @@ on:
       - main
     paths:
       - 'homepage/**'
+      - 'package/**'
 
 permissions:
   contents: write
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,14 +24,39 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
+      # =========================
+      # Build do pacote interno
+      # =========================
+      - name: Install package dependencies
+        working-directory: package
+        run: npm install
+
+      - name: Build internal package
+        working-directory: package
+        run: npm run build
+
+      - name: Link internal package globally
+        working-directory: package
+        run: npm link
+
+      # =========================
+      # Build do homepage
+      # =========================
+      - name: Install homepage dependencies
         working-directory: homepage
         run: npm install
 
-      - name: Build Vue app
+      - name: Link internal package into homepage
+        working-directory: homepage
+        run: npm link @seu-scope/nome-do-pacote
+
+      - name: Build homepage
         working-directory: homepage
         run: npm run build
 
+      # =========================
+      # Deploy
+      # =========================
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
