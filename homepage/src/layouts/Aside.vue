@@ -17,14 +17,6 @@ import { RouterLink } from 'vue-router';
                     </RouterLink>
 
                     <RouterLink
-                        to="/demos/gravity-stack"
-                        class="block py-2 px-4 rounded-md hover:bg-slate-100 transition-colors"
-                        active-class="block py-2 px-4 rounded-md font-semibold bg-blue-50 text-blue-600 border-l-4 border-blue-500"
-                    >
-                        Gravity and Stack
-                    </RouterLink>
-
-                    <RouterLink
                         to="/demos/cloth-trellis"
                         class="block py-2 px-4 rounded-md hover:bg-slate-100 transition-colors"
                         active-class="block py-2 px-4 rounded-md font-semibold bg-blue-50 text-blue-600 border-l-4 border-blue-500"

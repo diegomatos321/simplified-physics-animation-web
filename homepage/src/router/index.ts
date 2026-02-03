@@ -18,11 +18,11 @@ const router = createRouter({
                     name: 'polygon_chaos',
                     component: () => import('../views/examples/2d/PolygonChaos.vue'),
                 },
-                {
-                    path: 'gravity-stack',
-                    name: 'gravity_and_stack',
-                    component: () => import('../views/examples/2d/GravityAndStack.vue'),
-                },
+                // {
+                //     path: 'gravity-stack',
+                //     name: 'gravity_and_stack',
+                //     component: () => import('../views/examples/2d/GravityAndStack.vue'),
+                // },
                 {
                     path: 'cloth-trellis',
                     name: 'cloth_tellis',

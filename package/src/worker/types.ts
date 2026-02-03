@@ -45,7 +45,7 @@ export interface SimulationState {
 // Mensagens que a Main Thread pode enviar para o Worker
 export type MainToWorkerMessage =
     | { type: 'start'; config: Config; objects?: ObjectBuilderArgs[] } // `any` para simplificar, idealmente um tipo definido
-    | { type: 'add_body'; obj: ObjectBuilderArgs };
+    | { type: 'add_object'; obj: ObjectBuilderArgs };
 
 // Mensagens que o Worker pode enviar para a Main Thread
 export type WorkerToMainMessage =

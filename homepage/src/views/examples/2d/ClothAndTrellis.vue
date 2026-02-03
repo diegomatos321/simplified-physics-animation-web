@@ -81,7 +81,7 @@ import SceneThreaded from '@/scenes/SceneThreaded';
 // Component States
 let hasStarted = false;
 const totalEntities = 4;
-const threaded = false;
+let threaded = false;
 const fps = ref(0);
 
 // Main thread mode variables

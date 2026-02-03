@@ -119,8 +119,8 @@ self.addEventListener('message', (e: MessageEvent<MainToWorkerMessage>) => {
         isRunning = true;
         lastTime = performance.now();
         simulationInterval = self.setTimeout(step, 0);
-    } else if (msg.type === 'add_body') {
-        console.log('[Worker] Add body');
+    } else if (msg.type === 'add_object') {
+        console.log('[Worker] Add object');
         engine.addBody(MakeBody(msg.obj));
     }
 });

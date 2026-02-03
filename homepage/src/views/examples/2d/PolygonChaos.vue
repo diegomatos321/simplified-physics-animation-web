@@ -51,11 +51,6 @@ canvas {
                     <input id="threaded" name="threaded" type="checkbox" v-model="threaded" />
                 </div>
 
-                <!-- <div class="flex justify-between">
-                    <label for="pauseOnCollision">Pause on Collision</label>
-                    <input id="pauseOnCollision" name="pauseOnCollision" type="checkbox" v-model="engine.pauseOnCollision" @click="OnPauseCollisionBtn" />
-                </div> -->
-
                 <div class="flex justify-between">
                     <label for="broadPhaseMode">Broad Phase</label>
                     <select style="max-width: 100px" name="broadPhaseMode" id="broadPhaseMode" v-model="broadPhase" class="border border-slate-200 rounded">
@@ -102,13 +97,13 @@ let hasStarted = false;
 let totalEntities = 100, currEntities = 0;
 let broadPhase: BroadPhaseMode = BroadPhaseMode.Naive;
 let collisionDetection: CollisionDetectionMode = CollisionDetectionMode.Sat;
-const threaded = false;
+let threaded = true;
 const fps = ref(0);
 
 // Main thread mode variables
 const worldBoundings = 600;
 const gridArea = worldBoundings ** 2;
-let gridSize = Math.sqrt(gridArea / (totalEntities * 5));
+let gridSize = Math.sqrt(gridArea / (totalEntities * 3));
 let scene: IScene | null = null;
 
 const interval = 300;
@@ -229,9 +224,11 @@ onBeforeUnmount(() => {
 });
 
 function spawnObject() {
-    if (threaded && !(scene instanceof SceneThreaded)) {
-        const x = Math.random() * p.width;
-        const y = Math.random() * p.height;
+    if (!scene) return;
+
+    if (threaded && (scene instanceof SceneThreaded)) {
+        const x = Math.random() * worldBoundings;
+        const y = Math.random() * worldBoundings;
 
         const type = Math.random();
         const isStatic = Math.random() < 0.2 ? true : false;
@@ -247,10 +244,9 @@ function spawnObject() {
             obj = { type: ObjectType.Polygon, x, y, size, k: 6, isStatic };
         }
 
+        worker?.postMessage({ type: 'add_object', obj })
         currEntities++;
     } else {
-        if (!scene) return;
-
         const x = Math.random() * worldBoundings;
         const y = Math.random() * worldBoundings;
 
@@ -297,8 +293,8 @@ function getCollisionsCount() {
     return scene.getCollisionsCount();
 }
 
-function OnTotalEntitiesChange(e) {
-    gridSize = Math.sqrt(gridArea / (totalEntities * 5));
+function OnTotalEntitiesChange() {
+    gridSize = Math.sqrt(gridArea / (totalEntities * 3));
 }
 
 function OnWorkerEvent(e: MessageEvent<WorkerToMainMessage>) {
