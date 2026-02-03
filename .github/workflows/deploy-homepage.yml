@@ -36,10 +36,6 @@ jobs:
         working-directory: package
         run: npm run build
 
-      - name: Link internal package globally
-        working-directory: package
-        run: npm link
-
       # =========================
       # Build do homepage
       # =========================
@@ -49,7 +45,7 @@ jobs:
 
       - name: Link internal package into homepage
         working-directory: homepage
-        run: npm link @seu-scope/nome-do-pacote
+        run: npm link ../package
 
       - name: Build homepage
         working-directory: homepage
