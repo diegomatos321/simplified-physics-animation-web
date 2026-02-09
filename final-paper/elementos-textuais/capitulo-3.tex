@@ -90,13 +90,13 @@ A + B = \{ \vec{x} + \vec{y} \mid \vec{x} \in A,\ \vec{y} \in B \},
 $$
 onde \( \vec{x} \) e \( \vec{y} \) representam vetores posição associados a pontos pertencentes aos conjuntos \(A\) e \(B\), respectivamente.
 
-Do ponto de vista geométrico, a soma de Minkowski pode ser interpretada como o conjunto de todos os pontos obtidos ao transladar o objeto \(B\) por cada vetor posição pertencente a \(A\), mantendo sua forma e orientação, ou seja, faz-se uma cópia do objeto B centrado em cada ponto de A, como ilustrado na Figura~\ref{fig:soma-minkowski}.
+Do ponto de vista geométrico, a soma de Minkowski pode ser interpretada como o conjunto de todos os pontos obtidos ao transladar o objeto \(B\) por cada vetor posição pertencente a \(A\), mantendo sua forma e orientação, ou seja, faz-se uma cópia do objeto B centrado em cada ponto de A, como ilustrado na Figura~\ref{fig:soma-minkowski-sem-interseccao}.
 
 \begin{figure}[htb]
 	\centering
-	\includesvg[width=0.6\linewidth]{soma-minkowski}
-	\caption{Em vermelho a soma de Minkowski, em verde a diferença de Minkowski}
-	\label{fig:soma-minkowski}
+	\includesvg[width=0.6\linewidth]{soma-minkowski-sem-interseccao}
+	\caption{Soma de Minkowski, entre os conjuntos A e B.}
+	\label{fig:soma-minkowski-sem-interseccao}
 \end{figure}
 Uma propriedade muito útil da soma de Minkowski é o fato de que a soma de dois objetos convexos é um objeto convexo. Para um objeto A, usamos a notação $-A$ para denotar o reflexo de A sobre a origem O. A diferença de Minkowski $A-B$ pode ser obtida calculando a soma de Minkowski de A e $-B$
 $$
@@ -104,8 +104,13 @@ $$
 $$
 que pode ser pensado como um processo de varredura que calcula o vetor distância para cada ponto de $B$ em $A$. Neste trabalho, usaremos esse termo para referir a essa operação quando necessário.
 
-A diferença de Minkowski também é chamada de configuração do espaço de
-obstáculos (CSO, do inglês \textit{Configuration Space Obstacles}). Esse espaço possui uma propriedade muito útil de que A e B se intersectam se, e somente se, sua CSO contém a origem. Isso se deve ao fato de que se existe um ponto em comum entre A e B onde a diferença de Minkowski é igual a zero, logo, esse ponto coincide com a origem O.
+A diferença de Minkowski também é chamada de configuração do espaço de obstáculos (CSO, do inglês \textit{Configuration Space Obstacles}). Esse espaço possui uma propriedade muito útil de que A e B se intersectam se, e somente se, sua CSO contém a origem. Isso se deve ao fato de que se existe um ponto em comum entre A e B onde a diferença de Minkowski é igual a zero, logo, esse ponto coincide com a origem O. Compare a Figura~\ref{fig:soma-minkowski-com-interseccao} à Figura~\ref{fig:soma-minkowski-sem-interseccao}.
+\begin{figure}[htb]
+	\centering
+	\includesvg[width=0.6\linewidth]{soma-minkowski-com-interseccao}
+	\caption{Soma de Minkowski entre os conjuntos A e B em intersecção.}
+	\label{fig:soma-minkowski-com-interseccao}
+\end{figure}
 
 Assim o objetivo do BGJK reduz para determinar se a CSO contém ou não a origem. A grande coisa do BGJK é que você não precisa calcular todo CSO, apenas uma amostra do CSO modificando iterativamente um Simplex dentro da CSO até que o Simplex contenha a origem ou pare por não ser possível a origem estar contida no Simplex.
 
