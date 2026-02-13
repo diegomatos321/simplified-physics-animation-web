@@ -76,15 +76,19 @@ O SAT pode ser estendido para calcular a penetração mínima. Caso todos os eix
 \end{algorithm},
 onde $\epsilon$ é um valor numérico para tratar erros de operação flutuante e deve-se ser um valor baixo. O método possui complexidade linear no número de arestas e é bastante eficiente para polígonos convexos em 2D. Em 3D, entretanto, o número de eixos candidatos cresce significativamente, reduzindo sua praticidade em relação a alternativas como o GJK.
 
-\section{Algoritmo Gilbert-Johnson-Keerthi (GJK)}
+\section{Algoritmo de Gilbert-Johnson-Keerthi (GJK)}
 
-O algoritmo original de \citeonline{gjk} calcula a distância mínima entre dois conjuntos convexos, neste trabalho faremos uma versão simplificada, apresentada por \citeonline{muratori2016implementingGJK}, que realiza um teste Booleano GJK (BGJK) para o caso de dois objetos estarem em intersecção, com otimização usando regiões de Voronoi. Esse algoritmo funciona para ambientes 2D, é particularmente eficiente em 3D e é amplamente adotado em motores físicos por sua robustez e excelente desempenho.
+O algoritmo de Gilbert-Johnson-Keerthi (GJK) é um algoritmo clássico para calcular distância euclidiana entre dois objetos poligonais convexos, também é capaz de determinar os respectivos pontos mais próximos entre eles. Este algoritmo possui uma complexidade linear em relação ao número de vértices dos objetos e não está restrito a uma dimensão específica, podendo ser usado em qualquer espaço m-dimensional. Para calcular a distância é usado o subalgoritmo de Johnson, que resolve um sistema de equações lineares para combinação de vértices, faces e arestas. O algoritmo de GJK é amplamente utilizado em motores físicos devido à sua eficiência e robustez, especialmente em ambientes tridimensionais~\cite{gjk}.
+
+\citeonline{gjk_enhanced} propuseram uma versão aprimorada do GJK que é capaz de tratar qualquer objeto convexo. Além disso, com o passar dos anos, o subalgoritmo de distância de Johnson foi trocado a favor de outros mais sofisticados. Neste trabalho, detalharemos a versão de \citeonline{gjk_enhanced} e adotaremos o subalgoritmo apresentado por \citeonline{ericson2004gjk}, que se baseia numa abordagem geométrica ao invés de algébrica. O subalgoritmo de \citeonline{ericson2004gjk} realiza um teste Booleano GJK (BGJK) para o caso de dois objetos estarem em intersecção, com otimização usando regiões de Voronoi.
+
+% Neste trabalho faremos uma versão simplificada, apresentada por \citeonline{muratori2016implementingGJK}, que realiza um teste Booleano GJK (BGJK) para o caso de dois objetos estarem em intersecção, com otimização usando regiões de Voronoi. Esse algoritmo funciona para ambientes 2D, é particularmente eficiente em 3D e é amplamente adotado em motores físicos por sua robustez e excelente desempenho.
 
 % utilizando apenas uma função de suporte capaz de retornar o ponto mais distante de um conjunto em uma direção arbitrária. 
 
 % \subsection*{Soma de Minkowski}
 
-O algoritmo GJK fundamenta-se na soma de Minkowski entre dois conjuntos convexos A e B, definida como
+O algoritmo de GJK fundamenta-se na soma de Minkowski entre dois conjuntos convexos A e B, definida como
 $$
 A + B = \{ \vec{x} + \vec{y} \mid \vec{x} \in A,\ \vec{y} \in B \},
 $$
@@ -104,7 +108,7 @@ $$
 $$
 que pode ser pensado como um processo de varredura que calcula o vetor distância para cada ponto de $B$ em $A$. Neste trabalho, usaremos esse termo para referir a essa operação quando necessário.
 
-A diferença de Minkowski também é chamada de configuração do espaço de obstáculos (CSO, do inglês \textit{Configuration Space Obstacles}). Esse espaço possui uma propriedade muito útil de que A e B se intersectam se, e somente se, sua CSO contém a origem. Isso se deve ao fato de que se existe um ponto em comum entre A e B onde a diferença de Minkowski é igual a zero, logo, esse ponto coincide com a origem O. Compare a Figura~\ref{fig:soma-minkowski-com-interseccao} à Figura~\ref{fig:soma-minkowski-sem-interseccao}.
+A diferença de Minkowski, também é chamada de configuração do espaço de obstáculos (CSO, do inglês \textit{Configuration Space Obstacles}). Esse espaço possui uma propriedade muito útil de que A e B se intersectam se, e somente se, sua CSO contém a origem. Isso se deve ao fato de que se existe um ponto $p_A \subset A$ igual a $p_B \subset B$, então $p_A - p_B = \vec{0}$ é testemunha que há pelo menos um ponto que coincide com a origem O. Compare a Figura~\ref{fig:soma-minkowski-com-interseccao} à Figura~\ref{fig:soma-minkowski-sem-interseccao}.
 \begin{figure}[htb]
 	\centering
 	\includesvg[width=0.6\linewidth]{soma-minkowski-com-interseccao}
