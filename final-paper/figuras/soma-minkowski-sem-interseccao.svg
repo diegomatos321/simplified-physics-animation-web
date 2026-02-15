@@ -21,9 +21,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      showgrid="false"
-     inkscape:zoom="1.4628687"
-     inkscape:cx="175.34042"
-     inkscape:cy="145.94612"
+     inkscape:zoom="2.0688088"
+     inkscape:cx="126.88461"
+     inkscape:cy="122.05091"
      inkscape:window-width="1280"
      inkscape:window-height="651"
      inkscape:window-x="0"
@@ -31,7 +31,48 @@
      inkscape:window-maximized="1"
      inkscape:current-layer="svg14" />
   <defs
-     id="defs18" />
+     id="defs18">
+    <marker
+       style="overflow:visible"
+       id="marker9466"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Dot"
+       markerWidth="5.4000001"
+       markerHeight="5.4000001"
+       viewBox="0 0 5.4 5.4"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.45)"
+         style="fill:context-fill;fill-rule:evenodd;stroke:context-stroke;stroke-width:2"
+         d="M 5,0 C 5,2.76 2.76,5 0,5 -2.76,5 -5,2.76 -5,0 c 0,-2.76 2.3,-5 5,-5 2.76,0 5,2.24 5,5 z"
+         id="path9464"
+         sodipodi:nodetypes="sssss" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="marker9466-5"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Dot"
+       markerWidth="5.4000001"
+       markerHeight="5.4000001"
+       viewBox="0 0 5.4 5.4"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.45)"
+         style="fill:context-fill;fill-rule:evenodd;stroke:context-stroke;stroke-width:2"
+         d="M 5,0 C 5,2.76 2.76,5 0,5 -2.76,5 -5,2.76 -5,0 c 0,-2.76 2.3,-5 5,-5 2.76,0 5,2.24 5,5 z"
+         id="path9464-3"
+         sodipodi:nodetypes="sssss" />
+    </marker>
+  </defs>
   <!-- Linhas (recentralizadas) -->
   <line
      x1="4.120801"
@@ -115,9 +156,9 @@
   </g>
   <g
      id="g4332"
-     transform="translate(-35.879199,14.818048)">
+     transform="translate(-30.345762,-0.16464)">
     <polygon
-       points="208.64,220 153.64,260 93.64,240 88.64,200 93.64,180 203.64,165 "
+       points="153.64,260 93.64,240 88.64,200 93.64,180 203.64,165 208.64,220 "
        fill="#8fce98"
        fill-opacity="0.8"
        stroke="none"
@@ -145,4 +186,12 @@
        id="tspan303"
        x="136.37128"
        y="217.29955">O</tspan></text>
+  <path
+     style="fill:#333333;stroke-dasharray:none;stroke:#000000;fill-opacity:1;stroke-opacity:1;stroke-dashoffset:0;stroke-width:1;marker-start:url(#marker9466);marker-end:url(#marker9466);stroke-linecap:butt"
+     d="m 214.71081,114.81805 7.9555,-5.56484"
+     id="path306" />
+  <path
+     style="fill:#333333;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-start:url(#marker9466-5);marker-end:url(#marker9466-5)"
+     d="m 126.24425,209.83536 7.9555,-5.56484"
+     id="path306-5" />
 </svg>

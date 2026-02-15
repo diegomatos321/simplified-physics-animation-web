@@ -102,7 +102,7 @@ $$
 $$
 que pode ser pensado como um processo de varredura que calcula o vetor distância para cada ponto de $B$ em $A$. Neste trabalho, usaremos esse termo para referir a essa operação quando necessário.
 
-A diferença de Minkowski também é chamada de configuração do espaço de obstáculos (CSO, do inglês \textit{Configuration Space Obstacles}). Nesse espaço a distância entre os objetos A e B é igual à distância entre a origem O e o CSO, logo, A e B se intersectam se, e somente se, sua CSO contém a origem. Isso se deve ao fato de que se existe um ponto $p_A \subset A$ igual a $p_B \subset B$, então $p_A - p_B = \vec{0}$ é testemunha que há pelo menos um ponto que coincide com a origem O. Compare a Figura~\ref{fig:soma-minkowski-com-interseccao} à Figura~\ref{fig:soma-minkowski-sem-interseccao}.~\cite{linahan2015geometricgjk}.
+A diferença de Minkowski também é chamada de configuração do espaço de obstáculos (CSO, do inglês \textit{Configuration Space Obstacles}). Nesse espaço a distância entre os objetos A e B é igual à distância entre a origem O e o CSO, como ilustrado na Figura~\ref{fig:soma-minkowski-sem-interseccao}, logo, A e B se intersectam se, e somente se, sua CSO contém a origem. Isso se deve ao fato de que se existe um ponto $p_A \subset A$ igual a $p_B \subset B$, então $p_A - p_B = \vec{0}$ é testemunha que há pelo menos um ponto que coincide com a origem O. Compare a Figura~\ref{fig:soma-minkowski-com-interseccao} à Figura~\ref{fig:soma-minkowski-sem-interseccao}.~\cite{linahan2015geometricgjk}. Assim, o objetivo do GJK reduz para determinar se a CSO contém ou não a origem. 
 \begin{figure}[htb]
 	\centering
 	\includesvg[width=0.6\linewidth]{soma-minkowski-com-interseccao}
@@ -110,9 +110,7 @@ A diferença de Minkowski também é chamada de configuração do espaço de obs
 	\label{fig:soma-minkowski-com-interseccao}
 \end{figure}
 
-Assim, o objetivo do GJK reduz para determinar se a CSO contém ou não a origem. A grande coisa do algoritmo é que você não precisa calcular todo CSO, apenas uma amostra do CSO usando um mapeamento suporte. 
-
-Uma função de suporte é definida tal que: seja A um conjunto qualquer, o suporte de A na direção $\vec{d}$ retorna o ponto que pertence a superfície de A mais distante da origem na direção $\vec{d}$, esse ponto é chamado de ponto de suporte. Matematicamente fazemos $S_A (\vec{d}) = max\{v \cdot a : a \in A\}$.
+A grande coisa do algoritmo é que você não precisa calcular todo CSO, apenas uma amostra do CSO usando um mapeamento suporte. Uma função de suporte é definida tal que: seja A um conjunto qualquer, o suporte de A na direção $\vec{d}$ retorna o ponto que pertence a superfície de A mais distante da origem na direção $\vec{d}$, esse ponto é chamado de ponto de suporte. Matematicamente fazemos $S_A (\vec{d}) = max\{v \cdot a : a \in A\}$.
 
 Também é possível realizar aritmética com função suporte
 \begin{align*}
@@ -123,7 +121,7 @@ dessa forma, seja D a diferença de Minkowski de dois objetos convexos A e B, o 
 
 A busca pelo ponto mais próximo da origem dentro do CSO é sustentado pelo teorema de Carathéodory [Rockafellar96]. O teorema afirma que, para um corpo convexo H de Rd, cada ponto de H pode ser expresso como a combinação convexa de no máximo d + 1 pontos de H. Isso permite que o algoritmo GJK busque no CSO, mantendo um conjunto Q de até d + 1 pontos de C em cada iteração e Q forma um simplex dentro de C. Se a origem estiver contida no simplex atual, A e B se intersectam e o algoritmo para.
 
-Um Simplex é definido como um politopo de k+1 vérticos em um espaço de k-dimensão. Dessa forma um ponto é 0-simplex, um segmento de reta é 1-simplex, um triângulo é 2-simplex, um tetraedro é 3-simplex, como na Figura~\ref{fig:simplex}.
+Um Simplex é definido como um politopo de k+1 vértices em um espaço de k-dimensão. Dessa forma um ponto é 0-simplex, um segmento de reta é 1-simplex, um triângulo é 2-simplex, um tetraedro é 3-simplex, como na Figura~\ref{fig:simplex}.
 
 \begin{figure}[htb]
 	\centering
