@@ -70,6 +70,8 @@ O algoritmo de Gilbert-Johnson-Keerthi (GJK) é um algoritmo clássico para calc
 
 Com o passar dos anos, o subalgoritmo de distância de Johnson foi trocado a favor de outros mais sofisticados como, por exemplo, o subalgoritmo de Ericson apresentado na SIGGRAPH 2004~\cite{ericson2004gjk}. Este subalgoritmo se baseia numa abordagem geométrica ao invés de algébrica, com otimização usando regiões de Voronoi. Neste trabalho, detalharemos a versão aprimorada do GJK proposta por \citeonline{gjk_enhanced} que é capaz de tratar qualquer objeto curvo convexo, e o subalgoritmo de Ericson. 
 
+\subsection*{Soma de Minkowski}
+
 O algoritmo de GJK fundamenta-se na soma de Minkowski entre dois conjuntos convexos A e B, definida como
 $$
 A + B = \{ \vec{x} + \vec{y} \mid \vec{x} \in A,\ \vec{y} \in B \},
@@ -91,7 +93,7 @@ $$
 que pode ser pensado como um processo de varredura que calcula o vetor distância para cada ponto de $B$ em $A$. Neste trabalho, usaremos esse termo para referir a essa operação quando necessário.
 
 A diferença de Minkowski também é chamada de configuração do espaço de obstáculos (CSO, do inglês \textit{Configuration Space Obstacles}). Nesse espaço a distância entre os objetos A e B é igual à distância entre a origem O e o CSO, como ilustrado na Figura~\ref{fig:soma-minkowski-sem-interseccao}, que chamaremos de \textit{MinimumNormPoint(CSO)}. Logo, A e B se intersectam se, e somente se, sua CSO contém a origem~\cite{linahan2015geometricgjk}. Isso se deve ao fato de que se existe um ponto $p_A \subset A$ igual a $p_B \subset B$, então $p_A - p_B = \vec{0}$ é testemunha que há pelo menos um ponto que coincide com a origem O. Compare a Figura~\ref{fig:soma-minkowski-com-interseccao} à Figura~\ref{fig:soma-minkowski-sem-interseccao}. 
-% Assim, o objetivo do GJK reduz para determinar se a CSO contém ou não a origem. 
+
 \begin{figure}[htb]
 	\centering
 	\includesvg[width=0.6\linewidth]{soma-minkowski-com-interseccao}
@@ -99,7 +101,9 @@ A diferença de Minkowski também é chamada de configuração do espaço de obs
 	\label{fig:soma-minkowski-com-interseccao}
 \end{figure}
 
-A grande coisa do algoritmo é que você não precisa calcular todo CSO, apenas uma amostra do CSO usando um mapeamento suporte. Uma função de suporte é definida tal que: seja A um conjunto qualquer, o suporte de A na direção $\vec{d}$ retorna o ponto que pertence a superfície de A mais distante da origem na direção $\vec{d}$, esse ponto é chamado de ponto de suporte. \citeonline{gjk_enhanced} mostraram que é possível representar qualquer objeto convexo com a função suporte correta, como por exemplo:
+\subsection*{Função suporte e ponto de suporte}
+
+A grande coisa do algoritmo é que não é necessário calcular explicitamente o CSO, apenas uma amostra do CSO, sob demanda, usando um mapeamento suporte. Uma função de suporte é definida tal que: seja A um conjunto qualquer, o suporte de A na direção $\vec{d}$ retorna o ponto que pertence a superfície de A mais distante da origem na direção $\vec{d}$, esse ponto é chamado de ponto de suporte. \citeonline{gjk_enhanced} mostraram que é possível representar qualquer objeto convexo com a função suporte correta, como por exemplo:
 \begin{align*}
 	\text{Politopo}&: S_A (\vec{d}) = max\{v \cdot a : a \in A\}, \\
 	\text{Esfera com raio R}&: S_A (\vec{d}) = R \cdot \vec{d}
@@ -136,9 +140,11 @@ O teorema de Carathéodory em 2 dimensões afirma que podemos construir um triâ
 	\label{fig:caratheodory}
 \end{figure}
 
-Usaremos a mesma notação de \citeonline{linahan2015geometricgjk}, $||P||$ para denotar a norma (distância à origem) de um ponto $P$. O algoritmo constrói iterativamente simplices dentro do CSO mais próximos da origem até que o simplex pare de mudar. O ponto $P$ de norma mínima dessas simplices serve como aproximações sucessivas para \textit{MinimumNormPoint(CSO)}.
+\subsection*{O algoritmo}
 
-Para politopos, o GJK termina após um número finito de iterações. Para objetos curvos, um termo épsilon deve ser adicionado para evitar loops infinitos e limitar o erro entre a distância de separação calculada e real. Foi estabelecido em  
+O algoritmo constrói iterativamente simplices dentro do CSO mais próximos da origem até que o simplex pare de mudar. O ponto $P$ de norma mínima dessas simplices serve como aproximações sucessivas para \textit{MinimumNormPoint(CSO)}.
+
+Para politopos, o GJK termina após um número finito de iterações. Para objetos curvos, um termo $\epsilon$ deve ser adicionado para evitar loops infinitos e limitar o erro entre a distância de separação calculada e real. Foi estabelecido em  
 %adicionar citação
 que a distância ao quadrado entre a aproximação $P$ e o \textit{MinimumNormPoint(CSO)} real é limitada a um valor inferior a $P \cdot V$, onde V é o ponto de suporte do CSO na direção $-P$. Assim, se $||P||^2 - P \cdot V \leq \epsilon^2$, para alguma constante real muito pequena $\epsilon \geq 0$, concluímos que V não é mais extremo na direção $-P$ do que o próprio P e a distância do CSO à origem é ||P||. 
 
@@ -153,7 +159,7 @@ que a distância ao quadrado entre a aproximação $P$ e o \textit{MinimumNormPo
 	
 	\While{$||P||^2 - P \cdot V > \epsilon^2$}{
 		$Q' \leftarrow Q \cup \{V\}$ \\
-		P $\leftarrow$ MinimumNormPoint(ConvexHull($Q'$)) \\
+		P $\leftarrow$ MinimumNormPoint($Q'$) \\
 		Q $\leftarrow$ Faça $Q'$ o menor subconjunto convexo que contém $P$ \\
 		P $\leftarrow$ $S_{CSO}(-P)$
 	}
@@ -162,9 +168,26 @@ que a distância ao quadrado entre a aproximação $P$ e o \textit{MinimumNormPo
 	\label{alg:gjk}
 \end{algorithm}
 
-O Algoritmo~\ref{alg:gjk} começa com um ponto arbitrário $P$ no CSO e um conjunto simplex vazio $Q$. Então calcula um ponto de suporte $V$ na direção $-P$. Se $V$ não estiver mais distante na direção $-P$ do que o próprio $P$, então $P$ deve ser o ponto mais próximo da origem: o algoritmo termina com $||P||$ como a distância do CSO à origem. Caso contrário, o algoritmo adiciona $V$ ao conjunto simplex atual $Q$ e atualiza $P$ para ser o ponto mais próximo da origem dentro do novo simplex (MinimumNormPoint(ConvexHull($Q'$))). O simplex $Q$ é reduzido ao menor subconjunto convexo de $Q$ que ainda contém $P$, e o ponto de suporte $V$ na direção $-P$ é atualizado para a próxima iteração.
+O Algoritmo~\ref{alg:gjk} começa com um ponto arbitrário $P$ no CSO e um conjunto simplex vazio $Q$. Então calcula um ponto de suporte $V$ na direção $-P$. Se $V$ não estiver mais distante na direção $-P$ do que o próprio $P$, então $P$ deve ser o ponto mais próximo da origem: o algoritmo termina com $||P||$ como a distância do CSO à origem. Caso contrário, o algoritmo adiciona $V$ ao conjunto simplex atual $Q$ e atualiza $P$ para ser o ponto mais próximo da origem dentro do novo simplex (MinimumNormPoint($Q'$)). O simplex $Q$ é reduzido ao menor subconjunto convexo de $Q$ que ainda contém $P$, e o ponto de suporte $V$ na direção $-P$ é atualizado para a próxima iteração.
 
-O subalgoritmo de distância de \citeonline{ericson2004gjk} é responsável por computar o ponto mais próximo da origem dentro do novo simplex. Sua versão substituiu a versão algébrica de Johnson por uma geométrica, usando rotinas geométricas primitivas como \textit{ClosestPointOnEdgeToPoint()} e \textit{ClosestPointOnTriangleToPoint()}, que é implementado usando operações vetoriais. Apesar disso seu algoritmo é matematicamente equivalente ao de Johnson com um pequeno acrescimo de otimização: uma condição de parada antecipada  que testa se o ponto P mais próximo da origem coincide com a origem~\cite{linahan2015geometricgjk}.
+\subsection*{Subalgoritmo de distância de Ericson}
+
+A versão de \citeonline{ericson2004gjk} substituiu a versão algébrica de Johnson por uma geométrica, usando rotinas geométricas primitivas como \textit{ClosestPointOnEdgeToPoint()} e \textit{ClosestPointOnTriangleToPoint()}, que é implementado usando operações vetoriais como apresentado no Algoritmo~\ref{alg:ericson_gjk}. Apesar disso seu algoritmo é matematicamente equivalente ao de Johnson com um pequeno acrescimo de otimização: uma condição de parada antecipada  que testa se o ponto P mais próximo da origem coincide com a origem~\cite{linahan2015geometricgjk}.
+
+\begin{algorithm}[htb]
+	\caption{Subalgoritmo de distancia de Ericson}
+	\KwIn{Simplex Q, ponto P}
+	\KwOut{}
+
+	\If {length(Q) == 3} {
+        return ClosestPointOnTriangleToPoint(Q, p)
+	}
+	\Else {
+        return ClosestPointOnEdgeToPoint(Q, p);
+	}
+
+	\label{alg:ericson_gjk}
+\end{algorithm}
 
 Para cada dimensão do simplex Q, o subalgoritmo de Ericson calcula se a origem está contida ou não no simplex usando regiões de Voronoi, remove pontos antigos do simplex e procura por uma nova direção que maximize as chances do próximo ponto de suporte conter a origem. Para cada dimensão é feito uma conta diferente, neste trabalho iremos trabalhar apenas com objetos em 2D, por isso trataremos apenas dos casos 1-simplex e 2-simplex, \citeonline{linahan2015geometricgjk} realiza a prova a corretude e também mostra para 3-simplex. Para detalhar essa rotina usaremos uma conveção de nomear os pontos do Simplex em ordem alfabética, com o ponto mais recente sendo A.
 
@@ -187,11 +210,13 @@ Para o caso de 2 simplex temos a rotina \textit{ClosestPointOnTriangleToPoint()}
 
 % \textbf{DEFINIR REGIÃO VORONOI}
 
+\subsection*{Boolean GJK}
+
 Dependendo do problema a ser resolvido, é possível modificar o GJK para apenas determinar se há ou não intersecção entre dois objetos A e B, conhecido como Boolean GJK (BGJK). Este algoritmo se baseia no fato de que A e B se intersectam se, e somente se, sua CSO contém a origem, desta forma o objetivo do GJK se reduz para determinar se a CSO contém ou não a origem. Neste trabalho foi implementado uma versão do BGJK apresentada por \citeonline{muratori2016implementingGJK} que é baseado nos avanços de \citeonline{gjk_enhanced} e Ericson.
 
 Isso é feito construindo iterativamente um polígono dentro da CSO que tenta incluir a origem. Se o polígono que construímos contém a origem, então podemos dizer que a CSO contém a origem, logo há interseção entre os dois objetos. Este subalgoritmo começa com um simplex inicial e o refina iterativamente adicionando pontos encontrados usando a função de suporte em uma direção que aponta para a origem. Esse processo continua até que a origem seja encontrada dentro do simplex, indicando uma colisão, ou até que se determine que a origem não está contida, o que significa que não há colisão.
 
-A função de suporte deve retornar o ponto mais distante em uma direção dentro da CSO. Isso cria um simplex que contém uma área máxima, aumentando, portanto, a chance de que o algoritmo termine rapidamente. Além disso, podemos usar o fato de que todos os pontos retornados desta forma estão na borda da CSO e, portanto, se não pudermos adicionar um ponto além da origem ao longo de alguma direção, sabemos que a CSO não contém a origem. Isso aumenta as chances de o algoritmo sair rapidamente em casos de não interseção.
+Como todos os pontos retornados pela função suporte estão na borda da CSO e, portanto, se não pudermos adicionar um ponto além da origem ao longo de alguma direção, sabemos que a CSO não contém a origem. Isso aumenta as chances de o algoritmo sair rapidamente em casos de não interseção.
 
 \begin{algorithm}[htb]
 	\caption{Boolean GJK}
