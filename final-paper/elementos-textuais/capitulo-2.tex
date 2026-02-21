@@ -192,3 +192,22 @@ Deve-se encontrar o movimento mínimo que satisfaça cada restrição, para rest
 Onde $\epsilon$ representa o tamanho de passo local para convergência para solução ideal. Quando $\epsilon=1$ as partículas são movidas imediatamente para posição correta. Essa situação é comparável a um sistema de molas interconectadas entre partículas de rigidez que tendem para o infinito ou a uma haste rígida separando as duas partículas. 
 
 \citeonline{jakobsen2001advanced} utiliza um modelo baseado em partículas e restrições geométricas, evitando explicitamente a solução de equações diferenciais rígidas e instáveis. Em vez disso, correções iterativas são aplicadas diretamente às posições das partículas, proporcionando estabilidade numérica elevada e comportamento visualmente plausível mesmo sob passos de tempo grandes.
+
+\section{Polígonos, Poliedros e Politopos}
+
+Um polígono é um objeto geométrico plano e fechado, formada por segmentos de reta (lados) que não se cruzam, unindo-se apenas nas extremidades (vértices). Os polígonos possuem pelo menos três lados e ângulos, não podendo ter superfícies curvas ou abertas. Exemplos comuns incluem triângulos, quadrados e hexágonos.
+
+\begin{figure}[htb]
+	\centering
+	\includesvg[width=0.6\linewidth]{poligono-convexo-concavo}
+	\caption{Comparação entre polígono convexo (à esquerda) e polígono côncavo (à direita).}
+	\label{fig:poligonos}
+\end{figure}
+
+Um polígono é considerado convexo se, para quaisquer dois pontos contidos nessa forma, todo o segmento que os une também estiver contido nela, como ilustrado na Figura~\ref{fig:poligonos}. Uma consequência prática é que, para qualquer linha que atravesse o objeto, esta o intersecta em no máximo dois pontos. Formas não convexas podem ser tratadas como composições de múltiplas partes convexas, o que permite a aplicação direta de algoritmos especializados.
+
+Um poliedro é um sólido geométrico tridimensional fechado, limitado por um número finito de faces planas que são polígonos. As interseções das faces são as arestas do poliedro. As interseções das arestas são os vértices do poliedro. Cada face é uma região poligonal contendo n lados. Exemplos comuns incluem cubos, pirâmides e prismas.
+
+Poliedros convexos são aqueles cujos ângulos diedrais formados por planos adjacentes têm medidas menores do que 180 graus. Outra definição: Dados quaisquer dois pontos de um poliedro convexo, o segmento que tem esses pontos como extremidades, deverá estar inteiramente contido no poliedro.
+
+Um politopio é um objeto geométrico com lados planos (faces). Os politopos são a generalização dos poliedros tridimensionais para qualquer número de dimensões. Os politopos podem existir em qualquer número geral de dimensões n como um polítopo n-dimensional ou n-polítopo. Por exemplo, um polígono é um 2-politopo e um poliedro é um 3-politopo.

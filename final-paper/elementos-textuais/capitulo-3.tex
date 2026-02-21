@@ -4,18 +4,6 @@ A detecção de colisões é um componente fundamental em sistemas de simulaçã
 
 Este capítulo introduz os principais conceitos utilizados no âmbito deste trabalho, descrevendo as representações geométricas mais comuns para objetos convexos e apresentando dois algoritmos amplamente empregados em detecção de colisões: o Teorema do Eixo Separador (SAT, do inglês \textit{Separating Axis Theorem}) e o algoritmo Gilbert-Johnson-Keerthi (GJK). Ambos operam eficientemente em formas convexas e constituem a base de vários motores físicos modernos.
 
-\section{Polígonos convexos}
-
-Um objeto geométrico é definido como um conjunto não vazio, limitado e fechado de pontos. A propriedade de ser fechado implica que sua fronteira pertence ao próprio conjunto, enquanto a limitação garante que exista uma esfera de raio finito que contenha todos os seus pontos. Um plano, por exemplo, é fechado, mas não limitado.
-
-\begin{figure}[htb]
-	\centering
-	\includesvg[width=0.6\linewidth]{poligono-convexo-concavo}
-	\caption{Comparação entre polígono convexo (à esquerda) e polígono côncavo (à direita).}
-	\label{fig:poligonos}
-\end{figure}
-Uma forma é considerada convexa se, para quaisquer dois pontos contidos nessa forma, todo o segmento que os une também estiver contido nela, como ilustrado na Figura~\ref{fig:poligonos}. Uma consequência prática é que, para qualquer linha que atravesse o objeto, esta o intersecta em no máximo dois pontos. Formas não convexas podem ser tratadas como composições de múltiplas partes convexas, o que permite a aplicação direta de algoritmos especializados.
-
 \section{Teorema do Eixo Separador (SAT)}
 \label{sec:sat}
 
@@ -78,7 +66,7 @@ onde $\epsilon$ é um valor numérico para tratar erros de operação flutuante 
 
 \section{Algoritmo de Gilbert-Johnson-Keerthi (GJK)}
 
-O algoritmo de Gilbert-Johnson-Keerthi (GJK) é um algoritmo clássico para calcular distância euclidiana entre dois objetos poligonais convexos, também é capaz de determinar os respectivos pontos mais próximos entre eles. Este algoritmo possui uma complexidade linear em relação ao número de vértices dos objetos e não está restrito a uma dimensão específica, podendo ser usado em qualquer espaço m-dimensional. Para calcular a distância é usado o subalgoritmo de Johnson, que resolve um sistema de equações lineares para combinação de vértices, faces e arestas. O algoritmo de GJK é amplamente utilizado em motores físicos devido à sua eficiência e robustez, especialmente em ambientes tridimensionais~\cite{gjk}.
+O algoritmo de Gilbert-Johnson-Keerthi (GJK) é um algoritmo clássico para calcular distância euclidiana entre dois politopos convexos, também é capaz de determinar os respectivos pontos mais próximos entre eles. Este algoritmo possui uma complexidade linear em relação ao número de vértices dos objetos e não está restrito a uma dimensão específica, podendo ser usado em qualquer espaço m-dimensional. Para calcular a distância é usado o subalgoritmo de Johnson, que resolve um sistema de equações lineares para combinação de vértices, faces e arestas. O algoritmo de GJK é amplamente utilizado em motores físicos devido à sua eficiência e robustez, especialmente em ambientes tridimensionais~\cite{gjk}.
 
 Com o passar dos anos, o subalgoritmo de distância de Johnson foi trocado a favor de outros mais sofisticados como, por exemplo, o subalgoritmo de Ericson apresentado na SIGGRAPH 2004~\cite{ericson2004gjk}. Este subalgoritmo se baseia numa abordagem geométrica ao invés de algébrica, com otimização usando regiões de Voronoi. Neste trabalho, detalharemos a versão aprimorada do GJK proposta por \citeonline{gjk_enhanced} que é capaz de tratar qualquer objeto curvo convexo, e o subalgoritmo de Ericson. 
 
@@ -132,7 +120,7 @@ dessa forma, seja D a diferença de Minkowski de dois objetos convexos A e B, o 
 
 A busca pelo ponto mais próximo da origem dentro do CSO é sustentado pelo teorema de Carathéodory~\cite{rockafellar1970convex}. O teorema afirma que se um ponto $x$ está no interior do fecho convexo de um conjunto $P$ então $x$ está no interior de um simplex k-dimensional com vértices em $P$. Na literatura também pode ser encontrado como uma combinação convexa de no máximo d + 1 pontos de $P$.
 
-Um Simplex é definido como um politopo de k+1 vértices em um espaço de k-dimensão. Dessa forma um ponto é 0-simplex, um segmento de reta é 1-simplex, um triângulo é 2-simplex, um tetraedro é 3-simplex, como na Figura~\ref{fig:simplex}.
+Um simplex (plural simpleces) é definido como um politopo de k+1 vértices em um espaço de k-dimensão. Dessa forma um ponto é 0-simplex, um segmento de reta é 1-simplex, um triângulo é 2-simplex, um tetraedro é 3-simplex, como na Figura~\ref{fig:simplex}.
 \begin{figure}[htb]
 	\centering
 	\includesvg[width=\linewidth]{simplex}
@@ -148,7 +136,7 @@ O teorema de Carathéodory em 2 dimensões afirma que podemos construir um triâ
 	\label{fig:caratheodory}
 \end{figure}
 
-Usaremos a mesma notação de \citeonline{linahan2015geometricgjk}, $||P||$ para denotar a norma (distância à origem) de um ponto $P$. O algoritmo constrói iterativamente simplexos dentro do CSO mais próximos da origem até que o simplexo pare de mudar. O ponto $P$ de norma mínima desses simplexos serve como aproximações sucessivas para \textit{MinimumNormPoint(CSO)}.
+Usaremos a mesma notação de \citeonline{linahan2015geometricgjk}, $||P||$ para denotar a norma (distância à origem) de um ponto $P$. O algoritmo constrói iterativamente simplices dentro do CSO mais próximos da origem até que o simplex pare de mudar. O ponto $P$ de norma mínima dessas simplices serve como aproximações sucessivas para \textit{MinimumNormPoint(CSO)}.
 
 Para politopos, o GJK termina após um número finito de iterações. Para objetos curvos, um termo épsilon deve ser adicionado para evitar loops infinitos e limitar o erro entre a distância de separação calculada e real. Foi estabelecido em  
 %adicionar citação
@@ -199,7 +187,12 @@ Para o caso de 2 simplex temos a rotina \textit{ClosestPointOnTriangleToPoint()}
 
 % \textbf{DEFINIR REGIÃO VORONOI}
 
-Dependendo do problema a ser resolvido, é possível modificar o GJK para apenas determinar se há ou não intersecção entre dois objetos A e B, conhecido como Boolean GJK (BGJK). Este algoritmo se baseia no fato de que A e B se intersectam se, e somente se, sua CSO contém a origem, desta forma o objetivo do GJK se reduz para determinar se a CSO contém ou não a origem. Neste trabalho foi implementado uma versão do BGJK apresentada por \citeonline{muratori2016implementingGJK} que é baseado nos avanços de \citeonline{gjk_enhanced} e Ericson, feito no Algoritmo~\ref{alg:bgjk}.
+Dependendo do problema a ser resolvido, é possível modificar o GJK para apenas determinar se há ou não intersecção entre dois objetos A e B, conhecido como Boolean GJK (BGJK). Este algoritmo se baseia no fato de que A e B se intersectam se, e somente se, sua CSO contém a origem, desta forma o objetivo do GJK se reduz para determinar se a CSO contém ou não a origem. Neste trabalho foi implementado uma versão do BGJK apresentada por \citeonline{muratori2016implementingGJK} que é baseado nos avanços de \citeonline{gjk_enhanced} e Ericson.
+
+Isso é feito construindo iterativamente um polígono dentro da CSO que tenta incluir a origem. Se o polígono que construímos contém a origem, então podemos dizer que a CSO contém a origem, logo há interseção entre os dois objetos. Este subalgoritmo começa com um simplex inicial e o refina iterativamente adicionando pontos encontrados usando a função de suporte em uma direção que aponta para a origem. Esse processo continua até que a origem seja encontrada dentro do simplex, indicando uma colisão, ou até que se determine que a origem não está contida, o que significa que não há colisão.
+
+A função de suporte deve retornar o ponto mais distante em uma direção dentro da CSO. Isso cria um simplex que contém uma área máxima, aumentando, portanto, a chance de que o algoritmo termine rapidamente. Além disso, podemos usar o fato de que todos os pontos retornados desta forma estão na borda da CSO e, portanto, se não pudermos adicionar um ponto além da origem ao longo de alguma direção, sabemos que a CSO não contém a origem. Isso aumenta as chances de o algoritmo sair rapidamente em casos de não interseção.
+
 \begin{algorithm}[htb]
 	\caption{Boolean GJK}
 	\KwIn{Polígonos convexos A e B}
@@ -224,9 +217,7 @@ Dependendo do problema a ser resolvido, é possível modificar o GJK para apenas
 	\label{alg:bgjk}
 \end{algorithm}
 
-Inicializando um simplex Q com um ponto de suporte S numa direção aleatória do CSO (é comum ser escolhido a direção do centro de A para B). Então S é usado para gerar uma nova direção $\vec{d}$ oposta a S, isso é feito para maximizar a área do Simplex e as chances de conter a origem. O loop principal consiste em três etapas principais: primeiro calcular um novo ponto de suporte na direção atual e verificar se esse ponto ultrapassou a origem (S $\cdot \ \vec{d}$ < 0), se sim a origem não pode estar contida no Simplex Q, caso contrário adicionamos S ao Simplex e continuamos tentando incluir a origem. 
-
-Por fim, chamamos a rotina \textit{DoSimplex} que é responsável por: calcular se a origem está contida ou não no Simplex Q usando regiões de Voronoi, remover pontos antigos do simplex e procurar por uma nova direção que maximize as chances do próximo ponto de suporte conter a origem. Para cada dimensão é feito uma conta diferente, neste trabalho iremos trabalhar apenas com objetos em 2D, por isso trataremos apenas dos casos 1-simplex e 2-simplex, \citeonline{linahan2015geometricgjk} realiza a prova a corretude e também mostra para 3-simplex. Para detalhar essa rotina usaremos uma conveção de nomear os pontos do Simplex em ordem alfabética, com o ponto mais recente sendo A.
+O Algoritmo~\ref{alg:bgjk} começa om um simplex Q com um ponto de suporte S numa direção aleatória do CSO (é comum ser escolhido a direção do centro de A para B). Então S é usado para gerar uma nova direção $\vec{d}$ oposta a S, isso é feito para maximizar a área do simplex e as chances de conter a origem. O loop principal consiste em três etapas principais: primeiro calcular um novo ponto de suporte na direção atual e verificar se esse ponto ultrapassou a origem (S $\cdot \ \vec{d}$ < 0), se sim a origem não pode estar contida no simplex Q, caso contrário adicionamos S ao simplex e continuamos tentando incluir a origem. 
 
 % \textbf{1-Simplex}
 
