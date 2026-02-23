@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="762.04681"
+   height="470.70126"
+   viewBox="0 0 762.04681 470.70126"
+   version="1.1"
+   id="svg60"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs64" />
+  <style
+     id="style2">
+    .label-vertex { font: bold 24px serif; fill: black; }
+    .label-region { font: italic 28px sans-serif; fill: #FFD700; font-weight: bold; }
+  </style>
+  <g
+     stroke="#000000"
+     stroke-width="2"
+     stroke-dasharray="5, 5"
+     id="g18"
+     transform="translate(-39.226043,-9.4631245)">
+    <line
+       x1="420"
+       y1="120"
+       x2="350"
+       y2="10"
+       id="line6" />
+    <line
+       x1="420"
+       y1="120"
+       x2="520"
+       y2="20"
+       id="line8" />
+    <line
+       x1="130"
+       y1="360"
+       x2="40"
+       y2="250"
+       id="line10" />
+    <line
+       x1="130"
+       y1="360"
+       x2="140"
+       y2="480"
+       id="line12" />
+    <line
+       x1="710"
+       y1="360"
+       x2="730"
+       y2="480"
+       id="line14" />
+    <line
+       x1="710"
+       y1="360"
+       x2="790"
+       y2="250"
+       id="line16" />
+  </g>
+  <polygon
+     points="710,360 420,120 130,360 "
+     fill="#8B8B00"
+     stroke="#000000"
+     stroke-width="3"
+     id="polygon20"
+     style="fill:none"
+     transform="translate(-39.226043,-9.4631245)" />
+  <circle
+     cx="380.77396"
+     cy="110.53687"
+     r="5"
+     fill="#000000"
+     id="circle22" />
+  <circle
+     cx="90.773956"
+     cy="350.53687"
+     r="5"
+     fill="#000000"
+     id="circle24" />
+  <circle
+     cx="670.77393"
+     cy="350.53687"
+     r="5"
+     fill="#000000"
+     id="circle26" />
+  <text
+     x="400.77396"
+     y="115.53687"
+     class="label-vertex"
+     id="text28"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:24px;line-height:normal;font-family:serif">A</text>
+  <text
+     x="60.773956"
+     y="351.53687"
+     class="label-vertex"
+     id="text30"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:24px;line-height:normal;font-family:serif">B</text>
+  <text
+     x="690.77393"
+     y="345.53687"
+     class="label-vertex"
+     id="text32"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:24px;line-height:normal;font-family:serif">C</text>
+  <text
+     x="365.77396"
+     y="260.53687"
+     class="label-region"
+     id="text34"
+     style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:28px;line-height:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#000000;fill-opacity:1"><tspan
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif"
+       id="tspan1132">F</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-size:26.6667px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#000000;stroke-width:2.437"
+     x="174.44501"
+     y="207.10855"
+     id="text321"><tspan
+       id="tspan319"
+       x="174.44501"
+       y="207.10855"
+       style="font-size:26.6667px">$E_{AB}$</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-size:26.6667px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#000000;stroke-width:2.437"
+     x="362.72552"
+     y="67.559479"
+     id="text375"><tspan
+       id="tspan373"
+       x="362.72552"
+       y="67.559479">$V_A$</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-size:26.6667px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#000000;stroke-width:2.437"
+     x="527.7478"
+     y="219.29143"
+     id="text379"><tspan
+       id="tspan377"
+       x="527.7478"
+       y="219.29143">$E_{AC}$</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-size:26.6667px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#000000;stroke-width:2.437"
+     x="688.34003"
+     y="397.60413"
+     id="text383"><tspan
+       id="tspan381"
+       x="688.34003"
+       y="397.60413">$V_C$</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-size:26.6667px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#000000;stroke-width:2.437"
+     x="353.86523"
+     y="388.74387"
+     id="text387"><tspan
+       id="tspan385"
+       x="353.86523"
+       y="388.74387">$E_{BC}$</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-size:26.6667px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#000000;stroke-width:2.437"
+     x="22.71307"
+     y="408.67947"
+     id="text445"><tspan
+       id="tspan443"
+       x="22.71307"
+       y="408.67947">$V_B$</tspan></text>
+</svg>
