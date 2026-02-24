@@ -142,65 +142,61 @@ O teorema de Carathéodory em 2 dimensões afirma que podemos construir um triâ
 
 \subsection*{O algoritmo}
 
-O algoritmo constrói iterativamente simplices dentro do CSO mais próximos da origem até que o simplex pare de mudar. O ponto $P$ de norma mínima dessas simplices serve como aproximações sucessivas para \textit{MinimumNormPoint(CSO)}.
+Como todos os pontos retornados pela função suporte estão na borda da CSO e, portanto, se não pudermos adicionar um ponto além da origem ao longo de alguma direção, sabemos que a CSO não contém a origem. Isso aumenta as chances de o algoritmo sair rapidamente em casos de não interseção.
 
-Para politopos, o GJK termina após um número finito de iterações. Para objetos curvos, um termo $\epsilon$ deve ser adicionado para evitar loops infinitos e limitar o erro entre a distância de separação calculada e real. Foi estabelecido em  
-%adicionar citação
-que a distância ao quadrado entre a aproximação $P$ e o \textit{MinimumNormPoint(CSO)} real é limitada a um valor inferior a $P \cdot V$, onde V é o ponto de suporte do CSO na direção $-P$. Assim, se $||P||^2 - P \cdot V \leq \epsilon^2$, para alguma constante real muito pequena $\epsilon \geq 0$, concluímos que V não é mais extremo na direção $-P$ do que o próprio P e a distância do CSO à origem é ||P||. 
+Para politopos, o GJK termina após um número finito de iterações. Para objetos curvos, um termo $\epsilon$ deve ser adicionado para evitar loops infinitos e limitar o erro entre a distância de separação calculada e real. 
 
 \begin{algorithm}[htb]
 	\caption{GJK}
-	\KwIn{Polígonos convexos A e B}
+	\KwIn{Polígonos convexos A e B, direção inicial $\vec{d}$}
 	\KwOut{Distância euclidiana entre A e B}
 
-	P $\leftarrow$ Ponto qualquer na CSO \\
-	Q $\leftarrow$ \{\} \\
-	$V \leftarrow S_{CSO} (\text{-S})$ \\
+	S $\leftarrow S_A(\vec{d}) - S_B(-\vec{d})$ \\
+	Q $\leftarrow$ \{S\} \\
+	$\vec{d} \leftarrow -S$ \\
 	
-	\While{$||P||^2 - P \cdot V > \epsilon^2$}{
-		$Q' \leftarrow Q \cup \{V\}$ \\
-		P $\leftarrow$ MinimumNormPoint($Q'$) \\
-		Q $\leftarrow$ Faça $Q'$ o menor subconjunto convexo que contém $P$ \\
-		P $\leftarrow$ $S_{CSO}(-P)$
+	\While{iterações $<$ MAX\_ITER}{
+		S $\leftarrow S_A(\vec{d}) - S_B(-\vec{d})$ \\ 
+		\If{S $\cdot \vec{d} \leq \epsilon$ }{
+			Pare
+		}
+
+		$Q \leftarrow Q \cup \{S\}$ \\
+		Q, $\vec{d}$, contem\_origem $\leftarrow$ NearestSimplex(Q) \\
+		\If{contem\_origem} {
+			\Return \textbf{0}
+		}
 	}
 
-	\Return $||P||$
+	\Return MinimumNormPoint(Q)
 	\label{alg:gjk}
 \end{algorithm}
 
-O Algoritmo~\ref{alg:gjk} começa com um ponto arbitrário $P$ no CSO e um conjunto simplex vazio $Q$. Então calcula um ponto de suporte $V$ na direção $-P$. Se $V$ não estiver mais distante na direção $-P$ do que o próprio $P$, então $P$ deve ser o ponto mais próximo da origem: o algoritmo termina com $||P||$ como a distância do CSO à origem. Caso contrário, o algoritmo adiciona $V$ ao conjunto simplex atual $Q$ e atualiza $P$ para ser o ponto mais próximo da origem dentro do novo simplex (MinimumNormPoint($Q'$)). O simplex $Q$ é reduzido ao menor subconjunto convexo de $Q$ que ainda contém $P$, e o ponto de suporte $V$ na direção $-P$ é atualizado para a próxima iteração.
+O Algoritmo~\ref{alg:gjk} começa om um simplex Q com um ponto de suporte S numa direção aleatória do CSO (é comum ser escolhido a direção do centro de A para B). Então S é usado para gerar uma nova direção $\vec{d}$ oposta a S, isso é feito para maximizar a área do simplex e as chances de conter a origem. O loop principal consiste em três etapas principais: primeiro calcular um novo ponto de suporte na direção atual e verifica se esse ponto ultrapassou a origem, se sim a origem não pode estar contida no simplex Q, caso contrário adicionamos S ao simplex e atualiza Q para o simplex mais próximo da origem (NearestSimplex(Q)).
 
 % \textbf{DEFINIR REGIÃO VORONOI}
 
 \subsection*{Subalgoritmo de distância de Ericson}
 
-A versão de \citeonline{ericson2004gjk} substituiu a versão algébrica de Johnson por uma geométrica, usando rotinas geométricas primitivas como \textit{ClosestPointOnEdgeToPoint()} e \textit{ClosestPointOnTriangleToPoint()}, como apresentado no Algoritmo~\ref{alg:ericson_gjk}, que é implementado usando operações vetoriais. Apesar disso seu algoritmo é matematicamente equivalente ao de Johnson com um pequeno acrescimo de otimização: uma condição de parada antecipada  que testa se o ponto P mais próximo da origem coincide com a origem~\cite{linahan2015geometricgjk}.
+A versão de \citeonline{ericson2004gjk} substituiu a versão algébrica de Johnson por uma geométrica, usando rotinas geométricas primitivas como \textit{ClosestPointOnEdgeToPoint()} e \textit{ClosestPointOnTriangleToPoint()}, que é implementado usando operações vetoriais. Apesar disso seu algoritmo é matematicamente equivalente ao de Johnson com um pequeno acrescimo de otimização: uma condição de parada antecipada  que testa se o ponto P mais próximo da origem coincide com a origem~\cite{linahan2015geometricgjk}.
 
-Isso é feito construindo iterativamente um polígono dentro da CSO que tenta incluir a origem. Se o polígono que construímos contém a origem, então podemos dizer que a CSO contém a origem, logo há interseção entre os dois objetos. Este subalgoritmo começa com um simplex inicial e o refina iterativamente adicionando pontos encontrados usando a função de suporte em uma direção que aponta para a origem. Esse processo continua até que a origem seja encontrada dentro do simplex, indicando uma colisão, ou até que se determine que a origem não está contida, o que significa que não há colisão.
-
-Como todos os pontos retornados pela função suporte estão na borda da CSO e, portanto, se não pudermos adicionar um ponto além da origem ao longo de alguma direção, sabemos que a CSO não contém a origem. Isso aumenta as chances de o algoritmo sair rapidamente em casos de não interseção.
-
-% \begin{algorithm}[htb]
-% 	\caption{Subalgoritmo de distancia de Ericson}
-% 	\KwIn{Simplex Q, ponto P}
-% 	\KwOut{}
-
-% 	\If {length(Q) == 3} {
-%         return ClosestPointOnTriangleToPoint(Q, p)
-% 	}
-% 	\Else {
-%         return ClosestPointOnEdgeToPoint(Q, p);
-% 	}
-
-% 	\label{alg:ericson_gjk}
-% \end{algorithm}
+Este subalgoritmo constroi iterativamente um polígono dentro da CSO que tenta incluir a origem. Se o polígono que construímos contém a origem, então podemos dizer que a CSO contém a origem, logo há interseção entre os dois objetos. Este subalgoritmo começa com um simplex inicial e o refina iterativamente adicionando pontos encontrados usando a função de suporte em uma direção que aponta para a origem. Esse processo continua até que a origem seja encontrada dentro do simplex, indicando uma colisão, ou até que se determine que a origem não está contida, o que significa que não há colisão.
 
 Para cada dimensão do simplex Q, o subalgoritmo de Ericson calcula se a origem está contida ou não no simplex usando regiões de Voronoi, remove pontos antigos do simplex e procura por uma nova direção que maximize as chances do próximo ponto de suporte conter a origem. Para cada dimensão é feito uma conta diferente, neste trabalho iremos trabalhar apenas com objetos em 2D, por isso trataremos apenas dos casos 1-simplex e 2-simplex. 
-% Para detalhar essa rotina usaremos uma conveção de nomear os pontos do simplex em ordem alfabética, com o ponto mais recente sendo A.
 
-Para o caso de 1-simplex temos a rotina \textit{ClosestPointOnEdgeToPoint()} que procura o ponto mais próximo
+The challenge lies in drawing the optimal simplex to represent the MS. Consider figure 6 below where the MS contains the origin, and while its blue simplex triangle also contains the origin its red one does not.
+Press enter or click to view image in full size
 
-Para o caso de 2 simplex temos a rotina \textit{ClosestPointOnTriangleToPoint()}, ilustrada pela Figura~\ref{fig:gjk-ericson-voronoi}, testa para dois tipos de região de Voronoi, região de Vértice ou região de Aresta.
+% Fortunately, the optimal simplex can be determined algorithmically. First we choose a direction at random represented as a vector, then take the vertex of the MS furthest from the origin in that direction. This vertex is called a support point (Lindemann 2009:2). Next, we take the direction vector from the first support point to the origin, and find the support point which maps to that direction. Finally, we connect these two points in a line, get another direction vector which is normal to this line, then get the support point which maps to this direction. With three support points obtained we will have created a triangular simplex which has a reasonably good chance of containing the origin (if it lies within the MS boundary in the first place). This process is demonstrated in figure 7.
+
+% After this process there remains a possibility that the origin contained in the MS may not have been contained in the initial simplex. To guarantee finding a simplex which will contain the origin we simply use the direction vector from the normal of the simplex edge closest to the origin to find another support point and draw a new simplex using the support points that form the simplex edge closest to the origin. If the MS contains the origin then the origin will also be contained in this new simplex, confirming that a collision has occurred. This is demonstrated in figure 8 below. On the other hand, if the support point found by the normal direction vector happens to be a support point used for the current simplex, then there can be no new simplexes closer to the origin to encapsulate it, confirming that the origin is not within the MS boundary and that no collision has occurred (Reducible 2021).
+% % Para detalhar essa rotina usaremos uma conveção de nomear os pontos do simplex em ordem alfabética, com o ponto mais recente sendo A.
+
+Na primeira rodada do laço do Algorimto~\ref{alg:gjk}, depois de encontrar o ponto de suporte, ele é adicionado ao simples Q formando uma linha, este é o caso de 1-simplex ( \textit{ClosestPointOnEdgeToPoint()}). A próxima direção a ser procurada é a direção normal por AB, o ponto de suporte é adicionado ao simplex formando um triangulo.
+
+Como tem possibilidade da origem não estar contida no simplex formado pelo triangulo, caimos no caso 2 simplex (\textit{ClosestPointOnTriangleToPoint()})ilustrada pela Figura~\ref{fig:gjk-ericson-voronoi}. Calculamos uma nova direção de busca a partir da normal da aresta mais próxima a origem, caso  o novo ponto de suporte encontrado seja um dos pontos do simplex, então a origem não pode estar contida no simplex, caso contrário, o ponto A (mais antigo) é excluido e o novo ponto de suporte é adicionado ao simplex e o processo se repete.
+
+testa para dois tipos de região de Voronoi, região de Vértice ou região de Aresta.
 \begin{enumerate}
 	\item A origem está contida numa região de Vértice. Equação de exemplo para $V_A$:
 		\begin{itemize}
@@ -215,6 +211,8 @@ Para o caso de 2 simplex temos a rotina \textit{ClosestPointOnTriangleToPoint()}
 		\end{itemize}
 \end{enumerate}
 
+No entanto, o processo de encontrar o simplex ideal elimina automaticamente a exigência de verificar quatro dessas regiões. Como o ponto de suporte A foi o primeiro a ser adicionado, B foi o segundo e C foi o terceiro. O ponto de suporte C foi adicionado como resultado de encontrar o vetor direcional normal para a borda AB. Isso significa que a região de Voronoi $E_{AB}$, que fica em frente ao ponto de suporte C através da borda AB não pode conter a origem. As três regiões de canto também não podem conter a origem, uma vez que essas regiões devem situar-se além dos três pontos de apoio do simplex, que foram derivados dos pontos no limite do CSO que maximizam as distâncias em algumas direções determinadas. Isso deixa apenas as regiões de Voronoi $E_{AC}$, $E_{BC}$ e $ABC$ para investigar.
+
 \begin{figure}[htb]
 	\centering
 	\includesvg[width=\linewidth]{gjk-ericson-voronoi.svg}
@@ -226,29 +224,6 @@ Para o caso de 2 simplex temos a rotina \textit{ClosestPointOnTriangleToPoint()}
 
 Dependendo do problema a ser resolvido, é possível modificar o GJK para apenas determinar se há ou não intersecção entre dois objetos A e B, conhecido como Boolean GJK (BGJK). Este algoritmo se baseia no fato de que A e B se intersectam se, e somente se, sua CSO contém a origem, desta forma o objetivo do GJK se reduz para determinar se a CSO contém ou não a origem. Neste trabalho foi implementado uma versão do BGJK apresentada por \citeonline{muratori2016implementingGJK} que é baseado nos avanços de \citeonline{gjk_enhanced} e Ericson.
 
-% \begin{algorithm}[htb]
-% 	\caption{Boolean GJK}
-% 	\KwIn{Polígonos convexos A e B}
-% 	\KwOut{True se colidindo, False caso contrário}
-
-% 	S $\leftarrow S_{CSO} (\text{Direção aleatória})$ \\
-% 	Q $\leftarrow$ \{S\} \\
-% 	$\vec{d} \leftarrow -S$ \\
-	
-% 	\While{iterações $<$ MAX\_ITER}{
-% 		S $\leftarrow S_{CSO} (\vec{d})$ \\ 
-% 		\If{S $\cdot \vec{d}$ < 0}{
-% 			\Return False
-% 		}
-% 		$Q \leftarrow Q \cup \{S\}$ \\
-% 		\If{DoSimplex(Q, $\vec{d}$)} {
-% 			\Return True
-% 		}
-% 	}
-
-% 	\Return False
-% 	\label{alg:bgjk}
-% \end{algorithm}
 
 % O Algoritmo~\ref{alg:bgjk} começa om um simplex Q com um ponto de suporte S numa direção aleatória do CSO (é comum ser escolhido a direção do centro de A para B). Então S é usado para gerar uma nova direção $\vec{d}$ oposta a S, isso é feito para maximizar a área do simplex e as chances de conter a origem. O loop principal consiste em três etapas principais: primeiro calcular um novo ponto de suporte na direção atual e verificar se esse ponto ultrapassou a origem (S $\cdot \ \vec{d}$ < 0), se sim a origem não pode estar contida no simplex Q, caso contrário adicionamos S ao simplex e continuamos tentando incluir a origem. 
 
