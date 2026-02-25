@@ -142,6 +142,8 @@ O teorema de Carathéodory em 2 dimensões afirma que podemos construir um triâ
 
 \subsection*{O algoritmo}
 
+O algoritmo constrói iterativamente simplices dentro do CSO mais próximos da origem até que o simplex pare de mudar. O ponto $P$ de norma mínima dessas simplices serve como aproximações sucessivas para \textit{MinimumNormPoint(CSO)}.
+
 Como todos os pontos retornados pela função suporte estão na borda da CSO e, portanto, se não pudermos adicionar um ponto além da origem ao longo de alguma direção, sabemos que a CSO não contém a origem. Isso aumenta as chances de o algoritmo sair rapidamente em casos de não interseção.
 
 Para politopos, o GJK termina após um número finito de iterações. Para objetos curvos, um termo $\epsilon$ deve ser adicionado para evitar loops infinitos e limitar o erro entre a distância de separação calculada e real. 
@@ -180,23 +182,15 @@ O Algoritmo~\ref{alg:gjk} começa om um simplex Q com um ponto de suporte S numa
 
 A versão de \citeonline{ericson2004gjk} substituiu a versão algébrica de Johnson por uma geométrica, usando rotinas geométricas primitivas como \textit{ClosestPointOnEdgeToPoint()} e \textit{ClosestPointOnTriangleToPoint()}, que é implementado usando operações vetoriais. Apesar disso seu algoritmo é matematicamente equivalente ao de Johnson com um pequeno acrescimo de otimização: uma condição de parada antecipada  que testa se o ponto P mais próximo da origem coincide com a origem~\cite{linahan2015geometricgjk}.
 
-Este subalgoritmo constroi iterativamente um polígono dentro da CSO que tenta incluir a origem. Se o polígono que construímos contém a origem, então podemos dizer que a CSO contém a origem, logo há interseção entre os dois objetos. Este subalgoritmo começa com um simplex inicial e o refina iterativamente adicionando pontos encontrados usando a função de suporte em uma direção que aponta para a origem. Esse processo continua até que a origem seja encontrada dentro do simplex, indicando uma colisão, ou até que se determine que a origem não está contida, o que significa que não há colisão.
+Este subalgoritmo constroi iterativamente um simplex dentro da CSO que tenta incluir a origem. Se o simplex que construímos contém a origem, então podemos dizer que a CSO contém a origem, logo há interseção entre os dois objetos. Este subalgoritmo começa com um simplex inicial e o refina iterativamente adicionando pontos encontrados usando a função de suporte em uma direção que aponta para a origem. Esse processo continua até que a origem seja encontrada dentro do simplex, indicando uma colisão, ou até que se determine que a origem não está contida, o que significa que não há colisão.
 
-Para cada dimensão do simplex Q, o subalgoritmo de Ericson calcula se a origem está contida ou não no simplex usando regiões de Voronoi, remove pontos antigos do simplex e procura por uma nova direção que maximize as chances do próximo ponto de suporte conter a origem. Para cada dimensão é feito uma conta diferente, neste trabalho iremos trabalhar apenas com objetos em 2D, por isso trataremos apenas dos casos 1-simplex e 2-simplex. 
+Para cada dimensão do simplex Q, o subalgoritmo de Ericson calcula se a origem está contida ou não no simplex usando regiões de Voronoi, remove pontos antigos do simplex e procura por uma nova direção que maximize as chances do próximo ponto de suporte conter a origem. Para cada dimensão é feito uma conta diferente, neste trabalho iremos trabalhar apenas com objetos em 2D, por isso trataremos apenas dos casos 1-simplex e 2-simplex. Para detalhar essa rotina usaremos uma conveção de nomear os pontos do Simplex em ordem alfabética, com o ponto mais recente sendo A.
 
-The challenge lies in drawing the optimal simplex to represent the MS. Consider figure 6 below where the MS contains the origin, and while its blue simplex triangle also contains the origin its red one does not.
-Press enter or click to view image in full size
+Caso 1-simplex (\textit{ClosestPointOnEdgeToPoint()}) estamos trabalhando com um segmento de reta $\overline{AB}$. Isso divide o espaço em três regiões de Voronoi como ilustrado pela Figura: o espaço mais próximo de A, mais próximo de B e o espaço mais próximo de $\overline{AB}$. Se a origem estiver na região mais próxima de A, então jogamos fora o ponto B. Se estiver na região no lado mais próximo de B, então, mantemos B e jogamos A para fora. Caso contrário, deve estar mais próximo do próprio segmento de linha (nessa região central), e mantemos ambos A e B. ponto de suporte é buscado na direção normal ao segmento que aponta para a origem. 
 
-% Fortunately, the optimal simplex can be determined algorithmically. First we choose a direction at random represented as a vector, then take the vertex of the MS furthest from the origin in that direction. This vertex is called a support point (Lindemann 2009:2). Next, we take the direction vector from the first support point to the origin, and find the support point which maps to that direction. Finally, we connect these two points in a line, get another direction vector which is normal to this line, then get the support point which maps to this direction. With three support points obtained we will have created a triangular simplex which has a reasonably good chance of containing the origin (if it lies within the MS boundary in the first place). This process is demonstrated in figure 7.
+Caso 2-simplex (\textit{ClosestPointOnTriangleToPoint()}), temos um triangulo que divide o espaço em 7 regiões de Voronoi: regiões de vértice $V_A$, $V_B$, $V_C$, regiões de aresta $\overline{AB}, \overline{BC}, \overline{CA}$ e o interior $\triangle ABC$, como ilustrado na Figura~\ref{fig:gjk-ericson-voronoi}. Como estamos trabalhando em 2D, se a origem está contida no triângulo, então podemos afirmar que a distância entre A e B é zero. Caso contrário, dependendo de qual região ele cai, manteremos essa parte da figura e iteraremos novamente. Em 3D seria necessário manter todos os três pontos e considerar que a origem possa estar para cima ou para baixo do plano do triangulo. 
 
-% After this process there remains a possibility that the origin contained in the MS may not have been contained in the initial simplex. To guarantee finding a simplex which will contain the origin we simply use the direction vector from the normal of the simplex edge closest to the origin to find another support point and draw a new simplex using the support points that form the simplex edge closest to the origin. If the MS contains the origin then the origin will also be contained in this new simplex, confirming that a collision has occurred. This is demonstrated in figure 8 below. On the other hand, if the support point found by the normal direction vector happens to be a support point used for the current simplex, then there can be no new simplexes closer to the origin to encapsulate it, confirming that the origin is not within the MS boundary and that no collision has occurred (Reducible 2021).
-% % Para detalhar essa rotina usaremos uma conveção de nomear os pontos do simplex em ordem alfabética, com o ponto mais recente sendo A.
-
-Na primeira rodada do laço do Algorimto~\ref{alg:gjk}, depois de encontrar o ponto de suporte, ele é adicionado ao simples Q formando uma linha, este é o caso de 1-simplex ( \textit{ClosestPointOnEdgeToPoint()}). A próxima direção a ser procurada é a direção normal por AB, o ponto de suporte é adicionado ao simplex formando um triangulo.
-
-Como tem possibilidade da origem não estar contida no simplex formado pelo triangulo, caimos no caso 2 simplex (\textit{ClosestPointOnTriangleToPoint()})ilustrada pela Figura~\ref{fig:gjk-ericson-voronoi}. Calculamos uma nova direção de busca a partir da normal da aresta mais próxima a origem, caso  o novo ponto de suporte encontrado seja um dos pontos do simplex, então a origem não pode estar contida no simplex, caso contrário, o ponto A (mais antigo) é excluido e o novo ponto de suporte é adicionado ao simplex e o processo se repete.
-
-testa para dois tipos de região de Voronoi, região de Vértice ou região de Aresta.
+Os testes para dois tipos de região de Voronoi, região de Vértice ou região de Aresta seguem como:
 \begin{enumerate}
 	\item A origem está contida numa região de Vértice. Equação de exemplo para $V_A$:
 		\begin{itemize}
@@ -211,56 +205,15 @@ testa para dois tipos de região de Voronoi, região de Vértice ou região de A
 		\end{itemize}
 \end{enumerate}
 
-No entanto, o processo de encontrar o simplex ideal elimina automaticamente a exigência de verificar quatro dessas regiões. Como o ponto de suporte A foi o primeiro a ser adicionado, B foi o segundo e C foi o terceiro. O ponto de suporte C foi adicionado como resultado de encontrar o vetor direcional normal para a borda AB. Isso significa que a região de Voronoi $E_{AB}$, que fica em frente ao ponto de suporte C através da borda AB não pode conter a origem. As três regiões de canto também não podem conter a origem, uma vez que essas regiões devem situar-se além dos três pontos de apoio do simplex, que foram derivados dos pontos no limite do CSO que maximizam as distâncias em algumas direções determinadas. Isso deixa apenas as regiões de Voronoi $E_{AC}$, $E_{BC}$ e $ABC$ para investigar.
+No entanto, o processo de encontrar o simplex ideal elimina a necessidade de verificar quatro dessas regiões. Como o ponto de suporte A foi o primeiro a ser adicionado, B foi o segundo e C foi o terceiro. O ponto de suporte C foi adicionado como resultado de encontrar o vetor normal para $\overline{AB}$. Isso significa que a região de Voronoi $E_{AB}$, não pode conter a origem. As três regiões de Vértice também não podem conter a origem, uma vez que essas regiões estão além dos três pontos de apoio do simplex, que foram derivados dos pontos de suporte, que ficam no limite do CSO. Isso deixa apenas as regiões de Voronoi $E_{AC}$, $E_{BC}$ e $\triangle ABC$ para investigar.
 
 \begin{figure}[htb]
 	\centering
 	\includesvg[width=\linewidth]{gjk-ericson-voronoi.svg}
-	\caption{Região de Voronoi para o caso 3-simplex.}
+	\caption{Regiões de Voronoi para o caso 3-simplex.}
 	\label{fig:gjk-ericson-voronoi}
 \end{figure}
 
 \subsection*{Boolean GJK}
 
 Dependendo do problema a ser resolvido, é possível modificar o GJK para apenas determinar se há ou não intersecção entre dois objetos A e B, conhecido como Boolean GJK (BGJK). Este algoritmo se baseia no fato de que A e B se intersectam se, e somente se, sua CSO contém a origem, desta forma o objetivo do GJK se reduz para determinar se a CSO contém ou não a origem. Neste trabalho foi implementado uma versão do BGJK apresentada por \citeonline{muratori2016implementingGJK} que é baseado nos avanços de \citeonline{gjk_enhanced} e Ericson.
-
-
-% O Algoritmo~\ref{alg:bgjk} começa om um simplex Q com um ponto de suporte S numa direção aleatória do CSO (é comum ser escolhido a direção do centro de A para B). Então S é usado para gerar uma nova direção $\vec{d}$ oposta a S, isso é feito para maximizar a área do simplex e as chances de conter a origem. O loop principal consiste em três etapas principais: primeiro calcular um novo ponto de suporte na direção atual e verificar se esse ponto ultrapassou a origem (S $\cdot \ \vec{d}$ < 0), se sim a origem não pode estar contida no simplex Q, caso contrário adicionamos S ao simplex e continuamos tentando incluir a origem. 
-
-% \textbf{1-Simplex}
-
-% No caso de 2 pontos, Q=\{A,B\} é um 1-simplex com 3 regiões de Voronoi: dois semiespaços e uma faixa. Se o CSO contiver a origem quando n = 1, a região de Voronoi da faixa deve conter a origem.
-
-% \textbf{2-Simplex}
-
-% No caso de 3 pontos, Q = \{A, B, C\} é um 2-simplex com 8 regiões de Voronoi: uma para cada um dos três vértices, uma para cada uma das três arestas e duas para as regiões acima e abaixo do triângulo. Se o CSO contém a origem quando n = 2, então as regiões de Voronoi AC, AB, ABC ou ACB devem conter a origem.
-
-% Executar essa operação exige $2|A||B| $ subtrações. Isso é significativo, porque uma forma é composta de um número infinito de pontos.  A grande coisa sobre GJK é que você realmente não precisa calcular a diferença de Minkowski para todos os vértices. Uma vez que ambas as formas são convexas e definidas por vértices, só precisamos realizar esta operação nos vértices mais externos.
-
-%$ Dessa forma, queremos apenas saber se a diferença de Minkowski contém ou não a origem. Se isso acontecer, então sabemos que as formas estão se cruzando, caso contrário, as formas são disjuntas. Isso é feito construindo iterativamente um polígono dentro da diferença de Minkowski que tenta incluir a origem. Se o polígono que construímos contém a origem, então podemos dizer que a diferença de Minkowski contém a origem, logo há interseção entre os dois objetos. Este polígono que queremos construir deve ser da forma mais elementar possível, ou seja, um \textit{simplex}, que equivale em 2D a um triângulo, e em 3D a um tetraedro.
-
-% \subsection*{Função de Suporte}
-
-% O algoritmo GJK começa com um simplex inicial e o refina iterativamente adicionando pontos encontrados usando a função de suporte em uma direção que aponta para a origem. Esse processo continua até que a origem seja encontrada dentro do simplex, indicando uma colisão, ou até que se determine que a origem não está contida, o que significa que não há colisão.
-
-% A função de suporte deve retornar o ponto mais distante em uma direção dentro da diferença de Minkowski. Isso cria um simplex que contém uma área máxima, aumentando, portanto, a chance de que o algoritmo termine rapidamente. Além disso, podemos usar o fato de que todos os pontos retornados desta forma estão na borda da diferença de Minkowski e, portanto, se não pudermos adicionar um ponto além da origem ao longo de alguma direção, sabemos que a diferença de Minkowski não contém a origem. Isso aumenta as chances de o algoritmo sair rapidamente em casos de não interseção.
-
-% % \subsection*{Construção iterativa do simplex}
-
-% O Algoritmo~\ref{alg:gjk} busca determinar se a origem está contida em $A - B$ construindo iterativamente um simplex dentro da diferença de Minkowski.
-% \begin{algorithm}[htb]
-% 	\caption{GJK}
-% 	\LinesNumbered
-% 	\KwIn{Polígonos convexos $A$ e $B$}
-% 	\KwOut{Verdadeiro se ocorreu colisão}
-	
-% 	Escolhe-se uma direção inicial $\vec{d}$; \\
-% 	$p \leftarrow \text{support}(A - B,\ \vec{d})$ \\
-% 	\If{$p \cdot \vec{d} < 0$}{
-% 		\Return{False}
-% 	}
-% 	Atualiza-se o simplex com $p$ e calcula-se nova direção $\vec{d}$; \\
-% 	Itera-se até que o simplex contenha a origem ou seja possível concluir ausência de interseção.
-% 	\label{alg:gjk}
-% \end{algorithm}
-% O GJK é eficiente e converge rapidamente na prática, sendo mais apropriado que o SAT em cenários tridimensionais e em motores físicos de uso geral.
