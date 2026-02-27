@@ -66,9 +66,19 @@ onde $\epsilon$ é um valor numérico para tratar erros de operação flutuante 
 
 \section{Algoritmo de Gilbert-Johnson-Keerthi (GJK)}
 
-O algoritmo de Gilbert-Johnson-Keerthi (GJK) é um algoritmo clássico para calcular distância euclidiana entre dois politopos convexos, também é capaz de determinar os respectivos pontos mais próximos entre eles. Este algoritmo possui uma complexidade linear em relação ao número de vértices dos objetos e não está restrito a uma dimensão específica, podendo ser usado em qualquer espaço m-dimensional. Para calcular a distância é usado o subalgoritmo de Johnson, que resolve um sistema de equações lineares para combinação de vértices, faces e arestas. O algoritmo de GJK é amplamente utilizado em motores físicos devido à sua eficiência e robustez, especialmente em ambientes tridimensionais~\cite{gjk}.
+O algoritmo de Gilbert-Johnson-Keerthi (GJK) é um algoritmo clássico para calcular distância euclidiana entre dois politopos convexos, um problema fundamental em áreas como computação gráfica, simulação física, robótica, planejamento de trajetórias e sistemas de detecção de colisão. Este algoritmo permite calcular a distância mínima entre dois conjuntos convexos em $\mathbb{R}^m$ com complexidade linear no número de vértices dos objetos, sendo amplamente utilizado em motores físicos modernos. Para calcular a distância é usado o subalgoritmo de Johnson, que resolve um sistema de equações lineares para combinação de vértices, faces e arestas. O algoritmo de GJK é amplamente utilizado em motores físicos devido à sua eficiência e robustez, especialmente em ambientes tridimensionais~\cite{gjk}.
 
 Com o passar dos anos, o subalgoritmo de distância de Johnson foi trocado a favor de outros mais sofisticados como, por exemplo, o subalgoritmo de Ericson apresentado na SIGGRAPH 2004~\cite{ericson2004gjk}. Este subalgoritmo se baseia numa abordagem geométrica ao invés de algébrica, com otimização usando regiões de Voronoi. Neste trabalho, detalharemos a versão aprimorada do GJK proposta por \citeonline{gjk_enhanced} que é capaz de tratar qualquer objeto curvo convexo, e o subalgoritmo de Ericson. 
+
+\subsection*{Distância Euclidiana entre Conjuntos Convexos}
+
+Sejam $A$ e $B$ dois conjuntos convexos compactos em $\mathbb{R}^m$. A distância euclidiana entre eles é definida como:
+
+\begin{equation}
+d(A,B) = \min_{a \in A, b \in B} \| a - b \|
+\end{equation}
+
+Quando $A$ e $B$ se intersectam, $d(A,B) = 0$.
 
 \subsection*{Soma de Minkowski}
 
@@ -92,7 +102,12 @@ $$
 $$
 que pode ser pensado como um processo de varredura que calcula o vetor distância para cada ponto de $B$ em $A$. Neste trabalho, usaremos esse termo para referir a essa operação quando necessário.
 
-A diferença de Minkowski também é chamada de configuração do espaço de obstáculos (CSO, do inglês \textit{Configuration Space Obstacles}). Nesse espaço a distância entre os objetos A e B é igual à distância entre a origem O e o CSO, como ilustrado na Figura~\ref{fig:soma-minkowski-sem-interseccao}, que chamaremos de \textit{MinimumNormPoint(CSO)}. Logo, A e B se intersectam se, e somente se, sua CSO contém a origem~\cite{linahan2015geometricgjk}. Isso se deve ao fato de que se existe um ponto $p_A \subset A$ igual a $p_B \subset B$, então $p_A - p_B = \vec{0}$ é testemunha que há pelo menos um ponto que coincide com a origem O. Compare a Figura~\ref{fig:soma-minkowski-com-interseccao} à Figura~\ref{fig:soma-minkowski-sem-interseccao}. 
+A diferença de Minkowski também é chamada de configuração do espaço de obstáculos (CSO, do inglês \textit{Configuration Space Obstacles}). Nesse espaço a distância entre os objetos A e B é igual à distância entre a origem O e o CSO, como ilustrado na Figura~\ref{fig:soma-minkowski-sem-interseccao}, que chamaremos de \textit{MinimumNormPoint(CSO)}. Logo, A e B se intersectam se, e somente se, sua CSO contém a origem~\cite{linahan2015geometricgjk}, ou seja:
+\begin{equation*}
+d(A,B) = \min_{c \in CSO} \| c \|.
+\end{equation*}
+
+Isso se deve ao fato de que se existe um ponto $p_A \subset A$ igual a $p_B \subset B$, então $p_A - p_B = \vec{0}$ é testemunha que há pelo menos um ponto que coincide com a origem O, compare a Figura~\ref{fig:soma-minkowski-com-interseccao} à Figura~\ref{fig:soma-minkowski-sem-interseccao}. Portanto, o problema de proximidade entre dois objetos reduz-se ao problema de encontrar o ponto de menor norma da diferença de Minkowski.
 
 \begin{figure}[htb]
 	\centering
@@ -180,15 +195,35 @@ O Algoritmo~\ref{alg:gjk} começa om um simplex Q com um ponto de suporte S numa
 
 \subsection*{Subalgoritmo de distância de Ericson}
 
-A versão de \citeonline{ericson2004gjk} substituiu a versão algébrica de Johnson por uma geométrica, usando rotinas geométricas primitivas como \textit{ClosestPointOnEdgeToPoint()} e \textit{ClosestPointOnTriangleToPoint()}, que é implementado usando operações vetoriais. Apesar disso seu algoritmo é matematicamente equivalente ao de Johnson com um pequeno acrescimo de otimização: uma condição de parada antecipada  que testa se o ponto P mais próximo da origem coincide com a origem~\cite{linahan2015geometricgjk}.
+A versão de \citeonline{ericson2004gjk} substituiu a versão algébrica de Johnson por uma geométrica, usando rotinas geométricas primitivas como \textit{ClosestPointOnEdgeToPoint()} e \textit{ClosestPointOnTriangleToPoint()}, que é implementado usando operações vetoriais. Apesar disso seu algoritmo é matematicamente equivalente ao de Johnson\cite{linahan2015geometricgjk}.
 
 Este subalgoritmo constroi iterativamente um simplex dentro da CSO que tenta incluir a origem. Se o simplex que construímos contém a origem, então podemos dizer que a CSO contém a origem, logo há interseção entre os dois objetos. Este subalgoritmo começa com um simplex inicial e o refina iterativamente adicionando pontos encontrados usando a função de suporte em uma direção que aponta para a origem. Esse processo continua até que a origem seja encontrada dentro do simplex, indicando uma colisão, ou até que se determine que a origem não está contida, o que significa que não há colisão.
 
-Para cada dimensão do simplex Q, o subalgoritmo de Ericson calcula se a origem está contida ou não no simplex usando regiões de Voronoi, remove pontos antigos do simplex e procura por uma nova direção que maximize as chances do próximo ponto de suporte conter a origem. Para cada dimensão é feito uma conta diferente, neste trabalho iremos trabalhar apenas com objetos em 2D, por isso trataremos apenas dos casos 1-simplex e 2-simplex. Para detalhar essa rotina usaremos uma conveção de nomear os pontos do Simplex em ordem alfabética, com o ponto mais recente sendo A.
+Para cada dimensão do simplex Q, o subalgoritmo de Ericson calcula se a origem está contida ou não no simplex usando regiões de Voronoi, remove pontos antigos do simplex e procura por uma nova direção que maximize as chances do próximo ponto de suporte conter a origem. Para cada dimensão é feito uma conta diferente, neste trabalho iremos trabalhar apenas com objetos em 2D, por isso trataremos apenas dos casos 1-simplex e 2-simplex. Para detalhar essa rotina usaremos uma conveção de nomear os pontos do simplex em ordem alfabética, com o ponto mais recente sendo A.
+
+Caso 0-simplex é o início do GJK e contém apenas um ponto $A$, adiciona-o ao simples Q e continua para a próxima iteração. Caso a iteração termine nesse passo, o ponto mais próximo da origem é o próprio ponto $A$.
 
 Caso 1-simplex (\textit{ClosestPointOnEdgeToPoint()}) estamos trabalhando com um segmento de reta $\overline{AB}$. Isso divide o espaço em três regiões de Voronoi como ilustrado pela Figura: o espaço mais próximo de A, mais próximo de B e o espaço mais próximo de $\overline{AB}$. Se a origem estiver na região mais próxima de A, então jogamos fora o ponto B. Se estiver na região no lado mais próximo de B, então, mantemos B e jogamos A para fora. Caso contrário, deve estar mais próximo do próprio segmento de linha (na região central), e mantemos ambos A e B. ponto de suporte é buscado na direção normal ao segmento que aponta para a origem. 
 
-Porém, a origem sempre estará contida na região de Voronoi do segmento, pois, por construção os pontos de suporte A e B estão no limite do CSO. Logo, se a origem estivesse na região de A ou B isso seria um contradição, pois isso significaria que A ou B estão mais próximos da origem do que o segmento $\overline{AB}$, o que não é possível. Dessa forma, a próxima direção de busca apontando para origem é perpendicular ao segmento $\overline{AB}$.
+Porém, a origem sempre estará contida na região de Voronoi do segmento $\overline{AB}$, pois, por construção os pontos de suporte A e B estão no limite do CSO. Logo, se a origem estivesse na região de A ou B isso seria um contradição, pois isso significaria que A ou B estão mais próximos da origem do que o segmento $\overline{AB}$, o que não é possível. Dessa forma, a próxima direção de busca apontando para origem é perpendicular ao segmento $\overline{AB}$.
+
+Caso a iteração termine nesse passo, o ponto mais próximo da origem é obtido projetando-se a origem sobre o segmento. Definindo:
+\begin{equation*}
+	\overline{AB} = B - A.
+\end{equation*}
+O parâmetro de projeção é
+\begin{equation*}
+	t = \frac{-A \cdot \overline{AB}}{\overline{AB} \cdot \overline{AB}},
+\end{equation*}
+e ponto mais próximo é
+\begin{equation*}
+	P =
+	\begin{cases}
+		A, & t \le 0 \\
+		B, & t \ge 1 \\
+		A + t\overline{AB}, & 0 < t < 1
+	\end{cases}.
+\end{equation*}
 
 Caso 2-simplex (\textit{ClosestPointOnTriangleToPoint()}), temos um triangulo que divide o espaço em 7 regiões de Voronoi: regiões de vértice $V_A$, $V_B$, $V_C$, regiões de aresta $\overline{AB}, \overline{BC}, \overline{CA}$ e o interior $\triangle ABC$, como ilustrado na Figura~\ref{fig:gjk-ericson-voronoi}. Como estamos trabalhando em 2D, se a origem está contida no triângulo, então podemos afirmar que a distância entre A e B é zero. Caso contrário, dependendo de qual região ele cai, manteremos essa parte da figura e iteraremos novamente. Em 3D seria necessário manter todos os três pontos e considerar que a origem possa estar para cima ou para baixo do plano do triangulo. 
 
