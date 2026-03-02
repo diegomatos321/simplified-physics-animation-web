@@ -1,35 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   viewBox="0 0 348.8808 290.52506"
-   width="348.8808"
+   viewBox="0 0 344.76001 290.52506"
+   width="344.76001"
    height="290.52505"
    version="1.1"
    id="svg14"
-   sodipodi:docname="soma-minkowski-sem-interseccao.svg"
-   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
-  <sodipodi:namedview
-     id="namedview22"
-     pagecolor="#ffffff"
-     bordercolor="#000000"
-     borderopacity="0.25"
-     inkscape:showpageshadow="2"
-     inkscape:pageopacity="0.0"
-     inkscape:pagecheckerboard="0"
-     inkscape:deskcolor="#d1d1d1"
-     showgrid="false"
-     inkscape:zoom="2.0688088"
-     inkscape:cx="126.88461"
-     inkscape:cy="122.05091"
-     inkscape:window-width="1280"
-     inkscape:window-height="651"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="svg14" />
   <defs
      id="defs18">
     <marker
@@ -38,19 +15,15 @@
        refX="0"
        refY="0"
        orient="auto"
-       inkscape:stockid="Dot"
        markerWidth="5.4000001"
        markerHeight="5.4000001"
        viewBox="0 0 5.4 5.4"
-       inkscape:isstock="true"
-       inkscape:collect="always"
        preserveAspectRatio="xMidYMid">
       <path
          transform="scale(0.45)"
          style="fill:context-fill;fill-rule:evenodd;stroke:context-stroke;stroke-width:2"
          d="M 5,0 C 5,2.76 2.76,5 0,5 -2.76,5 -5,2.76 -5,0 c 0,-2.76 2.3,-5 5,-5 2.76,0 5,2.24 5,5 z"
-         id="path9464"
-         sodipodi:nodetypes="sssss" />
+         id="path9464" />
     </marker>
     <marker
        style="overflow:visible"
@@ -58,34 +31,30 @@
        refX="0"
        refY="0"
        orient="auto"
-       inkscape:stockid="Dot"
        markerWidth="5.4000001"
        markerHeight="5.4000001"
        viewBox="0 0 5.4 5.4"
-       inkscape:isstock="true"
-       inkscape:collect="always"
        preserveAspectRatio="xMidYMid">
       <path
          transform="scale(0.45)"
          style="fill:context-fill;fill-rule:evenodd;stroke:context-stroke;stroke-width:2"
          d="M 5,0 C 5,2.76 2.76,5 0,5 -2.76,5 -5,2.76 -5,0 c 0,-2.76 2.3,-5 5,-5 2.76,0 5,2.24 5,5 z"
-         id="path9464-3"
-         sodipodi:nodetypes="sssss" />
+         id="path9464-3" />
     </marker>
   </defs>
   <!-- Linhas (recentralizadas) -->
   <line
-     x1="4.120801"
+     x1="1.9608914e-08"
      y1="204.81805"
-     x2="348.8808"
+     x2="344.76001"
      y2="204.81805"
      stroke="#333333"
      stroke-width="1.11067"
      id="line2" />
   <line
-     x1="134.07076"
+     x1="129.94995"
      y1="27.933546"
-     x2="134.07076"
+     x2="129.94995"
      y2="290.52505"
      stroke="#333333"
      stroke-width="1.25207"
@@ -93,9 +62,9 @@
   <!-- Polígonos (transform removido e pontos recalculados) -->
   <g
      id="g4337"
-     transform="translate(14.120801,0.81804759)">
+     transform="translate(10,0.81804759)">
     <polygon
-       points="263.64,65 268.64,20 383.64,10 383.64,50 323.64,75 "
+       points="323.64,75 263.64,65 268.64,20 383.64,10 383.64,50 "
        fill="#ffabaa"
        fill-opacity="0.8"
        stroke="none"
@@ -114,9 +83,9 @@
   </g>
   <g
      id="g4327"
-     transform="translate(-1.8791992,14.818048)">
+     transform="translate(-6.0000002,14.818048)">
     <polygon
-       points="268.64,140 223.64,155 205.64,140 208.64,90 248.64,85 268.64,110 "
+       points="248.64,85 268.64,110 268.64,140 223.64,155 205.64,140 208.64,90 "
        fill="#9e9e9e"
        fill-opacity="0.8"
        stroke="none"
@@ -135,9 +104,9 @@
   </g>
   <g
      id="g4322"
-     transform="translate(31.0763,-0.74678741)">
+     transform="translate(26.955499,-0.74678741)">
     <polygon
-       points="298.64,80 301.64,115 243.64,120 "
+       points="301.64,115 243.64,120 298.64,80 "
        fill="#757575"
        fill-opacity="0.8"
        stroke="none"
@@ -156,9 +125,9 @@
   </g>
   <g
      id="g4332"
-     transform="translate(-30.345762,-0.16464)">
+     transform="translate(-34.466563,-0.16464)">
     <polygon
-       points="153.64,260 93.64,240 88.64,200 93.64,180 203.64,165 208.64,220 "
+       points="203.64,165 208.64,220 153.64,260 93.64,240 88.64,200 93.64,180 "
        fill="#8fce98"
        fill-opacity="0.8"
        stroke="none"
@@ -179,19 +148,38 @@
   <text
      xml:space="preserve"
      style="font-size:13.3333px;fill:#000000;stroke-width:1.4"
-     x="136.37128"
+     x="132.25047"
      y="217.29955"
      id="text305"><tspan
-       sodipodi:role="line"
        id="tspan303"
-       x="136.37128"
+       x="132.25047"
        y="217.29955">O</tspan></text>
   <path
-     style="fill:#333333;stroke-dasharray:none;stroke:#000000;fill-opacity:1;stroke-opacity:1;stroke-dashoffset:0;stroke-width:1;marker-start:url(#marker9466);marker-end:url(#marker9466);stroke-linecap:butt"
-     d="m 214.71081,114.81805 7.9555,-5.56484"
+     style="fill:#333333;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-start:url(#marker9466);marker-end:url(#marker9466)"
+     d="m 210.59001,114.81805 7.9555,-5.56484"
      id="path306" />
   <path
      style="fill:#333333;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-start:url(#marker9466-5);marker-end:url(#marker9466-5)"
-     d="m 126.24425,209.83536 7.9555,-5.56484"
+     d="m 122.12345,209.83536 7.9555,-5.56484"
      id="path306-5" />
+  <text
+     xml:space="preserve"
+     style="font-size:5.78393px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#000000;stroke:#000000;stroke-width:1.08448"
+     x="210.93846"
+     y="109.91329"
+     id="text3756"><tspan
+       id="tspan3754"
+       x="210.93846"
+       y="109.91329"
+       style="font-size:5.78393px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.08448;stroke-opacity:1">d</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-size:5.78393px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#000000;stroke:#000000;stroke-width:1.08448"
+     x="123.30499"
+     y="203.50826"
+     id="text3756-3"><tspan
+       id="tspan3754-6"
+       x="123.30499"
+       y="203.50826"
+       style="font-size:5.78393px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.08448;stroke-opacity:1">d</tspan></text>
 </svg>

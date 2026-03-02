@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   viewBox="-400 -350 880.8335 710.38892"
+   viewBox="-400 -350 880.8335 710.41101"
    width="880.8335"
-   height="710.38892"
+   height="710.41101"
    version="1.1"
    id="svg1791"
    sodipodi:docname="support-function.svg"
    inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   inkscape:export-filename="support-function.svg"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -40,7 +43,7 @@
        orient="auto-start-reverse"
        inkscape:stockid="TriangleStart"
        markerWidth="12"
-       markerHeight="14.4"
+       markerHeight="13.872832"
        viewBox="0 0 5.3244081 6.1553851"
        inkscape:isstock="true"
        inkscape:collect="always"
@@ -50,30 +53,6 @@
          style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
          d="M 5.77,0 -2.88,5 V -5 Z"
          id="path135" />
-    </marker>
-    <marker
-       id="arrowhead-d"
-       markerWidth="10"
-       markerHeight="7"
-       refX="9"
-       refY="3.5"
-       orient="auto">
-      <polygon
-         points="0,0 10,3.5 0,7 "
-         fill="#2ecc71"
-         id="polygon1730" />
-    </marker>
-    <marker
-       id="arrowhead-res"
-       markerWidth="12"
-       markerHeight="9"
-       refX="11"
-       refY="4.5"
-       orient="auto">
-      <polygon
-         points="0,9 0,0 12,4.5 "
-         fill="#9b59b6"
-         id="polygon1733" />
     </marker>
     <style
        id="style1736">
@@ -86,59 +65,55 @@
   </defs>
   <line
      x1="-400"
-     y1="10.388917"
+     y1="10.410995"
      x2="400"
-     y2="10.388917"
+     y2="10.410995"
      stroke="#eee"
      stroke-width="2"
      id="line1742"
      style="stroke:#000000;stroke-opacity:1" />
   <line
      x1="0"
-     y1="-339.61108"
+     y1="-339.58902"
      x2="0"
-     y2="360.38892"
+     y2="360.41098"
      stroke="#eee"
      stroke-width="2"
      id="line1744"
      style="stroke:#000000;stroke-opacity:1" />
   <circle
      cx="0"
-     cy="10.388917"
+     cy="10.410995"
      r="5"
      fill="#333333"
-     id="circle1746" />
-  <text
-     x="10"
-     y="30.388916"
-     class="label"
-     font-weight="bold"
-     id="text1748">Origem (0,0)</text>
+     id="circle1746"
+     style="fill:#000000;fill-opacity:1" />
   <g
      id="input-direction"
-     transform="translate(182.60953,141.44465)">
+     transform="translate(182.60953,141.46673)">
     <text
        x="90.000008"
        y="-82.631874"
        class="label vector-label"
        fill="#2ecc71"
-       id="text1754">Vetor Direção de Busca (d)</text>
+       id="text1754"
+       style="fill:#000000;fill-opacity:1">Vetor Direção de Busca (d)</text>
     <path
-       style="fill:#333333;stroke:#00980b;stroke-width:2.437;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#TriangleStart)"
+       style="fill:#333333;stroke:#000000;stroke-width:2;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#TriangleStart)"
        d="M 3.9125417,-38.59542 198.8331,-233.51604"
        id="path420" />
     <rect
-       style="fill:#00980b;fill-opacity:1;stroke:none;stroke-width:4.52586;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:4.52586;stroke-dasharray:none;stroke-opacity:1"
        id="rect4121"
        width="5.1317"
        height="5.1317"
-       x="265.47061"
-       y="-36.36758"
+       x="262.8801"
+       y="-39.306614"
        transform="rotate(-44.520793)" />
   </g>
   <g
      id="minkowski-space"
-     transform="translate(0,10.388916)">
+     transform="translate(0,10.410994)">
     <path
        d="M 160,-280 260,-150 180,50 -50,100 -150,0 -80,-200 Z"
        fill="#bdc3c7"
@@ -148,20 +123,20 @@
        stroke-dasharray="8, 5"
        stroke-linejoin="round"
        id="path1759"
-       style="opacity:1;fill:#bdc3c7;fill-opacity:0.2;stroke:#000000;stroke-opacity:1" />
+       style="opacity:1;fill:none;fill-opacity:0.2;stroke:#000000;stroke-opacity:1" />
     <g
        id="result-point-highlight">
       <line
-         x1="80.297005"
-         y1="-359.703"
-         x2="362.48602"
-         y2="-77.514"
+         x1="80.287781"
+         y1="-359.71225"
+         x2="359.13989"
+         y2="-81.550926"
          stroke="#2ecc71"
          stroke-width="1"
          stroke-dasharray="4"
          opacity="0.6"
          id="line1763"
-         style="opacity:1;fill:none;fill-opacity:1;stroke:#00980b;stroke-width:1.94005;stroke-dasharray:7.7602;stroke-dashoffset:0;stroke-opacity:1" />
+         style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.9739;stroke-dasharray:11.8434, 1.9739;stroke-dashoffset:0;stroke-opacity:1" />
       <circle
          cx="160"
          cy="-280"
@@ -169,10 +144,11 @@
          fill="#9b59b6"
          stroke="#ffffff"
          stroke-width="3"
-         id="circle1765" />
+         id="circle1765"
+         style="fill:#000000;fill-opacity:1" />
       <text
          xml:space="preserve"
-         style="font-size:16px;fill:#000000;stroke-dasharray:4, 1"
+         style="font-size:16px;fill:#000000;fill-opacity:1;stroke-dasharray:4, 1"
          x="171.5"
          y="-291.5"
          id="text447"><tspan
@@ -180,27 +156,35 @@
            id="tspan445"
            x="171.5"
            y="-291.5"
-           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:16px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#333333;fill-opacity:1">Ponto de suporte</tspan></text>
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:16px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#000000;fill-opacity:1">Ponto de suporte</tspan></text>
       <text
          x="180"
          y="-255"
          class="formula"
          fill="#9b59b6"
          anchor="start"
-         id="text1769">P = $S_{A-B}(d)$</text>
+         id="text1769"
+         style="fill:#000000;fill-opacity:1">P = $S_{A-B}(d)$</text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:32px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#000000;fill-opacity:1;stroke-width:2"
+         x="88.377693"
+         y="-88.953789"
+         id="text312"><tspan
+           sodipodi:role="line"
+           id="tspan310"
+           x="88.377693"
+           y="-88.953789"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:32px;font-family:sans-serif;-inkscape-font-specification:sans-serif">CSO</tspan></text>
     </g>
-    <line
-       x1="0"
-       y1="0"
-       x2="154"
-       y2="-270"
-       stroke="#9b59b6"
-       stroke-width="5"
-       marker-end="url(#arrowhead-res)"
-       id="line1772" />
+    <path
+       style="fill:none;fill-opacity:0.2;stroke:#000000;stroke-width:2;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#TriangleStart)"
+       d="m 0.26912,-0.87244 149.0542,-257.35574"
+       id="path3206"
+       sodipodi:nodetypes="cc" />
   </g>
   <path
-     style="fill:none;stroke:#00980b;stroke-width:2.437;stroke-dasharray:none;stroke-opacity:1"
-     d="m 349.45788,-79.415942 -8.82455,8.82455 9.66465,9.66466"
+     style="fill:none;stroke:#000000;stroke-width:2;stroke-dasharray:none;stroke-opacity:1"
+     d="m 344.79809,-84.874791 -12.72422,12.724212 13.93557,13.935576"
      id="path1441" />
 </svg>

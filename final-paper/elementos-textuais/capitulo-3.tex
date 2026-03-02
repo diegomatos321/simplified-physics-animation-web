@@ -88,13 +88,13 @@ A + B = \{ \vec{x} + \vec{y} \mid \vec{x} \in A,\ \vec{y} \in B \},
 $$
 onde \( \vec{x} \) e \( \vec{y} \) representam vetores posição associados a pontos pertencentes aos conjuntos \(A\) e \(B\), respectivamente.
 
-Do ponto de vista geométrico, a soma de Minkowski pode ser interpretada como o conjunto de todos os pontos obtidos ao transladar o objeto \(B\) por cada vetor posição pertencente a \(A\), mantendo sua forma e orientação, ou seja, faz-se uma cópia do objeto B centrado em cada ponto de A, como ilustrado na Figura~\ref{fig:soma-minkowski-sem-interseccao}.
+Do ponto de vista geométrico, a soma de Minkowski pode ser interpretada como o conjunto de todos os pontos obtidos ao transladar o objeto \(B\) por cada vetor posição pertencente a \(A\), mantendo sua forma e orientação, ou seja, faz-se uma cópia do objeto B centrado em cada ponto de A, como ilustrado na Figura~\ref{fig:soma-minkowski}.
 
 \begin{figure}[htb]
 	\centering
-	\includesvg[width=0.6\linewidth]{soma-minkowski-sem-interseccao}
+	\includesvg[width=\linewidth]{soma-minkowski}
 	\caption{Soma de Minkowski, entre os conjuntos A e B.}
-	\label{fig:soma-minkowski-sem-interseccao}
+	\label{fig:soma-minkowski}
 \end{figure}
 Uma propriedade muito útil da soma de Minkowski é o fato de que a soma de dois objetos convexos é um objeto convexo. Para um objeto A, usamos a notação $-A$ para denotar o reflexo de A sobre a origem O. A diferença de Minkowski $A-B$ pode ser obtida calculando a soma de Minkowski de A e $-B$
 $$
@@ -102,19 +102,12 @@ $$
 $$
 que pode ser pensado como um processo de varredura que calcula o vetor distância para cada ponto de $B$ em $A$. Neste trabalho, usaremos esse termo para referir a essa operação quando necessário.
 
-A diferença de Minkowski também é chamada de configuração do espaço de obstáculos (CSO, do inglês \textit{Configuration Space Obstacles}). Nesse espaço a distância entre os objetos A e B é igual à distância entre a origem O e o CSO, como ilustrado na Figura~\ref{fig:soma-minkowski-sem-interseccao}, que chamaremos de \textit{MinimumNormPoint(CSO)}. Logo, A e B se intersectam se, e somente se, sua CSO contém a origem~\cite{linahan2015geometricgjk}, ou seja:
+A diferença de Minkowski também é chamada de configuração do espaço de obstáculos (CSO, do inglês \textit{Configuration Space Obstacles}). Nesse espaço a distância entre os objetos A e B é igual à distância entre a origem O e o CSO, como ilustrado na Figura~\ref{fig:soma-minkowski}, que chamaremos de \textit{MinimumNormPoint(CSO)}. Logo, A e B se intersectam se, e somente se, sua CSO contém a origem~\cite{linahan2015geometricgjk}, ou seja:
 \begin{equation*}
 d(A,B) = \min_{c \in CSO} \| c \|.
 \end{equation*}
 
-Isso se deve ao fato de que se existe um ponto $p_A \subset A$ igual a $p_B \subset B$, então $p_A - p_B = \vec{0}$ é testemunha que há pelo menos um ponto que coincide com a origem O, compare a Figura~\ref{fig:soma-minkowski-com-interseccao} à Figura~\ref{fig:soma-minkowski-sem-interseccao}. Portanto, o problema de proximidade entre dois objetos reduz-se ao problema de encontrar o ponto de menor norma da diferença de Minkowski.
-
-\begin{figure}[htb]
-	\centering
-	\includesvg[width=0.6\linewidth]{soma-minkowski-com-interseccao}
-	\caption{Soma de Minkowski entre os conjuntos A e B em intersecção.}
-	\label{fig:soma-minkowski-com-interseccao}
-\end{figure}
+Isso se deve ao fato de que se existe um ponto $p_A \subset A$ igual a $p_B \subset B$, então $p_A - p_B = \vec{0}$ é testemunha que há pelo menos um ponto que coincide com a origem O, compare a Figura~\ref{fig:soma-minkowski} (a) e (b). Portanto, o problema de proximidade entre dois objetos reduz-se ao problema de encontrar o ponto de menor norma da diferença de Minkowski.
 
 \subsection*{Função suporte e ponto de suporte}
 
@@ -147,7 +140,7 @@ Um simplex (plural simpleces) é definido como um politopo de k+1 vértices em u
 	\label{fig:simplex}
 \end{figure}
 
-O teorema de Carathéodory em 2 dimensões afirma que podemos construir um triângulo usando pontos em $P$ que envolve qualquer ponto no interior do fecho convexo de $P$. Por exemplo, seja $P = {(0,0), (0,1), (1,0), (1,1)}$. O fecho convexo deste conjunto é um quadrado. Seja $x = (1/4, 1/4)$ no interior do fecho convexo de $P$. Podemos então construir um conjunto ${(0,0),(0,1),(1,0)} = P'$, cujo fecho convexo é um triângulo e envolve x, como ilustrado na Figura~\ref{fig:caratheodory}.~\cite{caratheodory_wikipedia}
+O teorema de Carathéodory em 2 dimensões afirma que podemos construir um triângulo usando pontos em $P$ que envolve qualquer ponto no interior do fecho convexo de $P$. Por exemplo, seja $P = {(0,0), (0,1), (1,0), (1,1)}$. O fecho convexo deste conjunto é um quadrado. Seja $x = (1/4, 1/4)$ no interior do fecho convexo de $P$. Podemos então construir um triangulo ${(0,0),(0,1),(1,0)} = P'$ que envolve x, como ilustrado na Figura~\ref{fig:caratheodory}.~\cite{caratheodory_wikipedia}
 \begin{figure}[htb]
 	\centering
 	\includegraphics[width=0.7\linewidth]{Caratheodorys_theorem_example.png}
@@ -157,61 +150,71 @@ O teorema de Carathéodory em 2 dimensões afirma que podemos construir um triâ
 
 \subsection*{O algoritmo}
 
-O algoritmo constrói iterativamente simplices dentro do CSO mais próximos da origem até que o simplex pare de mudar. O ponto $P$ de norma mínima dessas simplices serve como aproximações sucessivas para \textit{MinimumNormPoint(CSO)}.
+O algoritmo GJK constrói iterativamente simplex dentro do CSO (\textit{Configuration Space Obstacle}), cada vez mais próximos da origem, até que o simplex deixe de se alterar. O ponto $P$ de norma mínima pertencente a esses simplex fornece aproximações sucessivas para $\textit{MinimumNormPoint(CSO)}$, isto é, o ponto do CSO mais próximo da origem.
 
-Como todos os pontos retornados pela função suporte estão na borda da CSO e, portanto, se não pudermos adicionar um ponto além da origem ao longo de alguma direção, sabemos que a CSO não contém a origem. Isso aumenta as chances de o algoritmo sair rapidamente em casos de não interseção.
+Como todos os pontos retornados pela função suporte pertencem à fronteira do CSO, caso não seja possível encontrar um novo ponto que avance em direção à origem (isto é, que ultrapasse o plano ortogonal à direção de busca passando pela origem), conclui-se que a origem não pertence ao CSO. Isso implica que os objetos não se intersectam, permitindo a finalização antecipada do algoritmo em casos de não interseção.
 
-Para politopos, o GJK termina após um número finito de iterações. Para objetos curvos, um termo $\epsilon$ deve ser adicionado para evitar loops infinitos e limitar o erro entre a distância de separação calculada e real. 
+Para politopos convexos, o GJK termina após um número finito de iterações. Para objetos convexos com superfícies curvas, introduz-se um termo de tolerância $\epsilon$ a fim de evitar laços infinitos e limitar o erro entre a distância de separação calculada e a distância real.
 
 \begin{algorithm}[htb]
 	\caption{GJK}
-	\KwIn{Polígonos convexos A e B, direção inicial $\vec{d}$}
-	\KwOut{Distância euclidiana entre A e B}
+	\KwIn{Polígonos convexos $A$ e $B$, direção inicial $\vec{d}$}
+	\KwOut{Distância euclidiana entre $A$ e $B$}
 
-	S $\leftarrow S_A(\vec{d}) - S_B(-\vec{d})$ \\
-	Q $\leftarrow$ \{S\} \\
+	$S \leftarrow S_A(\vec{d}) - S_B(-\vec{d})$ \\
+	$Q \leftarrow \{S\}$ \\
 	$\vec{d} \leftarrow -S$ \\
 	
 	\While{iterações $<$ MAX\_ITER}{
-		S $\leftarrow S_A(\vec{d}) - S_B(-\vec{d})$ \\ 
-		\If{S $\cdot \vec{d} \leq \epsilon$ }{
+		$S \leftarrow S_A(\vec{d}) - S_B(-\vec{d})$ \\ 
+		
+		\If{$S \cdot \vec{d} \le \epsilon$}{
 			Pare
 		}
 
 		$Q \leftarrow Q \cup \{S\}$ \\
-		Q, $\vec{d}$, contem\_origem $\leftarrow$ NearestSimplex(Q) \\
-		\If{contem\_origem} {
-			\Return \textbf{0}
+		$Q$, $\vec{d} \leftarrow \text{NearestSimplex}(Q)$ \\
+
+		\If{$||P|| \le \epsilon$}{
+			\Return 0
 		}
 	}
 
-	\Return MinimumNormPoint(Q)
+	\Return $MinimumNormPoint(Q)$
 	\label{alg:gjk}
 \end{algorithm}
 
-O Algoritmo~\ref{alg:gjk} começa om um simplex Q com um ponto de suporte S numa direção aleatória do CSO (é comum ser escolhido a direção do centro de A para B). Então S é usado para gerar uma nova direção $\vec{d}$ oposta a S, isso é feito para maximizar a área do simplex e as chances de conter a origem. O loop principal consiste em três etapas principais: primeiro calcular um novo ponto de suporte na direção atual e verifica se esse ponto ultrapassou a origem, se sim a origem não pode estar contida no simplex Q, caso contrário adicionamos S ao simplex e atualiza Q para o simplex mais próximo da origem (NearestSimplex(Q)).
+O Algoritmo~\ref{alg:gjk} inicia com a construção de um simplex $Q$ contendo um ponto de suporte $S$ do CSO em uma direção inicial arbitrária (comumente escolhida como o vetor que liga o centro geométrico de $A$ ao centro geométrico de $B$). Em seguida, define-se a nova direção $\vec{d}$ como o vetor oposto a $S$, orientando a busca em direção à origem.
+
+O laço principal consiste em três etapas fundamentais. Primeiramente, calcula-se um novo ponto de suporte na direção atual $\vec{d}$. Caso o produto escalar $S \cdot \vec{d}$ não seja positivo (considerando a tolerância $\epsilon$), conclui-se que não há avanço em direção à origem, implicando que esta não pertence ao CSO e, portanto, que não há interseção entre os objetos.
+
+Caso contrário, o ponto $S$ é adicionado ao simplex $Q$. Em seguida, aplica-se o procedimento $\text{NearestSimplex}(Q)$, que determina o subconjunto convexo mínimo de $Q$ cujo fecho convexo contém o ponto mais próximo da origem, além de atualizar a direção de busca $\vec{d}$ para apontar desse ponto em direção à origem.
+
+Se, durante esse processo, for identificado que a origem pertence ao fecho convexo do simplex corrente, conclui-se que o CSO contém a origem e, consequentemente, que os objetos $A$ e $B$ se intersectam. Nesse caso, o algoritmo retorna distância zero. Caso contrário, o processo iterativo continua até que o critério de parada seja satisfeito.
 
 % \textbf{DEFINIR REGIÃO VORONOI}
 
 \subsection*{Subalgoritmo de distância de Ericson}
 
-A versão de \citeonline{ericson2004gjk} substituiu a versão algébrica de Johnson por uma geométrica, usando rotinas geométricas primitivas como \textit{ClosestPointOnEdgeToPoint()} e \textit{ClosestPointOnTriangleToPoint()}, que é implementado usando operações vetoriais. Apesar disso seu algoritmo é matematicamente equivalente ao de Johnson\cite{linahan2015geometricgjk}.
+A formulação apresentada por \citeonline{ericson2004gjk} substitui a abordagem algébrica original de Johnson por uma formulação geométrica baseada em testes utilizando regiões de Voronoi. Em vez de resolver sistemas algébricos para determinar coordenadas baricêntricas, a versão geométrica utiliza rotinas primitivas como \textit{ClosestPointOnEdgeToPoint()} e \textit{ClosestPointOnTriangleToPoint()}, implementadas por meio de operações vetoriais. Apesar da diferença na formulação, o algoritmo permanece matematicamente equivalente ao método de Johnson \cite{linahan2015geometricgjk}.
 
-Este subalgoritmo constroi iterativamente um simplex dentro da CSO que tenta incluir a origem. Se o simplex que construímos contém a origem, então podemos dizer que a CSO contém a origem, logo há interseção entre os dois objetos. Este subalgoritmo começa com um simplex inicial e o refina iterativamente adicionando pontos encontrados usando a função de suporte em uma direção que aponta para a origem. Esse processo continua até que a origem seja encontrada dentro do simplex, indicando uma colisão, ou até que se determine que a origem não está contida, o que significa que não há colisão.
+O subalgoritmo constrói iterativamente um simplex dentro do CSO e determina o ponto desse simplex mais próximo da origem. Caso a origem pertença ao fecho convexo do simplex, conclui-se que o CSO contém a origem e, portanto, há interseção entre os objetos.
+
+O procedimento inicia com um simplex inicial e o refina iterativamente, adicionando novos pontos obtidos pela função de suporte na direção que aponta para a origem. A cada iteração, determina-se qual subconjunto do simplex contém o ponto mais próximo da origem utilizando a decomposição do espaço em regiões de Voronoi.
 
 Para cada dimensão do simplex Q, o subalgoritmo de Ericson calcula se a origem está contida ou não no simplex usando regiões de Voronoi, remove pontos antigos do simplex e procura por uma nova direção que maximize as chances do próximo ponto de suporte conter a origem. Para cada dimensão é feito uma conta diferente, neste trabalho iremos trabalhar apenas com objetos em 2D, por isso trataremos apenas dos casos 1-simplex e 2-simplex. Para detalhar essa rotina usaremos uma conveção de nomear os pontos do simplex em ordem alfabética, com o ponto mais recente sendo A.
 
-Caso 0-simplex é o início do GJK e contém apenas um ponto $A$, adiciona-o ao simples Q e continua para a próxima iteração. Caso a iteração termine nesse passo, o ponto mais próximo da origem é o próprio ponto $A$.
+Caso 0-simplex, contém apenas o ponto $A$. A direção de busca é definida como $\vec{d} = -A$. Caso o algoritmo termine nesse passo, o ponto mais próximo da origem é o próprio $A$.
 
-Caso 1-simplex (\textit{ClosestPointOnEdgeToPoint()}) estamos trabalhando com um segmento de reta $\overline{AB}$. Isso divide o espaço em três regiões de Voronoi como ilustrado pela Figura: o espaço mais próximo de A, mais próximo de B e o espaço mais próximo de $\overline{AB}$. Se a origem estiver na região mais próxima de A, então jogamos fora o ponto B. Se estiver na região no lado mais próximo de B, então, mantemos B e jogamos A para fora. Caso contrário, deve estar mais próximo do próprio segmento de linha (na região central), e mantemos ambos A e B. ponto de suporte é buscado na direção normal ao segmento que aponta para a origem. 
+Caso 1-simplex (\textit{ClosestPointOnEdgeToPoint()}) estamos trabalhando com um segmento de reta $\overline{AB}$. Isso divide o espaço em três regiões de Voronoi como ilustrado pela Figura:  região de vértice $A$, região de vértice $B$ e região da aresta $\overline{AB}$. Se a origem estiver na região de $A$, remove-se o ponto $B$. Se estiver na região de $B$, remove-se o ponto $A$. Caso contrário, a origem encontra-se na região da aresta, mantendo-se ambos os pontos. O ponto de suporte é buscado na direção normal ao segmento que aponta para a origem. 
 
-Porém, a origem sempre estará contida na região de Voronoi do segmento $\overline{AB}$, pois, por construção os pontos de suporte A e B estão no limite do CSO. Logo, se a origem estivesse na região de A ou B isso seria um contradição, pois isso significaria que A ou B estão mais próximos da origem do que o segmento $\overline{AB}$, o que não é possível. Dessa forma, a próxima direção de busca apontando para origem é perpendicular ao segmento $\overline{AB}$.
+Porém, a origem sempre estará contida na região de Voronoi do segmento $\overline{AB}$, pois, por construção os pontos de suporte A e B estão no limite do CSO. Dessa forma, a próxima direção de busca apontando para origem é perpendicular ao segmento $\overline{AB}$.
 
-Caso a iteração termine nesse passo, o ponto mais próximo da origem é obtido projetando-se a origem sobre o segmento. Definindo:
+Caso a iteração termine nesse passo, o ponto mais próximo da origem é obtido projetando a origem sobre o segmento. Definindo:
 \begin{equation*}
 	\overline{AB} = B - A.
 \end{equation*}
-O parâmetro de projeção é
+O parâmetro de projeção da origem sobre o segmento é dado por:
 \begin{equation*}
 	t = \frac{-A \cdot \overline{AB}}{\overline{AB} \cdot \overline{AB}},
 \end{equation*}
@@ -225,7 +228,7 @@ e ponto mais próximo é
 	\end{cases}.
 \end{equation*}
 
-Caso 2-simplex (\textit{ClosestPointOnTriangleToPoint()}), temos um triangulo que divide o espaço em 7 regiões de Voronoi: regiões de vértice $V_A$, $V_B$, $V_C$, regiões de aresta $\overline{AB}, \overline{BC}, \overline{CA}$ e o interior $\triangle ABC$, como ilustrado na Figura~\ref{fig:gjk-ericson-voronoi}. Como estamos trabalhando em 2D, se a origem está contida no triângulo, então podemos afirmar que a distância entre A e B é zero. Caso contrário, dependendo de qual região ele cai, manteremos essa parte da figura e iteraremos novamente. Em 3D seria necessário manter todos os três pontos e considerar que a origem possa estar para cima ou para baixo do plano do triangulo. 
+Caso 2-simplex (\textit{ClosestPointOnTriangleToPoint()}), temos um triangulo que divide o espaço em 7 regiões de Voronoi: regiões de vértice $V_A$, $V_B$, $V_C$, regiões de aresta $\overline{AB}, \overline{BC}, \overline{CA}$ e o interior $\triangle ABC$, como ilustrado na Figura~\ref{fig:gjk-ericson-voronoi}. Como estamos trabalhando em 2D, se a origem está contida no triângulo, então podemos afirmar que a distância entre A e B é zero. Caso contrário, dependendo de qual região ele cai, manteremos essa parte da figura e iteraremos novamente. Em 3D seria necessário considerar a posição relativa da origem em relação ao plano do triângulo (para cima ou para baixo).
 
 \begin{figure}[htb]
 	\centering
@@ -253,4 +256,8 @@ No entanto, o processo de encontrar o simplex ideal elimina a necessidade de ver
 
 \subsection*{Boolean GJK}
 
-Dependendo do problema a ser resolvido, é possível modificar o GJK para apenas determinar se há ou não intersecção entre dois objetos A e B, conhecido como Boolean GJK (BGJK). Este algoritmo se baseia no fato de que A e B se intersectam se, e somente se, sua CSO contém a origem, desta forma o objetivo do GJK se reduz para determinar se a CSO contém ou não a origem. Neste trabalho foi implementado uma versão do BGJK apresentada por \citeonline{muratori2016implementingGJK} que é baseado nos avanços de \citeonline{gjk_enhanced} e Ericson.
+Dependendo do problema a ser resolvido, é possível modificar o GJK para resolver um problema de decisão e determinar se há ou não intersecção entre dois objetos A e B, conhecido como Boolean GJK (BGJK). Este algoritmo se baseia no fato de que A e B se intersectam se, e somente se, sua CSO contém a origem, desta forma o objetivo do GJK se reduz para determinar se a CSO contém ou não a origem. 
+
+Neste trabalho foi implementado uma versão do BGJK apresentada por \citeonline{muratori2016implementingGJK} que é baseado nos avanços de \citeonline{gjk_enhanced} e Ericson. Na formulação de Murotori, o simplex é manipulado com o objetivo exclusivo de verificar se ele contém a origem, testando regiões de Voronoi da mesma forma que Ericson.
+
+Seu critério de parada é mais simples: não há necessidade de calcular explicitamente o ponto mais próximo da origem nem de determinar coordenadas baricêntricas. O algoritmo termina quando a origem é encontrada dentro do simplex ou quando o simplex deixa de se alterar, indicando que a origem não pertence ao CSO. 
