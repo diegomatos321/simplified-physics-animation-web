@@ -10,44 +10,30 @@ export default function gjk(A: PolygonBody, B: PolygonBody): vec3[] | false {
 
     // initial search direction equals to the difference of the shapes center
     const d = vec3.subtract(vec3.create(), B.getCenter(), A.getCenter());
-    if (vec3.length(d) < TOLERANCE) {
-        vec3.set(d, 1, 0, 0); // Default direction if centers are identical
-    } else {
-        vec3.normalize(d, d);
-    }
 
     // get the first Minkowski Difference point
-    simplex.push(support(A, B, d));
+    let S = support(A, B, d)
+    simplex.push(S);
 
     // negate d for the next point
     vec3.negate(d, d);
 
     const MAX_ITERATIONS = 30;
     for (let i = 0; i < MAX_ITERATIONS; i++) {
-        const a = support(A, B, d);
+        S = support(A, B, d);
 
         // make sure that the last point we added actually passed the origin
-        if (vec3.dot(a, d) <= TOLERANCE) {
-            return false;
-        }
-
-        // // Check duplicate point (stuck case)
-        if (simplex.some((p) => vec3.sqrDist(p, a) < 1e-3)) {
+        if (vec3.dot(S, d) <= TOLERANCE) {
             return false;
         }
 
         // add a new point to the simplex because we haven't terminated yet
-        simplex.push(a);
+        simplex.push(S);
 
         // otherwise we need to determine if the origin is in
         // the current simplex
         if (containsOrigin(simplex, d)) {
             return simplex;
-        }
-
-        // // If direction is degenerate, stop
-        if (vec3.sqrLen(d) < TOLERANCE) {
-            return false;
         }
     }
 

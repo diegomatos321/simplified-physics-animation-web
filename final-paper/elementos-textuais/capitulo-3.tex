@@ -164,9 +164,14 @@ O teorema de Carathéodory em 2 dimensões afirma que podemos construir um triâ
 
 \subsection*{O algoritmo}
 
-O algoritmo GJK constrói iterativamente simplices $Q_1, Q_2, Q_3, ..., Q_n$ dentro do CSO (\textit{Configuration Space Obstacle}), até que chegar a um determinado simplex $Q_j = Q_{j+1}$. O ponto $P$ mais próximo da origem, pertencente a este simplex, constitui uma aproximação sucessivamente melhor da distância mínima entre os objetos.
+O algoritmo GJK constrói iterativamente simplices $Q_1, Q_2, Q_3, ..., Q_n$ dentro do CSO, até chegar a um determinado simplex $Q_j = Q_{j+1}$, determinando que não houve colisão. Alternativamente o ponto $P$ mais próximo da origem, pertencente a este simplex, constitui uma aproximação sucessivamente melhor da distância mínima entre os objetos, caso esteja suficientemente próximo de 0, então houve colisão.
 
-Como todos os pontos retornados pela função suporte pertencem à fronteira do CSO, caso não seja possível encontrar um novo ponto que avance em direção à origem (isto é, que ultrapasse o plano ortogonal à direção de busca passando pela origem), conclui-se que a origem não pertence ao CSO. Isso implica que os objetos não se intersectam, permitindo a finalização antecipada do algoritmo em casos de não interseção.
+O algoritmo tenta aproximar o simplex da origem procurando um ponto de suporte $\vec{S}$ usando a direção $\vec{d}$, que aponta de $P$ para a origem. Dessa forma:
+\begin{itemize}
+	\item Se $\vec{S} \cdot \vec{d} > 0$, então existe um ponto do CSO na direção da origem.
+	\item Se $\vec{S} \cdot \vec{d} = 0$, então o ponto de suporte é ortogonal à direção de busca, indicando que a origem está tangente ao CSO.
+	\item Se $\vec{S} \cdot \vec{d} < 0$, então o ponto mais extremo do CSO na direção $\vec{d}$ ainda está atrás da origem. Isso implica que todo CSO está no lado oposto da origem, permitindo a finalização antecipada do algoritmo em casos de não interseção.
+\end{itemize}
 
 \begin{algorithm}[htb]
 	\caption{GJK}
@@ -175,10 +180,10 @@ Como todos os pontos retornados pela função suporte pertencem à fronteira do 
 
 	$\vec{S} \leftarrow S_A(\vec{d}) - S_B(-\vec{d})$ \\
 	$Q \leftarrow \{\vec{S}\}$ \\
-	$\vec{P} \leftarrow 0$ \\
+	$\vec{P} \leftarrow \vec{S}$ \\
 	$\vec{d} \leftarrow -\vec{S}$ \\
 	
-	\While{$||\vec{P}|| \leq \epsilon$}{
+	\While{$||\vec{P}|| > \epsilon$}{
 		$\vec{S} \leftarrow S_A(\vec{d}) - S_B(-\vec{d})$ \\ 
 		
 		\If{$\vec{S} \cdot \vec{d} \le \epsilon$}{
@@ -197,9 +202,7 @@ O Algoritmo~\ref{alg:gjk} inicia com a construção de um simplex $Q$ contendo u
 
 O laço principal consiste em três etapas fundamentais. Primeiramente, calcula-se um novo ponto de suporte na direção atual $\vec{d}$. Caso adicionar o novo ponto de suporte não melhore a aproximação para origem, conclui-se que não há avanço em direção à origem. Introduz-se um termo de tolerância $\epsilon$ a fim de evitar laços infinitos e limitar o erro entre a distância de separação calculada e a distância real. Implicando que esta não pertence ao CSO e, portanto, que não há interseção entre os objetos.
 
-Caso contrário, o ponto $S$ é adicionado ao simplex $Q$. Em seguida, aplica-se o procedimento $\text{NearestSimplex}(Q)$, que determina o subconjunto convexo mínimo de $Q$ cujo fecho convexo contém o ponto mais próximo da origem, além de atualizar a direção de busca $\vec{d}$ para apontar desse ponto em direção à origem.
-
-Se, durante esse processo, for identificado que a origem pertence ao fecho convexo do simplex corrente, conclui-se que o CSO contém a origem e, consequentemente, que os objetos $A$ e $B$ se intersectam. Nesse caso, o algoritmo retorna distância zero. Caso contrário, o processo iterativo continua até que o critério de parada seja satisfeito.
+Caso contrário, o ponto $S$ é adicionado ao simplex $Q$. Em seguida, aplica-se o procedimento $\text{NearestSimplex}(Q)$, que determina o subconjunto convexo mínimo de $Q$ cujo fecho convexo contém o ponto mais próximo da origem, além de atualizar a direção de busca $\vec{d}$ para apontar de $\vec{P}$ à origem e de atualizar o ponto mais próximo $\vec{P}$.
 
 \subsection*{Diagrama de Voronoi}
 
