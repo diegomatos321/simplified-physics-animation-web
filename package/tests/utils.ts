@@ -44,11 +44,11 @@ export function exportCSV(metrics: Metrics, name: string) {
     }
 
     const header =
-        'particles,constraints,collisions_test,true_collisions,broadphase_time,narrowphase_time\n';
+        'particles,constraints,collisions_test,true_collisions,broadphase_time,narrowphase_time,dt\n';
     let rows = '';
     const rowsCount = metrics.particlesCount.length;
     for (let i = 0; i < rowsCount; i++) {
-        rows += `${metrics.particlesCount[i]},${metrics.constraintsCount[i]},${metrics.collisionsTest[i]},${metrics.trueCollisions[i]},${metrics.broadphaseTime[i]},${metrics.narrowphaseTime[i]}\n`;
+        rows += `${metrics.particlesCount[i]},${metrics.constraintsCount[i]},${metrics.collisionsTest[i]},${metrics.trueCollisions[i]},${metrics.broadphaseTime[i]},${metrics.narrowphaseTime[i]},${metrics.deltatime[i]}\n`;
     }
 
     writeFileSync(`${dir}/${name}.csv`, header + rows);

@@ -32,6 +32,7 @@ export interface Metrics {
     trueCollisions: number[];
     broadphaseTime: number[];
     narrowphaseTime: number[];
+    deltatime: number[];
 }
 
 export default class Engine {
@@ -48,6 +49,7 @@ export default class Engine {
         trueCollisions: [],
         broadphaseTime: [],
         narrowphaseTime: [],
+        deltatime: [],
     };
     public isPaused: boolean = false;
     public pauseOnCollision: boolean = false;
@@ -69,8 +71,11 @@ export default class Engine {
             return;
         }
 
+        const dtStart = performance.now();
+
         this.metrics.collisionsTest.push(0);
         this.metrics.trueCollisions.push(0);
+        this.metrics.deltatime.push(0);
         this.contactPairs.length = 0;
         this.collidersInfo.length = 0;
 
@@ -124,6 +129,8 @@ export default class Engine {
         }
 
         this.skip = false;
+
+        this.metrics.deltatime.push(performance.now() - dtStart);
     }
 
     /**

@@ -37,7 +37,7 @@ test('Collision detection – load experiment', () => {
 
         const testCase = testCases[i];
 
-        for (let objects = 1000; objects < 10_000; objects += 5000) {
+        for (let objects = 1000; objects < 10_000; objects += 1000) {
             const gridArea = testCase.worldBoundings ** 2;
             const gridSize = Math.sqrt(gridArea / (objects * 5));
 
