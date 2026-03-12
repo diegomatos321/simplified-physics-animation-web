@@ -75,7 +75,6 @@ export default class Engine {
 
         this.metrics.collisionsTest.push(0);
         this.metrics.trueCollisions.push(0);
-        this.metrics.deltatime.push(0);
         this.contactPairs.length = 0;
         this.collidersInfo.length = 0;
 

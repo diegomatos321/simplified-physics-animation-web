@@ -9,26 +9,26 @@ import Engine, {
 import * as utils from '../utils';
 
 const testCases = [
-    {
-        worldBoundings: 1000,
-        broadPhaseMode: BroadPhaseMode.Naive,
-        collisionDetection: CollisionDetectionMode.Sat,
-    },
-    {
-        worldBoundings: 1000,
-        broadPhaseMode: BroadPhaseMode.GridSpatialPartition,
-        collisionDetection: CollisionDetectionMode.Sat,
-    },
-    {
-        worldBoundings: 1000,
-        broadPhaseMode: BroadPhaseMode.Naive,
-        collisionDetection: CollisionDetectionMode.GjkEpa,
-    },
+    // {
+    //     worldBoundings: 1000,
+    //     broadPhaseMode: BroadPhaseMode.Naive,
+    //     collisionDetection: CollisionDetectionMode.Sat,
+    // },
     {
         worldBoundings: 1000,
         broadPhaseMode: BroadPhaseMode.GridSpatialPartition,
-        collisionDetection: CollisionDetectionMode.GjkEpa,
+        collisionDetection: CollisionDetectionMode.Sat,
     },
+    // {
+    //     worldBoundings: 1000,
+    //     broadPhaseMode: BroadPhaseMode.Naive,
+    //     collisionDetection: CollisionDetectionMode.GjkEpa,
+    // },
+    // {
+    //     worldBoundings: 1000,
+    //     broadPhaseMode: BroadPhaseMode.GridSpatialPartition,
+    //     collisionDetection: CollisionDetectionMode.GjkEpa,
+    // },
 ];
 
 test('Collision detection – load experiment', () => {
@@ -37,7 +37,7 @@ test('Collision detection – load experiment', () => {
 
         const testCase = testCases[i];
 
-        for (let objects = 1000; objects < 10_000; objects += 1000) {
+        for (let objects = 1000; objects <= 10_000; objects += 1000) {
             const gridArea = testCase.worldBoundings ** 2;
             const gridSize = Math.sqrt(gridArea / (objects * 5));
 
@@ -68,7 +68,6 @@ test('Collision detection – load experiment', () => {
                 engine.step(1 / 60);
             }
 
-            const now = new Date();
             let filename = 'collision-test';
             if (testCase.broadPhaseMode === BroadPhaseMode.Naive) {
                 filename += '-naive-mode';
@@ -87,6 +86,8 @@ test('Collision detection – load experiment', () => {
             ) {
                 filename += '-gjk-epa';
             }
+
+            const now = new Date();
             filename += `-${objects}-objects-${now.toISOString()}`;
 
             utils.exportCSV(engine.metrics, filename);

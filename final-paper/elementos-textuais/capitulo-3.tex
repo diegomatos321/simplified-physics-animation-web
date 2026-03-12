@@ -186,54 +186,46 @@ O algoritmo tenta aproximar o simplex da origem procurando um ponto de suporte $
 	\While{$||\vec{P}|| > \epsilon$}{
 		$\vec{S} \leftarrow S_A(\vec{d}) - S_B(-\vec{d})$ \\ 
 		
-		\If{$\vec{S} \cdot \vec{d} \le \epsilon$}{
-			Pare
+		\If{$\vec{S} \cdot \vec{d} \le \epsilon$}{ 
+			\tcp{A e B não se intersectam}
+			\Return $||P||$ 
 		}
 
 		$Q \leftarrow Q \cup \{\vec{S}\}$ \\
 		$Q$, $\vec{d}, \vec{P} \leftarrow \text{NearestSimplex}(Q)$ \\
 	}
 
-	\Return $||P||$
+	\Return $||P||$ \tcp{A e B se intersectam}
 	\label{alg:gjk}
 \end{algorithm}
 
 O Algoritmo~\ref{alg:gjk} inicia com a construção de um simplex $Q$ contendo um ponto de suporte $S$ do CSO em uma direção inicial arbitrária (comumente escolhida como o vetor que liga o centro geométrico de $A$ ao centro geométrico de $B$). Em seguida, define-se a nova direção $\vec{d}$ como o vetor oposto a $S$, orientando a busca em direção à origem.
 
-O laço principal consiste em três etapas fundamentais. Primeiramente, calcula-se um novo ponto de suporte na direção atual $\vec{d}$. Caso adicionar o novo ponto de suporte não melhore a aproximação para origem, conclui-se que não há avanço em direção à origem. Introduz-se um termo de tolerância $\epsilon$ a fim de evitar laços infinitos e limitar o erro entre a distância de separação calculada e a distância real. Implicando que esta não pertence ao CSO e, portanto, que não há interseção entre os objetos.
+O laço principal consiste em três etapas fundamentais. Primeiramente, calcula-se um novo ponto de suporte na direção atual $\vec{d}$. Caso adicionar o novo ponto de suporte não melhore a aproximação para origem, conclui-se que não há avanço em direção à origem. Introduz-se um termo de tolerância $\epsilon$ a fim de evitar laços infinitos e limitar o erro entre a distância de separação calculada e a distância real. Como a cada laço o ponto de suporte consulta um novo vértice, e há um número limitado de vértices a serem consumidos, então o algoritmo é garantido a terminar.
 
-Caso contrário, o ponto $S$ é adicionado ao simplex $Q$. Em seguida, aplica-se o procedimento $\text{NearestSimplex}(Q)$, que determina o subconjunto convexo mínimo de $Q$ cujo fecho convexo contém o ponto mais próximo da origem, além de atualizar a direção de busca $\vec{d}$ para apontar de $\vec{P}$ à origem e de atualizar o ponto mais próximo $\vec{P}$.
-
-\subsection*{Diagrama de Voronoi}
-
-Um diagrama Voronoi conhecido como uma tesselação de Voronoi ou partição Voronoi é uma estrutura geométrica que divide um determinado espaço nas regiões com base na distância a um conjunto dos pontos chamados ``sementes'' ou ``sítios''. Neste diagrama, cada região representa a área que está mais próxima de uma semente específica em comparação com qualquer outra semente em conjunto, como ilustrado na Figura~\ref{fig:voronoi}. 
-
-\begin{figure}[htb]
-	\centering
-	\includegraphics[width=0.7\linewidth]{regiao-voronoi.jpg}
-	\label{fig:voronoi}
-\end{figure}
+Caso contrário, o ponto $S$ é adicionado ao simplex $Q$. Em seguida, aplica-se o procedimento $\text{NearestSimplex}(Q)$, que determina o subconjunto convexo mínimo de $Q$ cujo fecho convexo contém o ponto mais próximo da origem, além de atualizar a direção de busca $\vec{d}$ para apontar de $\vec{P}$ à origem e de atualizar o ponto mais próximo $\vec{P}$. A complexidade assintótica de \textit{NearestSimplex} é constante e baixa, igual a cardinalidade de $Q$, que é no máximo 4 em 3D e 3 em 2D.
 
 \subsection*{Subalgoritmo de distância de Ericson}
 
-A formulação apresentada por \citeonline{ericson2004gjk} substitui a abordagem algébrica original de Johnson por uma formulação geométrica baseada em testes utilizando regiões de Voronoi. Em vez de resolver sistemas algébricos para determinar coordenadas baricêntricas, a versão geométrica utiliza rotinas primitivas como \textit{ClosestPointOnEdgeToPoint()} e \textit{ClosestPointOnTriangleToPoint()}, implementadas por meio de operações vetoriais. Apesar da diferença na formulação, o algoritmo permanece matematicamente equivalente ao método de Johnson \cite{linahan2015geometricgjk}.
+A formulação apresentada por \citeonline{ericson2004gjk} substitui a abordagem algébrica original de Johnson por uma formulação geométrica, simplificada, baseada em testes utilizando regiões. Apesar da diferença na formulação, o algoritmo permanece matematicamente equivalente ao método original de Johnson \cite{linahan2015geometricgjk}. O procedimento inicia com um simplex inicial e o refina iterativamente, adicionando novos pontos obtidos pela função de suporte na direção que aponta para a origem. A cada iteração, determina-se qual subconjunto do simplex contém o ponto mais próximo da origem utilizando a decomposição do espaço em regiões.
 
-O procedimento inicia com um simplex inicial e o refina iterativamente, adicionando novos pontos obtidos pela função de suporte na direção que aponta para a origem. A cada iteração, determina-se qual subconjunto do simplex contém o ponto mais próximo da origem utilizando a decomposição do espaço em regiões de Voronoi.
+Para cada dimensão do simplex Q, o subalgoritmo de Ericson calcula se a origem está contida ou não no simplex usando regiões, remove vértices antigos do simplex e procura por uma nova direção que maximize as chances do próximo ponto de suporte conter a origem. Para cada dimensão é feito uma análise, neste trabalho iremos trabalhar apenas com objetos em 2D, por isso trataremos apenas dos casos 1-simplex e 2-simplex. Para detalhar essa rotina usaremos uma conveção de chamar origem como $O$ e de nomear os vértices do simplex, que também são pontos de suporte do CSO, como $\vec{R} = \vec{OR} = \vec{R} - \vec{O}$, $\vec{S} = \vec{OS} = \vec{S} - \vec{O}$, $\vec{T} = \vec{OT} = \vec{T} - \vec{O}$, em ordem alfabética, com o ponto mais recente sendo $\vec{R}$.	
 
-Para cada dimensão do simplex Q, o subalgoritmo de Ericson calcula se a origem está contida ou não no simplex usando regiões de Voronoi, remove pontos antigos do simplex e procura por uma nova direção que maximize as chances do próximo ponto de suporte conter a origem. Para cada dimensão é feito uma conta diferente, neste trabalho iremos trabalhar apenas com objetos em 2D, por isso trataremos apenas dos casos 1-simplex e 2-simplex. Para detalhar essa rotina usaremos uma conveção de nomear os pontos do simplex em ordem alfabética, com o ponto mais recente sendo A.
+O caso 0-simplex é impossível, pois, como visto no Algoritmo~\ref{alg:gjk}, dentro do laço principal do GJK, o simplex é sempre atualizado com um novo ponto de suporte, e o simplex inicial já contém um ponto de suporte. Portanto, o simplex mínimo possível é um 1-simplex.
 
-Caso 0-simplex, contém apenas o ponto $A$. A direção de busca é definida como $\vec{d} = -A$. Caso o algoritmo termine nesse passo, o ponto mais próximo da origem é o próprio $A$.
-
-Caso 1-simplex (\textit{ClosestPointOnEdgeToPoint()}) estamos trabalhando com um segmento de reta $\overline{AB}$. Isso divide o espaço em três regiões de Voronoi como ilustrado pela Figura~\ref{fig:gjk-ericson-voronoi-1simplex}: região de vértice $A$, região de vértice $B$ e região da aresta $\overline{AB}$. Se a origem estiver na região de $A$, remove-se o ponto $B$. Se estiver na região de $B$, remove-se o ponto $A$. Caso contrário, a origem encontra-se na região da aresta, mantendo-se ambos os pontos. O ponto de suporte é buscado na direção normal ao segmento que aponta para a origem. 
+No caso 1-simplex temos os vetores $\vec{R}$ e $\vec{S}$ que dividem o espaço em três regiões, como ilustrado pela Figura~\ref{fig:gjk-ericson-1simplex}. A região do vértice $\vec{R}$ são todos os pontos anteriores ao vértice $\vec{R}$, similarmente a região do vértice $\vec{S}$ são todos os pontos anteriores ao vértice $\vec{S}$, e consequentemente a região da aresta $\vec{RS} = \vec{S} - \vec{R}$ são todos os pontos que estão no corredor entre $\vec{R}$ e $\vec{S}$. Se a origem estiver na região do vértice $\vec{R}$, remove-se o ponto $\vec{S}$. Se estiver na região do vértice $\vec{S}$, remove-se o ponto $\vec{R}$. Caso contrário, a origem encontra-se na região da aresta, mantendo-se ambos os pontos. A próxima direção de busca é escolhida perpendicularmente ao segmento $\vec{RS}$. O sinal dessa direção é definido de modo que o vetor normal $\vec{n}$ satisfaça
+\[
+\vec{n} \cdot \vec{RO} > 0,
+\]
+garantindo que a nova direção aponte para o lado que contém a origem. Entretanto, como as regiões de vértice estão no limite do CSO, se a origem estiver contida nas regiões de vértice então a origem está além do limite do CSO. Portanto, não há intersecção entre os objetos A e B. 
+% Entretanto, a origem deve estar contida na região da aresta $\vec{RS}$, pois, por construção os pontos de suporte $\vec{R}$ e $\vec{S}$ estão no limite do CSO. Caso contrário, não há intersecção entre os objetos A e B. Dessa forma, a próxima direção de busca apontando para origem é perpendicular ao segmento $\vec{RS}$, 
 
 \begin{figure}[htb]
 	\centering
-	\includesvg[width=0.7\linewidth]{gjk-ericson-voronoi-1simplex.svg}
-	\caption{Regiões de Voronoi para o caso 1-simplex.}
-	\label{fig:gjk-ericson-voronoi-1simplex}
+	\includesvg[width=\linewidth]{gjk-ericson-1simplex.svg}
+	\caption{Divisão de regiões para o caso 1-simplex.}
+	\label{fig:gjk-ericson-1simplex}
 \end{figure}
-
-Porém, a origem sempre estará contida na região de Voronoi do segmento $\overline{AB}$, pois, por construção os pontos de suporte A e B estão no limite do CSO. Dessa forma, a próxima direção de busca apontando para origem é perpendicular ao segmento $\overline{AB}$.
 
 Caso a iteração termine nesse passo, o ponto mais próximo da origem é obtido projetando a origem sobre o segmento. O parâmetro de projeção da origem sobre o segmento é dado por:
 \begin{equation*}
@@ -249,13 +241,13 @@ e ponto mais próximo é
 	\end{cases}.
 \end{equation*}
 
-Caso 2-simplex (\textit{ClosestPointOnTriangleToPoint()}), temos um triangulo que divide o espaço em 7 regiões de Voronoi: regiões de vértice $V_A$, $V_B$, $V_C$, regiões de aresta $\overline{AB}, \overline{BC}, \overline{CA}$ e o interior $\triangle ABC$, como ilustrado na Figura~\ref{fig:gjk-ericson-voronoi-2simplex}. Como estamos trabalhando em 2D, se a origem está contida no triângulo, então podemos afirmar que a distância entre A e B é zero. Caso contrário, dependendo de qual região ele cai, manteremos essa parte da figura e iteraremos novamente. Em 3D seria necessário considerar a posição relativa da origem em relação ao plano do triângulo (para cima ou para baixo).
+Caso 2-simplex (\textit{ClosestPointOnTriangleToPoint()}), temos um triangulo que divide o espaço em 7 regiões de Voronoi: regiões de vértice $V_A$, $V_B$, $V_C$, regiões de aresta $\overline{AB}, \overline{BC}, \overline{CA}$ e o interior $\triangle ABC$, como ilustrado na Figura~\ref{fig:gjk-ericson-2simplex}. Como estamos trabalhando em 2D, se a origem está contida no triângulo, então podemos afirmar que a distância entre A e B é zero. Caso contrário, dependendo de qual região ele cai, manteremos essa parte da figura e iteraremos novamente. Em 3D seria necessário considerar a posição relativa da origem em relação ao plano do triângulo (para cima ou para baixo).
 
 \begin{figure}[htb]
 	\centering
-	\includesvg[width=\linewidth]{gjk-ericson-voronoi-2simplex.svg}
+	\includesvg[width=\linewidth]{gjk-ericson-2simplex.svg}
 	\caption{Regiões de Voronoi para o caso 2-simplex.}
-	\label{fig:gjk-ericson-voronoi-2simplex}
+	\label{fig:gjk-ericson-2simplex}
 \end{figure}
 
 Os testes para dois tipos de região de Voronoi, região de Vértice ou região de Aresta seguem como:
@@ -272,6 +264,8 @@ Os testes para dois tipos de região de Voronoi, região de Vértice ou região 
 			\item $BO \cdot BA \ge 0$
 		\end{itemize}
 \end{enumerate}
+
+% INSERIR PSEUDOCODIGO
 
 No entanto, o processo de encontrar o simplex ideal elimina a necessidade de verificar quatro dessas regiões. Como o ponto de suporte C foi o primeiro a ser adicionado, B foi o segundo e A foi o terceiro. O ponto de suporte A foi adicionado como resultado de encontrar o vetor normal para $\overline{BC}$. Isso significa que a região de Voronoi $E_{BC}$, não pode conter a origem. As três regiões de Vértice também não podem conter a origem, uma vez que essas regiões estão além dos limites do CSO, que foram derivados dos pontos de suporte. Isso deixa apenas as regiões $E_{AC}$, $E_{AB}$ e $\triangle ABC$ para investigar.
 
