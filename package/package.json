@@ -51,8 +51,7 @@
         "seedrandom": "^3.0.5",
         "typescript": "~5.9.3",
         "vite": "^7.1.7",
-        "vite-tsconfig-paths": "^5.1.4",
-        "vitest": "^4.0.18"
+        "vite-tsconfig-paths": "^5.1.4"
     },
     "dependencies": {
         "earcut": "^3.0.2",
