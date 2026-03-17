@@ -3,21 +3,10 @@ import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { PolygonBody, RectangleBody, TriangleBody } from '../dist/bodies.js';
 export function generateBodies(count, worldDimensions, size) {
     const bodies = [];
-    const occupied = new Set();
 
-    while (bodies.length < count) {
-        const row = Math.floor((Math.random() * worldDimensions) / (2*size));
-        const col = Math.floor((Math.random() * worldDimensions) / (2*size));
-
-        const key = `${row}-${col}`;
-
-        if (occupied.has(key)) {
-            continue; // Skip if this cell is already occupied
-        }
-        occupied.add(key);
-
-        const x = col * 2*size + size/2 + (Math.random() - 0.5) * size; // Add some random offset to avoid perfect grid alignment
-        const y = row * 2*size + size/2 + (Math.random() - 0.5) * size; // Add some random offset to avoid perfect grid alignment
+    for (let i = 0; i < count; i++) {
+        const x = Math.random() * worldDimensions;
+        const y = Math.random() * worldDimensions;
 
         const type = Math.random();
         const isStatic = Math.random() < 0.2 ? true : false;
