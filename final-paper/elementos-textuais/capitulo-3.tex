@@ -9,7 +9,7 @@ Este capítulo introduz os principais conceitos utilizados no âmbito deste trab
 
 O Teorema do Eixo Separador é um dos métodos mais difundidos para detecção de colisão entre polígonos convexos. Além de identificar a presença ou ausência de interseção, o SAT também pode ser utilizado para calcular o vetor de translação mínima (MTV, do inglês \textit{Minimum Translation Vector}), útil para correções geométricas e resposta física.
 
-O SAT é um algoritmo genérico rápido que pode remover a necessidade de ter código de detecção de colisão para cada par tipo de forma, reduzindo assim o código e a manutenção. Ao traçar raios paralelos sob dois objetos (a partir de uma fonte luminosa, por exemplo) se as sombras formadas estiverem separadas então não há colisão, repita esse processo ao redor das formas, caso não encontre uma sombra que esteja separada uma da outra os objetos estão em colisão. O SAT se baseia no teorema geométrico que afirma:
+O SAT é um algoritmo genérico, rápido, que pode remover a necessidade de ter código de detecção de colisão para cada par tipo de forma, reduzindo assim o código e a manutenção. Seu funcionamento se baseia em traçar raios paralelos sob dois objetos (a partir de uma fonte luminosa, por exemplo) se as sombras formadas estiverem separadas então não há colisão, repita esse processo ao redor das formas, caso não encontre uma sombra que esteja separada uma da outra os objetos estão em colisão. O SAT se baseia no teorema geométrico que afirma:
 
 \begin{teorema}
 	Dois polígonos convexos $A$ e $B$ não se intersectam se, e somente se, existir um eixo (reta) sobre o qual as projeções de $A$ e $B$ não se sobrepõem.
@@ -43,8 +43,8 @@ O SAT pode ser estendido para calcular a penetração mínima. Caso todos os eix
 \begin{algorithm}[htb]
 	\caption{SAT com cálculo do MTV}
 	\KwIn{Polígonos convexos $A$ e $B$}
-	\KwOut{$\vec{d}$ e $\delta$, ou falso}
-	$\vec{d} \leftarrow \vec{0}$ \\
+	\KwOut{$\hat d$ e $\delta$, ou falso}
+	$\hat d \leftarrow \vec{0}$ \\
 	$\delta \leftarrow \infty$ \\
 	\ForEach{aresta $\hat{n}$ de A e B}{
 		$\hat{n} \leftarrow$ normal unitária de $\hat{n}$ \\
@@ -56,10 +56,10 @@ O SAT pode ser estendido para calcular a penetração mínima. Caso todos os eix
 		}
 		\If{$\Delta < \delta$}{
 			$\delta \leftarrow \Delta$ \\
-			$\vec{d} \leftarrow \hat{n}$
+			$\hat d \leftarrow \hat{n}$
 		}
 	}
-	\Return{$\vec{d}$, $\delta$}
+	\Return{$\hat d$, $\delta$}
 	\label{alg:sat_mtv}
 \end{algorithm},
 onde $\epsilon$ é um valor numérico para tratar erros de operação flutuante e deve-se ser um valor baixo. O método possui complexidade linear no número de arestas e é bastante eficiente para polígonos convexos em 2D. Em 3D, entretanto, o número de eixos candidatos cresce significativamente, reduzindo sua praticidade em relação a alternativas como o GJK.
@@ -70,7 +70,7 @@ O algoritmo de Gilbert-Johnson-Keerthi (GJK) é um algoritmo clássico para calc
 
 Originalmente o algoritmo permite calcular a distância mínima entre politopos convexos em $\mathbb{R}^m$, definidos pelo número de vértices em sua fronteira, com complexidade linear no número de vértices dos objetos. Para calcular a distância é usado o subalgoritmo de Johnson, que resolve um sistema de equações lineares para combinação de vértices, faces e arestas. O algoritmo de GJK é amplamente utilizado em motores físicos devido à sua eficiência e robustez, especialmente em ambientes tridimensionais~\cite{gjk}.
 
-Com o passar dos anos, o subalgoritmo de distância de Johnson foi substituído por outros mais sofisticados como, por exemplo, o subalgoritmo de Ericson apresentado na SIGGRAPH 2004~\cite{ericson2004gjk}. Este subalgoritmo se baseia numa abordagem geométrica ao invés de algébrica, com otimização usando regiões. Neste trabalho, detalharemos a versão aprimorada do GJK proposta por \citeonline{gjk_enhanced} que é capaz de tratar qualquer objeto convexo e o subalgoritmo de Ericson. 
+Com o passar dos anos, o subalgoritmo de distância de Johnson foi substituído por outros mais sofisticados como, por exemplo, o subalgoritmo de Ericson apresentado na SIGGRAPH 2004~\cite{ericson2004gjk}. Este subalgoritmo se baseia numa abordagem geométrica ao invés de algébrica, com otimização usando regiões. Neste trabalho, detalharemos a versão aprimorada do GJK proposta por \citeonline{gjk_enhanced}, que é capaz de tratar qualquer objeto convexo, e o subalgoritmo de Ericson. 
 
 \subsection*{Distância Euclidiana entre Conjuntos Convexos}
 
@@ -125,34 +125,34 @@ Isso se deve ao fato de que se existe um ponto $p_A \subset A$ igual a $p_B \sub
 
 \subsection*{Função suporte e ponto de suporte}
 
-Um ponto interessante do algoritmo é que não é necessário calcular explicitamente o CSO, apenas uma amostra do CSO, sob demanda, usando um mapeamento de suporte. Uma função de suporte é definida tal que: seja A um conjunto qualquer, o suporte de A na direção $\vec{d}$ retorna o ponto que pertence a superfície de A mais distante da origem na direção $\vec{d}$, esse ponto é chamado de ponto de suporte. \citeonline{gjk_enhanced} mostraram que é possível representar qualquer objeto convexo com a função suporte correta, como por exemplo:
+Um ponto interessante do algoritmo é que não é necessário calcular explicitamente o CSO, apenas uma amostra do CSO, sob demanda, usando um mapeamento de suporte. Uma função de suporte é definida tal que: seja A um conjunto qualquer, o suporte de A na direção de $\hat d$ retorna o ponto que pertence a superfície de A mais distante da origem na direção $\hat d$, esse ponto é chamado de ponto de suporte. \citeonline{gjk_enhanced} mostraram que é possível representar qualquer objeto convexo com a função suporte correta, como por exemplo:
 % \begin{align*}
-% 	\text{Politopo}&: S_A (\vec{d}) = \arg\max_{a \in A} (\vec d \cdot a), \\
+% 	\text{Politopo}&: S_A (\vec{d}) = \arg\max_{a \in A} (\hat d \cdot a), \\
 % 	\text{Esfera com raio R}&: S_A (\vec{d}) = O + R \vec{d}
 % \end{align*}
 
 \begin{align*}
 \text{Politopo:}&
-S_A(\vec d)
+S_A(\hat d)
 =
-\arg\max_{a \in A} (\vec d \cdot a),
+\arg\max_{a \in A} (\hat d \cdot a),
 \\[6pt]
 \text{Esfera de raio } r \text{ centrada em O }:&
-S_A(\vec d)
+S_A(\hat d)
 =
-O + r\frac{\vec d}{\|\vec d\|}.
+O + r \hat d
 \end{align*}
 
 Uma propriedade fundamental é que funções de suporte permitem realizar operações entre conjuntos convexos
 \begin{align*}
-	S_{A+B} (\vec{d}) &= S_A (\vec{d}) + S_B (\vec{d}) \\
-	S_{-A} (\vec{d}) &= -S_A (-\vec{d}).
+	S_{A+B} (\hat d) &= S_A (\hat d) + S_B (\hat d) \\
+	S_{-A} (\hat d) &= -S_A (-\hat d).
 \end{align*}
-Dessa forma, seja D a diferença de Minkowski de dois objetos convexos A e B, o suporte de D na direção $\vec{d}$ é a diferença dos suportes de A e B: $S_{A-B} (\vec{d}) = S_A (\vec{d}) - S_B (-\vec d)$, como ilustrado pela Figura~\ref{fig:support_function}. 
+Dessa forma, seja D a diferença de Minkowski de dois objetos convexos A e B, o suporte de D na direção $\hat d$ é a diferença dos suportes de A e B: $S_{A-B} (\hat d) = S_A (\hat d) - S_B (-\hat d)$, como ilustrado pela Figura~\ref{fig:support_function}. 
 \begin{figure}[htb]
 	\centering
 	\includesvg[width=0.6\linewidth]{support-function}
-	\caption{A função suporte na forma implícita $A - B$ ao longo da direção $\vec{d}$.}
+	\caption{A função suporte na forma implícita $A - B$ ao longo da direção $\hat d$.}
 	\label{fig:support_function}
 \end{figure}
 
@@ -178,44 +178,44 @@ O teorema de Carathéodory em 2 dimensões afirma que podemos construir um triâ
 
 O algoritmo GJK constrói iterativamente simplices $Q_1, Q_2, Q_3, ..., Q_n$ dentro do CSO, até chegar a um determinado simplex $Q_j = Q_{j+1}$, determinando que não houve colisão. Alternativamente o ponto $\vec{p}$ mais próximo da origem, pertencente a este simplex, constitui uma aproximação sucessivamente melhor da distância mínima entre os objetos, caso esteja suficientemente próximo de 0, então houve colisão.
 
-O algoritmo tenta aproximar o simplex da origem procurando um ponto de suporte $\vec{s}$ usando a direção $\vec{d}$, que aponta de $P$ para a origem. Dessa forma:
+O algoritmo tenta aproximar o simplex da origem procurando um ponto de suporte $\vec{s}$ usando a direção $\hat d$, que aponta de $P$ para a origem. Dessa forma:
 \begin{itemize}
-	\item Se $\vec{s} \cdot \vec{d} > 0$, então existe um ponto do CSO na direção da origem.
-	\item Se $\vec{s} \cdot \vec{d} = 0$, então o ponto de suporte é ortogonal à direção de busca, indicando que a origem está tangente ao CSO.
-	\item Se $\vec{s} \cdot \vec{d} < 0$, então mesmo o ponto mais extremo do CSO na direção $\vec d$ não ultrapassa a origem. Consequentemente, nenhum ponto do CSO pode estar além da origem nessa direção, implicando que a origem não pertence ao CSO e que os objetos $A$ e $B$ não se intersectam.
+	\item Se $\vec{s} \cdot \hat d > 0$, então existe um ponto do CSO na direção da origem.
+	\item Se $\vec{s} \cdot \hat d = 0$, então o ponto de suporte é ortogonal à direção de busca, indicando que a origem está tangente ao CSO.
+	\item Se $\vec{s} \cdot \hat d < 0$, então o ponto mais extremo do CSO na direção $\hat d$ não ultrapassa a origem. Consequentemente, nenhum ponto do CSO pode estar além da origem nessa direção, implicando que a origem não pertence ao CSO e que os objetos $A$ e $B$ não se intersectam.
 \end{itemize}
 
 \begin{algorithm}[htb]
 	\caption{GJK}
-	\KwIn{Polígonos convexos $A$ e $B$, direção inicial $\vec{d}$}
+	\KwIn{Polígonos convexos $A$ e $B$, direção inicial $\hat d$}
 	\KwOut{Distância euclidiana entre $A$ e $B$}
 
-	$\vec{s} \leftarrow S_A(\vec{d}) - S_B(-\vec{d})$ \\
+	$\vec{s} \leftarrow S_A(\hat d) - S_B(-\hat d)$ \\
 	$Q \leftarrow \{\vec{s}\}$ \\
 	$\vec{p} \leftarrow \vec{s}$ \\
-	$\vec{d} \leftarrow -\vec{s}$ \\
+	$\hat d \leftarrow -\vec{s}$ \\
 	
 	\While{$\|\vec{p}\| > \epsilon$}{
-		$\vec{s} \leftarrow S_A(\vec{d}) - S_B(-\vec{d})$ \\ 
+		$\vec{s} \leftarrow S_A(\hat d) - S_B(-\hat d)$ \\ 
 		
-		\If{$\vec{s} \cdot \vec{d} \le \epsilon$}{ 
+		\If{$\vec{s} \cdot \hat d \le \epsilon$}{ 
 			\tcp{A e B não se intersectam}
 			\Return $\|\vec{p}\|$ 
 		}
 
 		$Q \leftarrow Q \cup \{\vec{s}\}$ \\
-		$Q, \vec{d}, \vec{p} \leftarrow \text{NearestSimplex}(Q)$ \\
+		$Q, \hat d, \vec{p} \leftarrow \text{NearestSimplex}(Q)$ \\
 	}
 
 	\Return $\|\vec{p}\|$ \tcp{A e B se intersectam}
 	\label{alg:gjk}
 \end{algorithm}
 
-O Algoritmo~\ref{alg:gjk} inicia com a construção de um simplex Q contendo um ponto de suporte $s$ do CSO em uma direção inicial arbitrária (comumente escolhida como o vetor que liga o centro geométrico de A ao centro geométrico de B). Em seguida, define-se a nova direção $\vec{d}$ como o vetor oposto a $s$, orientando a busca em direção à origem.
+O Algoritmo~\ref{alg:gjk} inicia com a construção de um simplex Q contendo um ponto de suporte $\vec s$ do CSO em uma direção inicial arbitrária (comumente escolhida como o vetor que liga o centro geométrico de A ao centro geométrico de B). Em seguida, define-se a nova direção $\hat d$ como o vetor oposto a $\vec s$, orientando a busca em direção à origem.
 
-O laço principal consiste em três etapas fundamentais. Primeiramente, calcula-se um novo ponto de suporte na direção atual $\vec{d}$. Caso adicionar o novo ponto de suporte não melhore a aproximação para origem, conclui-se que não há avanço em direção à origem. Introduz-se um termo de tolerância $\epsilon$ a fim de evitar laços infinitos e limitar o erro entre a distância de separação calculada e a distância real. Como a cada laço o ponto de suporte consulta um novo vértice, e há um número limitado de vértices a serem consumidos, então o algoritmo é garantido a terminar.
+O laço principal consiste em três etapas fundamentais. Primeiramente, calcula-se um novo ponto de suporte na direção atual $\hat d$. Caso adicionar o novo ponto de suporte não melhore a aproximação para origem, conclui-se que não há avanço em direção à origem. Introduz-se um termo de tolerância $\epsilon$ a fim de evitar laços infinitos e limitar o erro entre a distância de separação calculada e a distância real. Como a cada laço o ponto de suporte consulta um novo vértice, e há um número limitado de vértices a serem consumidos, então o algoritmo é garantido a terminar.
 
-Caso contrário, o ponto $\vec s$ é adicionado ao simplex Q. Em seguida, aplica-se o procedimento $\text{NearestSimplex}(Q)$, que determina o subconjunto convexo mínimo de Q cujo fecho convexo contém o ponto mais próximo da origem, além de atualizar a direção de busca $\vec{d}$ para apontar de $\vec{p}$ à origem e de atualizar o ponto mais próximo $\vec{p}$. A complexidade assintótica de \textit{NearestSimplex} é constante e baixa, igual a cardinalidade de Q, que é no máximo 4 em 3D e 3 em 2D.
+Caso contrário, o ponto $\vec s$ é adicionado ao simplex Q. Em seguida, aplica-se o procedimento $\text{NearestSimplex}(Q)$, que determina o subconjunto convexo mínimo de Q cujo fecho convexo contém o ponto mais próximo da origem, além de atualizar a direção de busca $\hat d$ para apontar de $\vec{p}$ à origem e de atualizar o ponto mais próximo $\vec{p}$. A complexidade assintótica de \textit{NearestSimplex} é constante e baixa, igual a cardinalidade de Q, que é no máximo 4 em 3D e 3 em 2D.
 
 \subsection*{Subalgoritmo de distância de Ericson}
 
@@ -249,7 +249,7 @@ $$
 $$
 então a origem está na região associada ao vértice $S$. Caso contrário, a origem encontra-se na região da aresta $\vec{rs}$, como no Algoritmo~\ref{alg:ericson-1simplex}. A nova direção de busca deve ser perpendicular ao vetor $\vec{rs}$ e orientada em direção à origem. Essa direção pode ser obtida utilizando o produto triplo vetorial
 $$
-\vec d = (\vec{rs} \times \vec{ro}) \times \vec{rs}.
+\hat d = (\vec{rs} \times \vec{ro}) \times \vec{rs}.
 $$
 O produto triplo gera um vetor perpendicular a $\vec{rs}$ e contido no plano definido por $\vec{rs}$ e $\vec{ro}$, e orientado em direção à origem.
 % com sinal positivo caso a origem esteja a direita de $\vec{rs}$ ou negativo caso contrário. 
@@ -258,7 +258,7 @@ Entretanto, como as regiões de vértice estão no limite do CSO, se a origem es
 \begin{algorithm}[htb]
 	\caption{Caso 1-simplex}
 	\KwIn{Simplex $Q = \{\vec r, \vec s \}$}
-	\KwOut{Simplex Q, direção de busca $\vec{d}$ e ponto mais próximo $\vec{p}$}
+	\KwOut{Simplex Q, direção de busca $\hat d$ e ponto mais próximo $\vec{p}$}
 
 	$\vec{rs} \leftarrow \vec s - \vec r$ \\
 	$\vec{ro} \leftarrow -\vec r$ \\
@@ -273,10 +273,10 @@ Entretanto, como as regiões de vértice estão no limite do CSO, se a origem es
 		\Return Q, $\vec{so}$, $\vec s$ \tcp{Origem na região do vértice S}
 	}
 
-	$\vec d \leftarrow (\vec{rs} \times \vec{ro}) \times \vec{rs}$ \\
+	$\hat d \leftarrow (\vec{rs} \times \vec{ro}) \times \vec{rs}$ \\
 	$\vec{p} \leftarrow \text{Calcular ponto mais proximo}$
 
-	\Return Q, $\vec d$, $\vec{p}$ \tcp{Origem na região da aresta}
+	\Return Q, $\hat d$, $\vec{p}$ \tcp{Origem na região da aresta}
 	\label{alg:ericson-1simplex}
 \end{algorithm}
 
@@ -284,7 +284,7 @@ Caso a iteração termine nesse passo, o ponto mais próximo da origem é obtido
 $$
 t = \frac{(-\vec r) \cdot (\vec{rs})} {\|\vec{rs}\|^2}.
 $$
-e ponto mais próximo é
+e o ponto mais próximo é
 $$
 	\vec p =
 	\begin{cases}
@@ -294,7 +294,7 @@ $$
 	\end{cases}
 $$
 
-O caso 2-simplex, temos um triângulo que divide o espaço em 7 regiões: regiões do vértice $R$, $S$, $T$, regiões da aresta $\vec{rs}, \vec{st}, \vec{rt}$, que são todos os pontos que estão no corredor da aresta e anteriores ao seu vértice, e o interior $\triangle RST$, como ilustrado na Figura~\ref{fig:gjk-ericson-2simplex}. Como estamos trabalhando em 2D, se a origem está contida no triângulo, então podemos afirmar que os dois objetos se intersectam. Caso contrário, dependendo de qual região ele cai, manteremos essa parte da figura e iteraremos novamente, como no Algoritmo~\ref{alg:ericson-2simplex}. Em 3D seria necessário considerar a posição relativa da origem em relação ao plano do triângulo (para cima ou para baixo).
+O caso 2-simplex, temos um triângulo que divide o espaço em 7 regiões: regiões do vértice $R$, $S$, $T$, regiões da aresta $\vec{rs}, \vec{st}, \vec{rt}$, que são todos os pontos que estão no corredor da aresta e anteriores ao seu vértice, e o interior do $\triangle RST$, como ilustrado na Figura~\ref{fig:gjk-ericson-2simplex}. Como estamos trabalhando em 2D, se a origem está contida no triângulo, então podemos afirmar que os dois objetos se intersectam. Caso contrário, dependendo de qual região ele cai, manteremos essa parte da figura e iteraremos novamente, como no Algoritmo~\ref{alg:ericson-2simplex}. Em 3D seria necessário considerar a posição relativa da origem em relação ao plano do triângulo (para cima ou para baixo).
 \begin{figure}[htb]
 	\centering
 	\includesvg[width=\linewidth]{gjk-ericson-2simplex.svg}
@@ -302,7 +302,7 @@ O caso 2-simplex, temos um triângulo que divide o espaço em 7 regiões: regiõ
 	\label{fig:gjk-ericson-2simplex}
 \end{figure}
 
-No entanto, o processo de encontrar o simplex ideal elimina a necessidade de verificar quatro dessas regiões. Como o ponto de suporte $T$ foi o primeiro a ser adicionado, $S$ foi o segundo e $R$ foi o terceiro. O ponto de suporte $R$ foi adicionado como resultado de encontrar o vetor normal a aresta $\vec{st}$. Isso significa que a região da aresta $\vec{st}$, não pode conter a origem. As três regiões do vértice também não podem conter a origem, uma vez que essas regiões estão além dos limites do CSO, que foram derivados dos pontos de suporte. Isso deixa apenas as regiões $\vec{rs}$, $\vec{rt}$ e o $\triangle RST$ para investigar.
+No entanto, o processo de encontrar o simplex ideal elimina a necessidade de verificar quatro dessas regiões. Como o ponto de suporte $T$ foi o primeiro a ser adicionado, $S$ foi o segundo e $R$ foi o terceiro. O ponto de suporte $R$ foi adicionado como resultado de encontrar o vetor normal a aresta $\vec{st}$. Isso significa que a região da aresta $\vec{st}$, não pode conter a origem. As três regiões do vértice também não podem conter a origem, uma vez que essas regiões estão além dos limites do CSO, que foram derivados dos pontos de suporte. Isso deixa apenas as regiões $\vec{rs}$, $\vec{rt}$ e o interior do $\triangle RST$ para investigar.
 
 Dessa forma, para determinar em qual região do simplex a origem se encontra, analisam-se inicialmente as regiões associadas às arestas incidentes em $R$. O vetor normal ao plano do triângulo é obtido por
 $$
@@ -310,28 +310,28 @@ $$
 $$
 A direção perpendicular à aresta $\vec{rs}$ no plano do triângulo é dada por
 $$
-\vec d_1 = \vec n \times \vec{rs}.
+\hat d_1 = \vec n \times \vec{rs}.
 $$
 Se
 $$
-\vec d_1 \cdot \vec{ro} > 0,
+\hat d_1 \cdot \vec{ro} > 0,
 $$
 então a origem encontra-se na região associada à aresta $\vec{rs}$. Nesse caso o simplex é reduzido ao segmento $\{R,S\}$ e o algoritmo passa a executar o caso 1-simplex.
 
 De maneira análoga, define-se
 $$
-\vec d_2 = \vec{rt} \times \vec n.
+\hat d_2 = \vec{rt} \times \vec n.
 $$
 Se
 $$
-\vec d_2 \cdot \vec{ro} > 0
+\hat d_2 \cdot \vec{ro} > 0
 $$
 então a origem encontra-se na região associada à aresta $\vec{rt}$, e o simplex é reduzido ao segmento $\{R,T\}$ e o algoritmo passa a executar o caso 1-simplex. Se ambos os casos anteriores forem falso, a origem encontra-se no interior do triângulo.
 
 \begin{algorithm}[htb]
 	\caption{Caso 2-simplex}
 	\KwIn{Simplex $Q = \{\vec r, \vec s, \vec t\}$}
-	\KwOut{Simplex Q, direção de busca $\vec{d}$ e ponto mais próximo $\vec{p}$}
+	\KwOut{Simplex Q, direção de busca $\hat d$ e ponto mais próximo $\vec{p}$}
 
 	$\vec{rs} \leftarrow \vec s - \vec r$ \\
 	$\vec{rt} \leftarrow \vec t - \vec r$ \\
@@ -339,18 +339,18 @@ então a origem encontra-se na região associada à aresta $\vec{rt}$, e o simpl
 
 	$\vec n \leftarrow \vec{rs} \times \vec{rt}$ \\
 
-	$\vec d_1 \leftarrow \vec n \times \vec{rs}$ \\
+	$\hat d_1 \leftarrow \vec n \times \vec{rs}$ \\
 
-	\If{$\vec d_1 \cdot \vec{ro} > 0$}{
+	\If{$\hat d_1 \cdot \vec{ro} > 0$}{
 
 		$Q \leftarrow \{R,S\}$ \\
 
 		\Return executar Caso 1-Simplex($Q$) \tcp{Origem na região da aresta $\vec{rs}$}
 	}
 
-	$\vec d_2 \leftarrow \vec{rt} \times \vec n$ \\
+	$\hat d_2 \leftarrow \vec{rt} \times \vec n$ \\
 
-	\If{$\vec d_2 \cdot \vec{ro} > 0$}{
+	\If{$\hat d_2 \cdot \vec{ro} > 0$}{
 
 		$Q \leftarrow \{R,T\}$ \\
 
@@ -358,7 +358,7 @@ então a origem encontra-se na região associada à aresta $\vec{rt}$, e o simpl
 	}
 
 	\tcp{Há interseção, distância 0}
-	\Return Q, $\vec d$, 0
+	\Return Q, $\hat d$, 0
 	\label{alg:ericson-2simplex}
 \end{algorithm}
 
@@ -366,7 +366,7 @@ então a origem encontra-se na região associada à aresta $\vec{rt}$, e o simpl
 
 Dependendo do problema a ser resolvido, é possível modificar o GJK para resolver um problema de decisão e determinar se há ou não interseção entre dois objetos A e B, conhecido como Boolean GJK (BGJK). Este algoritmo se baseia no fato de que A e B se intersectam se, e somente se, sua CSO contém a origem. Desta forma o objetivo do GJK se reduz para determinar se a CSO contém ou não a origem. 
 
-Neste trabalho foi implementado uma versão do BGJK apresentada por \citeonline{muratori2016implementingGJK} que é baseado nos avanços de \citeonline{gjk_enhanced} e \citeonline{ericson2004gjk}. Na formulação de Murotori, o simplex é manipulado com o objetivo exclusivo de verificar se ele contém a origem, testando regiões da mesma forma que \citeonline{ericson2004gjk}. Seu critério de parada é mais simples: (1) não há necessidade de calcular explicitamente o ponto mais próximo da origem; (2) o caso 1-simplex sempre retorna Falso, pois, não tem como garantir que a origem está contida no CSO. O algoritmo termina quando a origem é encontrada dentro do simplex ou quando o simplex $Q_j = Q_{j+1}$, indicando que a origem não pertence ao CSO, como no Algoritmo. 
+Neste trabalho foi implementado uma versão do BGJK apresentada por \citeonline{muratori2016implementingGJK}, como o Algoritmo~\ref{alg:bgjk}, que é baseado nos avanços de \citeonline{gjk_enhanced} e \citeonline{ericson2004gjk}. Na formulação de Murotori, o simplex é manipulado com o objetivo exclusivo de verificar se ele contém a origem, testando regiões da mesma forma que \citeonline{ericson2004gjk}. Seu critério de parada é mais simples: (1) não há necessidade de calcular explicitamente o ponto mais próximo da origem; (2) a direção de busca não precisa estar normalizada pois sua escala não influencia o resultado; (3) o caso 1-simplex sempre retorna Falso, pois, não tem como garantir que a origem está contida no CSO. Veja o Algoritmo~\ref{alg:bgjk-1simplex} e~\ref{alg:bgjk-2simplex}. O algoritmo termina quando a origem é encontrada dentro do simplex ou quando o simplex $Q_j = Q_{j+1}$, indicando que a origem não pertence ao CSO, como no Algoritmo. 
 
 \begin{figure}[ht]
 	\centering
@@ -442,17 +442,17 @@ Neste trabalho foi implementado uma versão do BGJK apresentada por \citeonline{
 
 \begin{algorithm}[htb]
 	\caption{BGJK}
-	\KwIn{Polígonos convexos $A$ e $B$, direção inicial $\vec{d}$}
+	\KwIn{Polígonos convexos $A$ e $B$, direção inicial $\vec d$}
 	\KwOut{Verdadeiro se A e B se intersectam, falso caso contrário}
 
-	$\vec{s} \leftarrow S_A(\vec{d}) - S_B(-\vec{d})$ \\
+	$\vec{s} \leftarrow S_A(\vec d) - S_B(-\vec d)$ \\
 	$Q \leftarrow \{\vec{s}\}$ \\
-	$\vec{d} \leftarrow -\vec{s}$ \\
+	$\vec d \leftarrow -\vec{s}$ \\
 	
 	\While{True}{
-		$\vec{s} \leftarrow S_A(\vec{d}) - S_B(-\vec{d})$ \\ 
+		$\vec{s} \leftarrow S_A(\vec d) - S_B(-\vec d)$ \\ 
 		
-		\If{$\vec{s} \cdot \vec{d} \le 0$}{ 
+		\If{$\vec{s} \cdot \vec d \le 0$}{ 
 			\tcp{A e B não se intersectam}
 			\Return False 
 		}
@@ -466,6 +466,8 @@ Neste trabalho foi implementado uma versão do BGJK apresentada por \citeonline{
 			\Return True
 		}
 	}
+
+	\label{alg:bgjk}
 \end{algorithm}
 
 É possível modificar esse algoritmo para usar variáveis de controle adicionais e parar com antecedencia em caso a origem está contida em regiões de vértice. Neste trabalho foi preferido manter a formulação mais simples e se beneficiar da estrutura iterativa.

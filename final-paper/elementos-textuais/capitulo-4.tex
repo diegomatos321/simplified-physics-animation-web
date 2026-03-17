@@ -36,10 +36,10 @@ Para dois objetos convexos $A$ e $B$ em colisão, o esquema de detecção de col
 \subsection*{Colisão Vértice-Vértice}
 
 Se o contato ocorre pontualmente entre duas partículas $p$ e $q$, a correção é dividida igualmente (assumindo massas iguais):
-\begin{equation}
+$$
 	\Delta \vec{p} = -\frac{1}{2}\vec{d}, \qquad
 	\Delta \vec{q} = +\frac{1}{2}\vec{d}.
-\end{equation}
+$$
 
 \subsection*{Colisão Vértice-Aresta}
 
@@ -57,7 +57,7 @@ Esta é a configuração mais comum. Um vértice $p$ de um corpo colide contra u
 \end{equation}
 ou seja, quando $\alpha=0, p=x_2$, quando $\alpha=1, p=x_1$.
 
-Durante a separação, a correção $\Delta \vec{p}$ deve alterar indiretamente $\vec{x}_1$ e $\vec{x}_2$ de forma proporcional a essa parametrização. A partir da Eq.~\ref{eq:parametric_edge}, derivamos o valor de $\alpha$ calculando quanto o ponto de contato $p$ está ao ``longo'' da aresta que vai do ponto $\vec{x}_2 \rightarrow \vec{x}_1$. Dessa forma, \citeonline{jakobsen2001advanced} computa as novas posições movendo as partículas proporcionalmente a $\alpha$:
+Durante a separação, a correção $\Delta \vec{p}$ deve alterar indiretamente $\vec{x}_1$ e $\vec{x}_2$ de forma proporcional a essa parametrização. A partir da Eq.~\ref{eq:parametric_edge}, derivamos o valor de $\alpha$ calculando quanto o ponto de contato $p$ está ao ``longo'' da aresta $\vec{x_1 x_2} = \vec{x_2} - \vec{x_1}$. Dessa forma, \citeonline{jakobsen2001advanced} computa as novas posições movendo as partículas proporcionalmente a $\alpha$:
 \begin{align*}
 	\vec{x}_1 +&= \alpha \Delta_p \\
 	\vec{x}_2 +&= (1-\alpha) \Delta_p \\
@@ -74,9 +74,9 @@ Isso garante que a geometria original é preservada e que o ponto $\vec{p}$, def
 
 \section{Algoritmo de Expansão de Politopos (EPA)}
 
-Enquanto o SAT fornece naturalmente o MTV, o algoritmo BGJK apenas informa se há interseção (retornando um \textit{simplex} interno à diferença de Minkowski). Para obter a profundidade e a normal da colisão necessárias para a resposta física, utiliza-se o Algoritmo de Expansão de Politopos (EPA, do inglês \textit{Expanding Polytope Algorithm}).
+Enquanto o SAT fornece naturalmente o MTV, o algoritmo BGJK apenas informa se há interseção. Para obtermos mais informações necessárias para etapa de separação, o BGJK pode ser modificado para retornar o simplex final $Q$ em caso de colisão. Dessa forma, é possível usar este simplex para calcular a profundidade e a normal da colisão necessárias para a resposta física, utiliza-se o Algoritmo de Expansão de Politopos (EPA, do inglês \textit{Expanding Polytope Algorithm}).
 
-O Algoritmo~\ref{alg:epa} expande o \textit{simplex} final do BGJK iterativamente até encontrar a fronteira da diferença de Minkowski mais próxima da origem. A distância entre o ponto mais próximo com a origem é a profundidade de penetração. Além disso, o vetor normal para o ponto mais próximo é a direção de separação (ponto de contato). A solução ingênua é usar a normal da face mais próxima da origem, porém um \textit{simplex} não precisa conter nenhuma das faces do polígono original, o que pode levar ao cálculo de uma normal incorreta.
+O Algoritmo~\ref{alg:epa} expande o simplex final do BGJK iterativamente até encontrar a fronteira do CSO mais próxima da origem. A distância $\delta$ entre o ponto mais próximo com a origem é a profundidade de penetração. Além disso, o vetor normal $\hat n$ para o ponto mais próximo é a direção de separação (ponto de contato). A solução ingênua é usar a normal da face mais próxima da origem, porém um simplex não precisa conter nenhuma das faces do polígono original, o que pode levar ao cálculo de uma normal incorreta.
 \begin{algorithm}[htb]
 	\caption{EPA}
 	\KwIn{Simplex}

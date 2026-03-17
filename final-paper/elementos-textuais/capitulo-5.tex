@@ -76,7 +76,7 @@ OBBs geralmente oferecem melhor ajuste, especialmente para objetos alongados ou 
 
 \subsection*{Fecho Convexo}
 
-O Fecho Convexo (FC) de um conjunto finito de pontos p é definido como a menor região convexa que contém todos os pontos em p, sendo frequentemente utilizado como um objeto delimitador. Determinar o fecho convexo é um problema recorrente em computação geométrica, especialmente quando se deseja organizar pontos em estruturas mais simples ou acelerar operações posteriores, como testes de colisão.
+O fecho convexo de um conjunto finito de pontos $p$ é definido como a menor região convexa que contém todos os pontos em $p$, sendo frequentemente utilizado como um objeto delimitador. Determinar o fecho convexo é um problema recorrente em computação geométrica, especialmente quando se deseja organizar pontos em estruturas mais simples ou acelerar operações posteriores, como testes de colisão.
 
 Existem vários algoritmos, entre os quais o \textit{Quickhull} é um algoritmo bastante conhecido para o cálculo do fecho convexo de um conjunto finito de pontos em qualquer dimensão, adotando uma estratégia de divisão e conquista semelhante ao \textit{quicksort} \cite{barber1996quickhull}.
 
@@ -100,7 +100,7 @@ Apresenta complexidade média $O(n \log n)$ em 2D, podendo chegar a $O(n^2)$ em 
 \begin{figure}[htb]
     \centering
     \includegraphics[width=\textwidth]{quickhull_steps.jpg}
-    \caption{Etapas do quickhull Fonte: \cite{clustering_explanation2024}.}
+    \caption{Etapas do quickhull fonte: \cite{clustering_explanation2024}.}
     \label{fig:quickhull_2d}
 \end{figure}
 
@@ -114,7 +114,7 @@ As técnicas de partição espacial constituem um dos principais instrumentos da
 
 A literatura apresenta diversas estruturas de dados voltadas à organização espacial, incluindo abordagens hierárquicas como \textit{Quadtrees}, \textit{Octrees}, \textit{Binary Space Partitioning Trees} (BSP), \textit{K-d Trees} e \textit{Ball Trees}. As grades uniformes (\textit{Uniform Grids}) constituem um esquema muito usado de subdivisão espacial. 
 
-Uma grade uniforme subdivide o espaço em células de tamanho fixo e igual, associando cada objeto às células que sua caixa delimitadora intercepta, conforme ilustrado na Figura~\ref{fig:grade-uniforme}. Essa abordagem assume implicitamente que a escala dos objetos é relativamente homogênea, hipótese que influencia diretamente sua eficiência.
+Uma grade uniforme subdivide o espaço em células de tamanho fixo e igual, associando cada objeto às células que sua caixa delimitadora intercepta, conforme ilustrado na Figura~\ref{fig:grade-uniforme}. Dessa forma, reduz-se o número de testes de colisão de um contra todos para apenas os pares que compartilham células. Essa abordagem assume implicitamente que a escala dos objetos é relativamente homogênea, hipótese que influencia diretamente sua eficiência.
 
 \begin{figure}[htb]
 	\caption{Divisão espacial em grade uniforme}
@@ -155,7 +155,7 @@ Assim, a adoção de uma grade uniforme não constitui uma solução universal, 
 
 Ao término da Filtragem, obtém-se um conjunto $P$ de pares candidatos à colisão, com redução significativa do custo computacional em relação ao método quadrático. Ainda assim, no pior caso, quando muitos objetos se concentram em uma única célula, a complexidade pode degradar novamente para $O(n^2)$, evidenciando o caráter heurístico dessa etapa.
 
-A etapa de Refinamento realiza testes geométricos precisos nos pares de candidatos P, essa fase é chamada de Narrow Phase. Utiliza-se algoritmos mais sofisticados para determinar se os objetos estão de fato colidindo, como SAT, GJK e EPA, vistos anteriormente. Essa fase nem sempre é obrigatória pois, sua aplicação pode se tratar de objetos retangulares que caibam justamente nas dimensões de sua caixa delimitadora.
+A etapa de Refinamento realiza testes geométricos precisos nos pares de candidatos $P$, essa fase é chamada de Narrow Phase. Utiliza-se algoritmos mais sofisticados para determinar se os objetos estão de fato colidindo, como SAT, GJK e EPA, vistos anteriormente. Essa fase nem sempre é obrigatória pois, sua aplicação pode se tratar de objetos retangulares que caibam justamente nas dimensões de sua caixa delimitadora.
 
 \section{Como determinar o intervalo de integração da física}
 
@@ -169,7 +169,7 @@ A simulação física em aplicações interativas apresenta elevado custo comput
 
 Uma abordagem amplamente adotada consiste na separação conceitual entre as rotinas de renderização e simulação física. Enquanto a renderização é executada na thread principal, geralmente sincronizada com o ciclo de atualização visual por meio de mecanismos como \textit{requestAnimationFrame}, a simulação física pode ser executada em uma thread separada, utilizando \textit{Web Workers}. Essa separação reduz a probabilidade de bloqueios na interface e permite que o cálculo físico seja realizado de forma assíncrona em relação ao processo de desenho.
 
-Nesse modelo, a thread responsável pela simulação apenas escreve o estado físico mais atual e a renderização consome apenas o estado físico mais recente disponível, como ilustrado na Figura~\ref{fig:diagrama-threaded}.
+Neste trabalho foi implementando um modelo de separação da thread de renderização e simulação física para o artefato web. A thread responsável pela simulação apenas escreve o estado físico mais atual e a renderização consome apenas o estado físico mais recente disponível, como ilustrado na Figura~\ref{fig:diagrama-threaded}.
 
 \begin{figure}[htb]
 	\centering
@@ -180,11 +180,11 @@ Nesse modelo, a thread responsável pela simulação apenas escreve o estado fí
 
 A simulação física apresenta dependências de dados que dificultam sua paralelização completa. Na resolução de colisões e restrições, múltiplas interações podem envolver um mesmo corpo rígido ou partícula. Por exemplo, colisões entre os pares $(A,B)$ e $(B,C)$ compartilham o corpo $B$, o que exige coordenação cuidadosa para evitar inconsistências. No método de \citeonline{jakobsen2001advanced}, em particular, a ordem de aplicação das restrições influencia o resultado final, tornando a execução paralela ainda mais sensível a variações na ordem de processamento.
 
-Embora a execução da simulação em múltiplas threads pareça uma solução natural para aumentar o desempenho, a programação concorrente introduz uma série de desafios. Um dos principais problemas está relacionado à distribuição de carga (\textit{load balancing}). Em simulações físicas, o custo computacional não é uniforme: regiões do espaço com maior densidade de corpos exigem mais testes de colisão e mais iterações de resolução de restrições, enquanto regiões esparsas demandam pouco processamento. Como essa distribuição varia dinamicamente ao longo do tempo, torna-se difícil dividir o trabalho de forma equilibrada entre várias threads.
+Além disso, um dos principais problemas está relacionado à distribuição de carga (\textit{load balancing}). Em simulações físicas, o custo computacional não é uniforme: regiões do espaço com maior densidade de corpos exigem mais testes de colisão e mais iterações de resolução de restrições, enquanto regiões esparsas demandam pouco processamento. Como essa distribuição varia dinamicamente ao longo do tempo, torna-se difícil dividir o trabalho de forma equilibrada entre várias threads.
 
 Outro desafio fundamental refere-se à consistência dos dados. Em um ambiente multithread, diferentes threads podem acessar e modificar simultaneamente os mesmos estados físicos, como posições e orientações dos corpos. Essa situação pode levar a condições de corrida, resultados inconsistentes e instabilidade numérica. Em simulações físicas, utilizar estados parcialmente atualizados é particularmente problemático, pois pequenas inconsistências podem se propagar e amplificar ao longo das iterações.
 
-Além disso, a necessidade de mecanismos de sincronização, como travas (\textit{locks}), operações atômicas e barreiras, introduz sobrecarga adicional e pode reduzir significativamente os ganhos esperados com o paralelismo. Em muitos casos, o custo de sincronização supera o benefício obtido com a execução paralela, especialmente quando a granularidade das tarefas é fina, como na resolução individual de colisões.
+A necessidade de mecanismos de sincronização, como travas (\textit{locks}), operações atômicas e barreiras, introduz sobrecarga adicional e pode reduzir significativamente os ganhos esperados com o paralelismo. Em muitos casos, o custo de sincronização supera o benefício obtido com a execução paralela, especialmente quando a granularidade das tarefas é fina, como na resolução individual de colisões.
 
 Outro aspecto relevante é o não-determinismo introduzido pela execução concorrente. A ordem de escalonamento das threads pode variar entre execuções, levando a resultados físicos ligeiramente diferentes mesmo sob condições iniciais idênticas. Esse comportamento dificulta a depuração, a reprodução de simulações e a implementação de funcionalidades como \textit{replays} ou sincronização em aplicações distribuídas.
 
