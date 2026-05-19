@@ -20,10 +20,9 @@ Os objetos convexos são representados como listas de vértices ordenados, assoc
 
 Este trabalho disponibiliza uma implementação pública com o objetivo de permitir a reprodução dos experimentos e a extensão das técnicas apresentadas~\footnote{Disponível em: \url{https://github.com/devdiegomatos/simplified-physics-animation-web}}.
 
-% O código-fonte da biblioteca desenvolvida, bem como as aplicações de demonstração, encontram-se disponíveis em: \url{}.
 \section{Ambiente de Visualização}
 
-Com o objetivo de permitir a análise qualitativa do comportamento dos algoritmos, foram desenvolvidas duas aplicações interativas (\textit{demos})~\footnote{https://devdiegomatos.github.io/simplified-physics-animation-web/}, utilizando \textit{p5.js}
+Com o objetivo de permitir a análise qualitativa do comportamento dos algoritmos, foi desenvolvido um site em \textit{Vue.js 3} com duas \textit{demos}~\footnote{https://devdiegomatos.github.io/simplified-physics-animation-web/}, utilizando \textit{p5.js} para renderização do canvas. Vale ressaltar que a biblioteca é independente da visualização, as escolhas de \textit{Vue.js 3} e \textit{p5.js} foram apenas preferência do autor.
 
 A primeira demonstração consiste em um ambiente contendo múltiplos objetos convexos, com número de vértices variando de 3 e 8, inseridos em uma caixa com obstáculos. Esse cenário permite a observação da dinâmica de colisões em tempo real. A interface possibilita o controle de parâmetros relevantes, como a quantidade de objetos, o algoritmo de detecção de colisão (SAT ou GJK/EPA) e a estratégia de filtragem, incluindo o uso de uma grade uniforme. A Figura~\ref{fig:demo1} ilustra esse ambiente.
 

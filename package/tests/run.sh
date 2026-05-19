@@ -9,7 +9,7 @@ do
             echo "[benchmark] $bp mode + $np collision detection - $i objects"
 
             OUTPUT="results/mylib/$bp-$np-$i-objects.csv"
-            node benchmark.js  --broadphase=$bp --narrowphase=$np --objects=$i >> $OUTPUT
+            node benchmark.js --broadphase=$bp --narrowphase=$np --objects=$i >> $OUTPUT
 
             echo "Finished"
         done

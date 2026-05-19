@@ -185,8 +185,8 @@ Deve-se encontrar o movimento mínimo que satisfaça cada restrição, para rest
 	\caption{Relaxamento para restrição linear}
 	$\vec{\delta} \leftarrow \vec x_2 - \vec x_1$ \\
 	$c \leftarrow \frac{\|\vec{\delta}\| - d}{\|\vec{\delta}\|}$ \\
-	$\vec x_1 \leftarrow \vec x_1 - \epsilon \, \vec{\delta} \, c$ \\
-	$\vec x_2 \leftarrow \vec x_2 + \epsilon \, \vec{\delta} \, c$
+	$\vec x_1 \leftarrow \vec x_1 + \epsilon \, \vec{\delta} \, c$ \\
+	$\vec x_2 \leftarrow \vec x_2 - \epsilon \, \vec{\delta} \, c$
 	\label{al:linear_constraint}
 \end{algorithm}
 Onde $\epsilon$ representa o tamanho de passo local para convergência para solução ideal. Quando $\epsilon=1$ as partículas são movidas imediatamente para posição correta. Essa situação é comparável a um sistema de molas interconectadas entre partículas de rigidez que tendem para o infinito ou a uma haste rígida separando as duas partículas. 
