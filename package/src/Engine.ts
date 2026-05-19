@@ -136,7 +136,10 @@ export default class Engine {
         //         gridInitTime += end - start;
         //     }
         // }
+        const intStart = performance.now();
         this.integrate(dt);
+        const intEnd = performance.now();
+        integrationTime = intEnd - intStart;
         for (const body of this.bodies) {
             body.aabb = null;
             body._convexHull = null;
