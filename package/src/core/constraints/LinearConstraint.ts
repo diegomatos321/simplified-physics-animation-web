@@ -19,21 +19,19 @@ export default class LinearConstraint extends IConstraint {
             this.p0.position,
         );
         const deltalength = vec3.length(delta);
-        const diff =
-            (deltalength - this.restlength) /
-            (deltalength * (this.p0.invmass + this.p1.invmass));
+        const diff = (deltalength - this.restlength) / deltalength;
 
         const vel1 = vec3.scale(
             vec3.create(),
             delta,
-            this.p0.invmass * diff * this.restitution,
+            diff * this.restitution,
         );
         this.p0.move(vel1);
 
         const vel2 = vec3.scale(
             vec3.create(),
             delta,
-            -this.p1.invmass * diff * this.restitution,
+            -diff * this.restitution,
         );
         this.p1.move(vel2);
     }

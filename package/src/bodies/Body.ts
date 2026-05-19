@@ -24,11 +24,6 @@ export default abstract class Body {
         Body.nextId++;
     }
 
-    abstract triangulation(): {
-        uvs: [number, number][];
-        indices: number[];
-    };
-
     public getAABB(): AABB {
         if (this.aabb) {
             return this.aabb;

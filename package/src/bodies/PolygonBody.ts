@@ -1,4 +1,3 @@
-import earcut from 'earcut';
 import { vec3 } from 'gl-matrix';
 
 import type IConstraint from '../core/constraints/IConstraint';
@@ -62,40 +61,6 @@ export default class PolygonBody extends Body {
         }
 
         return new PolygonBody(particles, restitution, isStatic);
-    }
-
-    triangulation(): { uvs: [number, number][]; indices: number[] } {
-        const convexHull = this.convexHull(); // Automatic UV Generation via Bounding Box
-
-        let minX = Infinity,
-            minY = Infinity,
-            maxX = -Infinity,
-            maxY = -Infinity;
-
-        for (const particle of convexHull.particles) {
-            minX = Math.min(minX, particle.position[0]);
-            minY = Math.min(minY, particle.position[1]);
-            maxX = Math.max(maxX, particle.position[0]);
-            maxY = Math.max(maxY, particle.position[1]);
-        }
-
-        const uvs: [number, number][] = convexHull.particles.map((particle) => {
-            const x = particle.position[0];
-            const y = particle.position[1];
-
-            return [(x - minX) / (maxX - minX), (y - minY) / (maxY - minY)];
-        }); // Automatic Triangulation with Earcut
-
-        const flattened_vertices = convexHull.particles
-            .map((p) => [p.position[0], p.position[1]])
-            .flat();
-
-        const indices = earcut(flattened_vertices);
-
-        return {
-            uvs,
-            indices,
-        };
     }
 
     // The convex of a polygon is itself

@@ -99,37 +99,6 @@ export default class TrellisBody extends Body {
         this.constraintsIndices = constraintsIndices;
     }
 
-    triangulation() {
-        const uvs: [number, number][] = [];
-
-        const cols = this.nx + 1,
-            rows = this.ny + 1;
-        for (let j = 0; j < rows; j++) {
-            for (let i = 0; i < cols; i++) {
-                const u = i / (cols - 1);
-                const v = j / (rows - 1);
-                uvs.push([u, v]);
-            }
-        }
-
-        const indices: number[] = [];
-        for (let j = 0; j < rows - 1; j++) {
-            for (let i = 0; i < cols - 1; i++) {
-                // compute indices of the 4 corners of the cell
-                const v0 = j * cols + i;
-                const v1 = j * cols + (i + 1);
-                const v2 = (j + 1) * cols + i;
-                const v3 = (j + 1) * cols + (i + 1);
-
-                // two triangles per quad
-                indices.push(v0, v1, v2); // lower-left triangle
-                indices.push(v1, v3, v2); // upper-right triangle
-            }
-        }
-
-        return { uvs, indices };
-    }
-
     // Compute the convex hull of the body using quickhull algorithm
     convexHull(): PolygonBody {
         if (this._convexHull) {
