@@ -95,7 +95,7 @@ for (let i = 0; i < rowsCount; i++) {
         }
         row += `${metrics[key][i]},`;
     }
-    rows += row + '\n';
+    rows += row.slice(0, -1) + '\n';
 }
 
 const header = keys.join(',') + '\n';
